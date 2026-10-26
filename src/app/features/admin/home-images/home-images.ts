@@ -13,6 +13,7 @@ import { Field } from '../../../shared/components/field/field';
 import { protectUnsavedChanges } from '../../../core/guards/unsaved-changes.guard';
 import { importHomeImages, type DriveImportResult } from './drive-import';
 import { translateHomeImage } from './translate-home-image';
+import { processHomeImages, type HomeImageBulkAction, type HomeImageBulkResult } from './bulk-home-images';
 
 @Component({
   imports: [PageHeader, Button, State, ImageCard, Dialog, ResourceForm, FormsModule, Field],
@@ -36,6 +37,15 @@ export class HomeImages implements OnInit {
   readonly deleteTarget = signal<TravelRecord | null>(null);
   readonly deleting = signal(false);
   readonly deleteError = signal('');
+  readonly checkedIds = signal<ReadonlySet<string>>(new Set());
+  readonly selectionMode = signal(false);
+  readonly checkedRecords = computed(() => this.records().filter(record => this.checkedIds().has(record.id)));
+  readonly allChecked = computed(() => this.records().length > 0 && this.checkedRecords().length === this.records().length);
+  readonly bulkDeletingOpen = signal(false);
+  readonly bulkBusy = signal(false);
+  readonly bulkProgress = signal<{completed: number; total: number} | null>(null);
+  readonly bulkResult = signal<HomeImageBulkResult | null>(null);
+  readonly actionsLocked = computed(() => this.loading() || this.importing() || this.saving() || this.translating() || this.deleting() || this.bulkBusy());
   readonly translationsOpen = signal(false);
   readonly savedTranslations = computed(() => this.languages()
     .filter(language => language.codigo !== 'es')
@@ -54,7 +64,7 @@ export class HomeImages implements OnInit {
   readonly importProgress = signal<{completed: number; total: number} | null>(null);
   private readonly pendingImport = protectUnsavedChanges(
     () => this.editorOpen() && !!this.editor()?.hasChanges(),
-    () => this.importing() || this.translating() || this.saving() || this.deleting(),
+    () => this.importing() || this.translating() || this.saving() || this.deleting() || this.bulkBusy(),
   );
   canDeactivate() { return this.pendingImport.confirm(); }
   readonly fields = computed<FieldDefinition[]>(() => [
@@ -63,8 +73,60 @@ export class HomeImages implements OnInit {
     {key: 'activo', label: 'Mostrar en el inicio', type: 'checkbox'},
   ]);
   canEdit() { return this.data.auth.hasPermission('destinos.edit'); }
+  toggleSelectionMode() {
+    if (!this.canEdit() || this.actionsLocked() || this.bulkDeletingOpen()) return;
+    this.selectionMode.update(enabled => !enabled);
+    this.checkedIds.set(new Set());
+  }
+  toggleChecked(id: string) {
+    if (!this.canEdit() || !this.selectionMode() || this.actionsLocked() || this.bulkDeletingOpen()) return;
+    this.checkedIds.update(ids => { const next = new Set(ids); if (next.has(id)) next.delete(id); else next.add(id); return next; });
+  }
+  selectAll() {
+    if (!this.canEdit() || this.actionsLocked() || this.bulkDeletingOpen()) return;
+    this.checkedIds.set(new Set(this.records().map(record => record.id)));
+  }
+  clearSelection() {
+    if (!this.canEdit() || this.actionsLocked() || this.bulkDeletingOpen()) return;
+    this.checkedIds.set(new Set());
+  }
+  requestBulkDelete() {
+    if (!this.canEdit() || this.actionsLocked() || !this.checkedRecords().length || this.editorOpen() || this.importOpen() || this.deleteTarget()) return;
+    this.bulkResult.set(null);
+    this.bulkDeletingOpen.set(true);
+  }
+  closeBulkDelete() { if (!this.bulkBusy()) this.bulkDeletingOpen.set(false); }
+  async runBulk(action: HomeImageBulkAction) {
+    if (!this.canEdit() || this.actionsLocked() || this.editorOpen() || this.importOpen() || this.deleteTarget() || !this.checkedRecords().length) return;
+    if ((action === 'delete') !== this.bulkDeletingOpen()) return;
+    const images = this.checkedRecords().map(record => ({id: record.id, title: record.title, active: !!record.raw['activo']}));
+    this.bulkBusy.set(true);
+    this.bulkResult.set(null);
+    this.pendingImport.sync();
+    try {
+      const result = await processHomeImages(images, action, async (id, operation) => {
+        if (!this.canEdit()) throw new Error('No tienes permiso para modificar imágenes.');
+        if (operation === 'delete') await this.data.legacy.eliminarImagenFondoAdmin(id);
+        else await this.data.legacy.actualizarEstadoImagenFondoAdmin(id, operation === 'activate');
+      }, (completed, total) => this.bulkProgress.set({completed, total}));
+      const succeeded = new Set(result.succeeded);
+      this.records.update(records => action === 'delete'
+        ? records.filter(record => !succeeded.has(record.id))
+        : records.map(record => succeeded.has(record.id) ? {...record, status: action === 'activate' ? 'Activo' : 'Inactivo', raw: {...record.raw, activo: action === 'activate'}} : record));
+      this.checkedIds.set(new Set(result.failed.map(failure => failure.id)));
+      this.bulkResult.set(result);
+      this.bulkDeletingOpen.set(false);
+      this.data.invalidate();
+      if (result.failed.length) this.toast.warning('La operación terminó con errores. Las imágenes fallidas siguen seleccionadas para reintentar.');
+      else this.toast.success('La operación se completó correctamente.');
+    } finally {
+      this.bulkBusy.set(false);
+      this.bulkProgress.set(null);
+      this.pendingImport.sync();
+    }
+  }
   requestDelete(record: TravelRecord) {
-    if (!this.canEdit() || this.loading() || this.importing() || this.saving() || this.deleting() || this.editorOpen()) return;
+    if (!this.canEdit() || this.actionsLocked() || this.bulkDeletingOpen() || this.editorOpen()) return;
     this.deleteError.set('');
     this.deleteTarget.set(record);
   }
@@ -73,13 +135,14 @@ export class HomeImages implements OnInit {
   }
   async confirmDelete() {
     const record = this.deleteTarget();
-    if (!record || !this.canEdit() || this.deleting() || this.saving() || this.importing()) return;
+    if (!record || !this.canEdit() || this.actionsLocked()) return;
     this.deleting.set(true);
     this.deleteError.set('');
     this.pendingImport.sync();
     try {
       await this.data.legacy.eliminarImagenFondoAdmin(Number(record.id));
       this.records.update(records => records.filter(image => image.id !== record.id));
+      this.checkedIds.update(ids => new Set([...ids].filter(id => id !== record.id)));
       this.data.invalidate();
       this.deleteTarget.set(null);
       this.toast.success('La imagen se eliminó de Trotapie. El archivo de Google Drive se conserva.');
@@ -92,14 +155,14 @@ export class HomeImages implements OnInit {
     }
   }
   openDriveImport() {
-    if (!this.canEdit() || this.loading() || this.saving() || this.importing() || this.editorOpen() || this.deleting() || this.deleteTarget()) return;
+    if (!this.canEdit() || this.actionsLocked() || this.bulkDeletingOpen() || this.editorOpen() || this.deleteTarget()) return;
     this.importOpen.set(true);
   }
   closeDriveImport() {
     if (!this.importing()) this.importOpen.set(false);
   }
   async importDrive() {
-    if (!this.canEdit() || !this.importOpen() || this.importing() || this.saving() || this.editorOpen() || this.loading() || !this.driveFolder.trim()) return;
+    if (!this.canEdit() || !this.importOpen() || this.actionsLocked() || this.bulkDeletingOpen() || this.editorOpen() || !this.driveFolder.trim()) return;
     this.importing.set(true);
     this.pendingImport.sync();
     this.importError.set('');
@@ -128,21 +191,30 @@ export class HomeImages implements OnInit {
       this.data.invalidate();
       await this.load();
       this.importing.set(false);
+      if (this.importResult() && !this.importResult()!.failed.length && !this.importError()) {
+        this.driveFolder = '';
+        this.importResult.set(null);
+        this.importProgress.set(null);
+        this.importError.set('');
+        this.importOpen.set(false);
+      }
       this.pendingImport.sync();
     }
   }
   ngOnInit() { void this.load(); }
   async load() {
+    if (this.bulkBusy() || this.deleting() || this.bulkDeletingOpen()) return;
     this.loading.set(true); this.error.set('');
     try {
       const [images, languages] = await Promise.all([this.data.legacy.obtenerImagenesFondoAdmin(), this.data.legacy.obtenerIdiomasAdmin()]);
       this.languages.set(languages);
       this.records.set(images.map(image => ({id: String(image.id), title: image.nombre_destino || 'Sin nombre', subtitle: 'Imagen del inicio', image: image.url_imagen, status: image.activo ? 'Activo' : 'Inactivo', raw: image})));
+      this.checkedIds.update(ids => new Set([...ids].filter(id => this.records().some(record => record.id === id))));
     } catch (error) { this.error.set(error instanceof Error ? error.message : 'No pudimos cargar las imágenes del inicio.'); }
     finally { this.loading.set(false); }
   }
   open(record: TravelRecord | null) {
-    if (!this.canEdit() || this.importing() || this.saving() || this.translating() || this.deleting() || this.deleteTarget()) return;
+    if (!this.canEdit() || this.actionsLocked() || this.bulkDeletingOpen() || this.deleteTarget()) return;
     this.selected.set(record); this.editorError.set('');
     this.translationsOpen.set(false);
     const value: Row = record ? {...record.raw} : {activo: true};
@@ -153,7 +225,7 @@ export class HomeImages implements OnInit {
     if (this.pendingImport.confirm()) this.editorOpen.set(false);
   }
   async save(value: Row) {
-    if (!this.canEdit() || this.saving() || this.importing() || this.translating()) return;
+    if (!this.canEdit() || this.actionsLocked() || this.bulkDeletingOpen()) return;
     this.saving.set(true); this.editorError.set('');
     this.pendingImport.sync();
     try {

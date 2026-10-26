@@ -1,8 +1,9 @@
 <tp-page-header title="Imágenes del inicio" eyebrow="Trotapie / Contenido" backTo="/admin/dashboard" description="Gestiona las fotografías del inicio y de Lugares para inspirar. La portada se elige al azar entre las imágenes activas; las primeras tres activas aparecen en las tarjetas.">
-  <button tpButton icon="refresh" [busy]="loading()" [disabled]="importing() || saving() || deleting()" (click)="load()">Actualizar</button>
+  <button tpButton icon="refresh" [busy]="loading()" [disabled]="actionsLocked() || bulkDeletingOpen()" (click)="load()">Actualizar</button>
   @if(canEdit()){
-    <button tpButton icon="download" (click)="openDriveImport()" [disabled]="loading() || importing() || saving() || !!error()">Importar desde Drive</button>
-    <button tpButton variant="primary" icon="plus" (click)="open(null)" [disabled]="loading() || importing() || saving() || !!error()">Agregar imagen</button>
+    <button tpButton type="button" [icon]="selectionMode() ? 'close' : 'check'" [attr.aria-pressed]="selectionMode()" [disabled]="actionsLocked() || bulkDeletingOpen() || !!error() || !records().length" (click)="toggleSelectionMode()">{{selectionMode() ? 'Cancelar selección' : 'Seleccionar imágenes'}}</button>
+    <button tpButton icon="download" (click)="openDriveImport()" [disabled]="actionsLocked() || bulkDeletingOpen() || !!error()">Importar desde Drive</button>
+    <button tpButton variant="primary" icon="plus" (click)="open(null)" [disabled]="actionsLocked() || bulkDeletingOpen() || !!error()">Agregar imagen</button>
   }
 </tp-page-header>
 @if(canEdit()){
@@ -34,12 +35,38 @@
 @if(loading()){<tp-state mode="loading"/>}
 @else if(error()){<tp-state mode="error" [message]="error()" (retry)="load()"/>}
 @else {
+  @if(canEdit() && selectionMode() && records().length){
+    <section class="bulk-toolbar" aria-label="Selección y acciones de imágenes" [attr.aria-busy]="bulkBusy()">
+      <label class="select-all"><input type="checkbox" [checked]="allChecked()" [indeterminate]="checkedRecords().length > 0 && !allChecked()" [disabled]="actionsLocked() || bulkDeletingOpen()" (change)="allChecked() ? clearSelection() : selectAll()"/>Seleccionar todas</label>
+      <span role="status">{{checkedRecords().length}} seleccionadas</span>
+      @if(checkedRecords().length){
+        <div class="bulk-actions">
+          <button tpButton type="button" [disabled]="actionsLocked() || bulkDeletingOpen()" (click)="runBulk('activate')">Activar</button>
+          <button tpButton type="button" [disabled]="actionsLocked() || bulkDeletingOpen()" (click)="runBulk('deactivate')">Inactivar</button>
+          <button tpButton type="button" variant="danger" icon="trash" [disabled]="actionsLocked() || bulkDeletingOpen()" (click)="requestBulkDelete()">Eliminar</button>
+          <button tpButton type="button" variant="quiet" [disabled]="actionsLocked() || bulkDeletingOpen()" (click)="clearSelection()">Limpiar selección</button>
+        </div>
+      }
+    </section>
+  }
+  <div aria-live="polite" role="status">
+    @if(bulkProgress(); as progress){<p>Procesadas {{progress.completed}} de {{progress.total}} imágenes. No cierres esta página.</p><progress [value]="progress.completed" [max]="progress.total" aria-label="Progreso de la operación"></progress>}
+    @if(bulkResult(); as result){
+      <div class="bulk-result">
+        <p>{{result.action === 'delete' ? 'Eliminación' : result.action === 'activate' ? 'Activación' : 'Inactivación'}}: {{result.succeeded.length}} realizadas · {{result.skipped.length}} sin cambios · {{result.failed.length}} con error.</p>
+        @if(result.failed.length){<p>Las imágenes con error siguen seleccionadas. Puedes reintentar la acción.</p><ul>@for(failure of result.failed; track failure.id){<li><strong>{{failure.name}}</strong>: {{failure.message}}</li>}</ul>}
+      </div>
+    }
+  </div>
   <section class="home-images-grid" aria-label="Imágenes del inicio">
     @for(record of records(); track record.id){
-      <article class="home-image-entry">
+      <article class="home-image-entry" [class.is-selected]="checkedIds().has(record.id)">
         <tp-image-card class="uniform-size" [record]="record" [hasActions]="canEdit()" label="Editar imagen" (selected)="open($event)"/>
         @if(canEdit()){
-          <button tpButton type="button" variant="danger" icon="trash" title="Eliminar imagen" [disabled]="importing() || saving() || deleting()" [attr.aria-label]="'Eliminar imagen: '+record.title" (click)="requestDelete(record)"></button>
+          @if(selectionMode()){
+            <label class="image-selection"><input type="checkbox" [checked]="checkedIds().has(record.id)" [disabled]="actionsLocked() || bulkDeletingOpen()" [attr.aria-label]="'Seleccionar imagen: '+record.title" (change)="toggleChecked(record.id)"/></label>
+          }
+          <button tpButton type="button" variant="danger" icon="trash" title="Eliminar imagen" [disabled]="actionsLocked() || bulkDeletingOpen()" [attr.aria-label]="'Eliminar imagen: '+record.title" (click)="requestDelete(record)"></button>
         }
       </article>
     }
@@ -63,6 +90,17 @@
       <button tpButton type="button" [disabled]="deleting()" (click)="closeDelete()">Cancelar</button>
       <button tpButton type="button" variant="danger" [busy]="deleting()" [disabled]="!canEdit() || !deleteTarget()" (click)="confirmDelete()">{{deleting() ? 'Eliminando…' : 'Eliminar imagen'}}</button>
     </div>
+</tp-dialog>
+<tp-dialog [open]="bulkDeletingOpen()" title="Eliminar imágenes seleccionadas" [busy]="bulkBusy()" (closed)="closeBulkDelete()">
+  <p>¿Quieres eliminar {{checkedRecords().length}} imágenes de Trotapie? Esta acción no se puede deshacer. Los archivos originales de Google Drive no se borrarán.</p>
+  <ul class="bulk-delete-preview">
+    @for(record of checkedRecords(); track record.id){<li><img [src]="record.image" alt="" loading="lazy"/><span>{{record.title}}</span></li>}
+  </ul>
+  @if(bulkProgress(); as progress){<p role="status">Procesadas {{progress.completed}} de {{progress.total}} imágenes.</p>}
+  <div class="dialog-actions">
+    <button tpButton type="button" [disabled]="bulkBusy()" (click)="closeBulkDelete()">Cancelar</button>
+    <button tpButton type="button" variant="danger" [busy]="bulkBusy()" [disabled]="!canEdit() || !checkedRecords().length" (click)="runBulk('delete')">{{bulkBusy() ? 'Eliminando…' : 'Eliminar '+checkedRecords().length+' imágenes'}}</button>
+  </div>
 </tp-dialog>
 <tp-dialog [open]="translationsOpen()" title="Traducciones del destino" (closed)="translationsOpen.set(false)">
   <p class="translations-note">Estas son las traducciones guardadas. Al guardar cambios, se traducirá automáticamente el nombre en español.</p>
