@@ -1,0 +1,21 @@
+.destination-facts {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 160px), 1fr));
+  gap: 12px;
+  margin: 0 0 32px;
+}
+.destination-facts > div {
+  padding: 16px;
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  background: var(--surface);
+}
+.destination-facts dt {
+  color: var(--muted);
+  font-size: 11px;
+}
+.destination-facts dd {
+  margin: 6px 0 0;
+  font-size: 13px;
+  overflow-wrap: anywhere;
+}

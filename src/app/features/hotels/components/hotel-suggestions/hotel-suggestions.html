@@ -1,0 +1,43 @@
+<section class="hotel-suggestions" aria-labelledby="hotels-heading">
+  <div class="suggestions-heading">
+    <div>
+      <span class="eyebrow">{{ text('Tu próximo descanso', 'Your next getaway') }}</span>
+      <h2 id="hotels-heading">{{ text('Encuentra tu estancia', 'Find your stay') }}</h2>
+      <p>
+        {{
+          text(
+            'Una selección para comenzar a planear tu viaje.',
+            'A selection to start planning your trip.'
+          )
+        }}
+      </p>
+    </div>
+    <span class="result-count">{{ page().items.length }} {{ text('opciones', 'options') }}</span>
+  </div>
+  @if (page().items.length) {
+    <div class="hotel-suggestions-grid">
+      @for (record of page().items; track record.id) {
+        <tp-image-card
+          [record]="record"
+          [label]="text('Ver hotel', 'View hotel')"
+          (selected)="selected.emit($event)"
+        />
+      }
+    </div>
+    <div class="suggestions-actions">
+      <a tpButton icon="right" [routerLink]="['/hoteles', destinationId()]">{{
+        text('Ver más hoteles', 'See more hotels')
+      }}</a>
+    </div>
+  } @else {
+    <tp-state
+      [title]="text('Estamos preparando tu estancia', 'We are preparing your stay')"
+      [message]="
+        text(
+          'Pronto habrá hoteles disponibles para este destino.',
+          'Hotels will be available for this destination soon.'
+        )
+      "
+    />
+  }
+</section>

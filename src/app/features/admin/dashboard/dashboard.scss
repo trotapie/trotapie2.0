@@ -1,0 +1,335 @@
+.dashboard-intro {
+  display: grid;
+  grid-template-columns: 1fr 1.06fr;
+  gap: 32px;
+  margin: 8px 0 24px;
+  align-items: stretch;
+}
+.dashboard-welcome {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding: 20px 8px 8px;
+}
+.dashboard-welcome h1 {
+  font-size: clamp(28px, 3vw, 42px);
+  margin: 10px 0;
+}
+.greeting-dot {
+  color: var(--brand);
+}
+.dashboard-welcome > p {
+  font-size: 13px;
+}
+.intro-numbers {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  margin: 32px 0 18px;
+}
+.intro-numbers > div {
+  padding: 0 16px;
+  border-left: 1px solid var(--line);
+}
+.intro-numbers span {
+  display: block;
+  font-size: 12px;
+  color: var(--muted);
+}
+.intro-numbers strong {
+  display: block;
+  margin-top: 8px;
+  font-size: 30px;
+  font-weight: 500;
+  letter-spacing: -0.05em;
+  font-variant-numeric: tabular-nums;
+}
+.intro-progress {
+  display: flex;
+  height: 14px;
+  width: 100%;
+  border-radius: 999px;
+  overflow: hidden;
+}
+.intro-progress > span:first-child {
+  display: block;
+  background: var(--ink);
+  border-radius: 999px;
+  min-width: 0;
+  flex-shrink: 0;
+}
+.intro-progress .sand {
+  flex: 1;
+  background: var(--sand);
+  border-radius: 999px;
+}
+.intro-progress .striped {
+  flex: 1;
+  background: repeating-linear-gradient(120deg, transparent 0 3px, var(--line) 3px 4px);
+}
+.dashboard-cover {
+  position: relative;
+  min-height: 245px;
+  border-radius: 24px;
+  overflow: hidden;
+  background: var(--brand-soft);
+}
+.dashboard-cover img {
+  height: 100%;
+  width: 100%;
+  object-fit: cover;
+  max-height: 280px;
+}
+.cover-pill {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: #fff;
+  color: #242820;
+  padding: 7px 12px;
+  border-radius: 999px;
+  font-size: 10px;
+}
+.cover-pill tp-icon {
+  height: 14px;
+  width: 14px;
+}
+.cover-caption {
+  position: absolute;
+  bottom: 18px;
+  left: 24px;
+  color: #fff;
+  font-size: 25px;
+  font-weight: 500;
+  letter-spacing: -0.035em;
+  text-shadow: 0 2px 12px #0008;
+}
+.dashboard-bento {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  gap: 16px;
+}
+.bento-metrics {
+  grid-column: span 3;
+}
+.distribution-panel {
+  grid-column: span 3;
+}
+.destinations-panel {
+  grid-column: span 6;
+}
+.recent-panel {
+  grid-column: span 9;
+}
+.next-panel {
+  grid-column: span 3;
+}
+.metric-panel {
+  flex: 1;
+  min-height: 175px;
+  padding: 20px;
+}
+.metric-heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 8px;
+}
+.metric-heading h2 {
+  font-size: 16px;
+}
+.metric-panel > strong,
+.distribution-panel > strong {
+  display: block;
+  font-size: 32px;
+  font-weight: 500;
+  letter-spacing: -0.05em;
+  margin-top: 24px;
+  font-variant-numeric: tabular-nums;
+}
+.metric-panel p,
+.distribution-panel > p {
+  font-size: 10px;
+  margin-top: 5px;
+}
+.metric-bottom {
+  display: flex;
+  justify-content: space-between;
+  align-items: end;
+  gap: 8px;
+}
+.mini-bars {
+  display: flex;
+  align-items: end;
+  gap: 3px;
+  height: 44px;
+}
+.mini-bars i {
+  width: 2px;
+  background: var(--ink);
+  max-height: 40px;
+}
+.metric-sand {
+  background: var(--sand-soft);
+}
+.distribution-chart {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  margin-top: 48px;
+}
+.distribution-chart > div {
+  position: relative;
+  min-height: 46px;
+  display: flex;
+  justify-content: space-between;
+  align-items: start;
+  font-size: 11px;
+}
+.distribution-chart b {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  height: 10px;
+  background: var(--ink);
+  border-radius: 999px;
+}
+.distribution-chart .sand-bar {
+  background: var(--sand);
+}
+.distribution-chart em {
+  font-style: normal;
+}
+.chart-footnote {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 9px;
+  color: var(--muted);
+  padding-top: 20px;
+  margin-top: 24px;
+  border-top: 1px solid var(--line);
+}
+.chart-footnote tp-icon {
+  width: 14px;
+  height: 14px;
+}
+.destination-preview-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+.destinations-panel {
+  padding: 20px;
+  --card-surface: var(--muted-surface);
+  --card-border: transparent;
+}
+.next-panel {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  background: var(--brand-soft);
+}
+.next-icon {
+  display: grid;
+  place-items: center;
+  width: 56px;
+  height: 56px;
+  background: var(--surface);
+  color: var(--brand);
+  border-radius: 18px;
+  margin: 20px 0;
+}
+.next-panel h2 {
+  font-size: 22px;
+  line-height: 1.25;
+  margin-bottom: 12px;
+}
+.next-panel p {
+  font-size: 11px;
+  line-height: 1.8;
+  margin-bottom: 24px;
+}
+.next-panel > a:last-child {
+  font-size: 10px;
+  margin-top: 10px;
+}
+.next-panel > .btn-primary {
+  width: 100%;
+  margin-top: auto;
+}
+@media (max-width: 1100px) {
+  .bento-metrics,
+  .distribution-panel {
+    grid-column: span 6;
+  }
+  .destinations-panel {
+    grid-column: span 12;
+  }
+  .recent-panel {
+    grid-column: span 8;
+  }
+  .next-panel {
+    grid-column: span 4;
+  }
+  .dashboard-intro {
+    gap: 20px;
+  }
+  .dashboard-cover {
+    min-height: 230px;
+  }
+  .destination-preview-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+@media (max-width: 700px) {
+  .dashboard-intro {
+    grid-template-columns: 1fr;
+  }
+  .dashboard-welcome {
+    padding-top: 0;
+  }
+  .dashboard-cover {
+    min-height: 200px;
+    max-height: 230px;
+  }
+  .dashboard-cover img {
+    height: 230px;
+  }
+  .intro-numbers {
+    margin-top: 24px;
+  }
+  .dashboard-bento {
+    gap: 12px;
+  }
+  .metric-panel {
+    padding: 18px;
+  }
+  .distribution-panel {
+    padding: 20px;
+  }
+  .distribution-chart {
+    margin-top: 32px;
+  }
+  .recent-panel,
+  .next-panel {
+    grid-column: span 12;
+  }
+  .destination-preview-grid {
+    grid-template-columns: 1fr;
+  }
+  .next-panel h2 {
+    font-size: 26px;
+  }
+  .metric-heading .btn {
+    width: 32px;
+    min-height: 32px;
+    padding: 8px;
+  }
+  .metric-heading h2 {
+    font-size: 14px;
+  }
+}
+.inspiration-actions { display: flex; align-items: center; justify-content: flex-end; flex-wrap: wrap; gap: 8px; }

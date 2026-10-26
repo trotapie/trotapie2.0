@@ -1,0 +1,34 @@
+<div class="date-range-control" cdkOverlayOrigin #trigger="cdkOverlayOrigin">
+  @if(label){<label class="control-label" [for]="inputId || labelId+'-start'" [id]="labelId">{{label}}@if(required){<span class="required-mark"> *</span>}</label>}
+  <div [class.date-range-fields]="!single">
+    <button #startTrigger type="button" [id]="inputId || labelId+'-start'" [class.date-trigger]="single" [class.placeholder]="single && !value.start" [disabled]="disabled" (click)="abierto ? close() : open('start')" [attr.aria-label]="single ? (label || 'Seleccionar fecha') : 'Fecha de inicio'" [attr.aria-expanded]="abierto && (single || activeEndpoint==='start')" aria-haspopup="dialog" [attr.aria-controls]="abierto ? panelId : null">
+      @if(!single){<small>Inicio</small>}
+      <span>{{value.start ? formatDate(value.start) : single ? 'dd/mm/aaaa' : 'Seleccionar'}}</span>
+      <tp-icon name="calendar"/>
+    </button>
+    @if(!single){<button #endTrigger type="button" [disabled]="disabled" (click)="abierto ? close() : open('end')" aria-label="Fecha de fin" [attr.aria-expanded]="abierto && activeEndpoint==='end'" aria-haspopup="dialog" [attr.aria-controls]="abierto ? panelId : null"><small>Fin</small><span>{{value.end ? formatDate(value.end) : 'Seleccionar'}}</span><tp-icon name="calendar"/></button>}
+  </div>
+  @if(mostrarEstadia && value.start && value.end){<small>{{nights(value)}} {{nights(value)===1?'noche':'noches'}}</small>}
+</div>
+<ng-template cdkConnectedOverlay [cdkConnectedOverlayOrigin]="trigger" [cdkConnectedOverlayOpen]="abierto" [cdkConnectedOverlayHasBackdrop]="true" cdkConnectedOverlayBackdropClass="cdk-overlay-transparent-backdrop" [cdkConnectedOverlayPositions]="posiciones" [cdkConnectedOverlayPush]="true" (attach)="focusCalendar()" (backdropClick)="close()" (overlayKeydown)="$event.key==='Escape' && close()" (detach)="close()">
+  <section #calendarPanel tpPopupKeyboard (dismissed)="close()" class="range-panel" [class.single-date-panel]="single" [id]="panelId" tpMotion="menu" role="dialog" [attr.aria-label]="single ? 'Seleccionar '+(label || 'fecha') : 'Seleccionar rango de fechas'">
+    <div class="calendar-toolbar">
+      <button tpButton variant="icon" icon="left" type="button" aria-label="Mes anterior" (click)="moveMonth(-1)"></button>
+      <span>{{single ? 'Selecciona una fecha' : 'Selecciona fecha de '+(activeEndpoint==='start'?'inicio':'fin')}}</span>
+      <button tpButton variant="icon" icon="right" type="button" aria-label="Mes siguiente" (click)="moveMonth(1)"></button>
+    </div>
+    <div class="calendars" [class.single-calendar]="single">
+      @for(month of months;track month.getTime();let index=$index){
+        <section class="calendar" [class.calendar-secondary]="index===1"><h3 aria-live="polite">{{monthLabel(month)}}</h3><div class="weekdays">@for(day of weekdays;track day){<span>{{day}}</span>}</div>
+          <div class="days" (keydown)="calendarKeydown($event)">@for(day of daysForMonth(month);track day.key){<button type="button" [attr.data-date]="day.key" [class.range-start]="isStart(day.key)" [class.range-end]="isEnd(day.key)" [class.in-range]="isInRange(day.key)" [class.today]="day.key===todayKey" [disabled]="!day.currentMonth || isDisabled(day.key)" [attr.aria-label]="formatDate(day.key)" [attr.aria-current]="day.key===todayKey?'date':null" [attr.aria-pressed]="isStart(day.key)||isEnd(day.key)" (click)="select(day)">{{day.day}}</button>}</div>
+        </section>
+      }
+    </div>
+    <div class="calendar-footer">
+      @if(mostrarEstadia){<small>{{estadiaLabel}}</small>}
+      @if(single){<button tpButton icon="calendar" type="button" [disabled]="isDisabled(todayKey)" (click)="chooseToday()">Hoy</button>}
+      <button tpButton icon="trash" type="button" (click)="clear()">Borrar</button>
+      @if(!single){<button tpButton icon="check" variant="primary" type="button" [disabled]="!!pendingValue.start && !pendingValue.end" (click)="apply()">Aplicar</button>}
+    </div>
+  </section>
+</ng-template>

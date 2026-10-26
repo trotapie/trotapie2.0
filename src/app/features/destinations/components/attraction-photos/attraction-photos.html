@@ -1,0 +1,9 @@
+<section class="photographs"><div class="gallery-heading"><div><h4>Fotografías</h4><p>{{images().length||0}} imágenes de esta atracción</p></div><tp-badge [label]="active()?'Activa':'Inactiva'"/></div>
+          <div class="photos-grid">
+            @for(img of images();track img;let i=$index){
+              <article class="photo-card"><button class="photo-preview" type="button" [attr.aria-label]="'Ver fotografía '+(i+1)" (click)="preview.set({src:img.imagen_url,title:img.nombre||title(),image:img})"><img [src]="img.imagen_url" [alt]="img.nombre||'Fotografía de '+title()" loading="lazy" (error)="$any($event.target).style.visibility='hidden'"/><span class="photo-eye"><tp-icon name="eye"/></span></button><div class="photo-caption"><div><strong>{{img.nombre||'Fotografía '+(i+1)}}</strong><small>{{img.carpeta_nombre||img.carpeta||'General'}}</small></div><button tpButton type="button" icon="edit" variant="icon" [disabled]="busy()" [attr.aria-label]="'Editar diseño de fotografía '+(i+1)" (click)="edited.emit(img)"></button></div></article>
+            }@empty{<div class="gallery-empty"><tp-icon name="landscape"/><strong>Aún no hay fotografías</strong><p>Agrega una imagen o importa una carpeta para comenzar.</p></div>}
+          </div>
+        </section>
+<tp-image-preview [editable]="true" [busy]="busy()" (edited)="editPreview()" [open]="!!preview()" [src]="preview()?.src||''" [title]="preview()?.title||'Fotografía de la atracción'" (closed)="preview.set(null)"/>
+

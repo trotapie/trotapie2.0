@@ -1,0 +1,39 @@
+
+    <div class="color-picker" [class.color-picker--disabled]="disabled">
+      <button
+        class="color-picker__swatch"
+        type="button"
+        [style.background-color]="value"
+        [disabled]="disabled"
+        [attr.aria-label]="label || 'Seleccionar color'"
+        (click)="openPicker()"
+      >
+        <span class="color-picker__swatch-icon" aria-hidden="true">&#9998;</span>
+      </button>
+      <div class="color-picker__value">
+        <span class="color-picker__eyebrow">HEX</span>
+        <input
+          type="text"
+          inputmode="text"
+          maxlength="7"
+          autocomplete="off"
+          spellcheck="false"
+          [value]="value"
+          [disabled]="disabled"
+          [attr.aria-label]="(label || 'Color') + ' en formato HEX'"
+          (input)="onHexInput($any($event.target).value)"
+          (blur)="normalizeHex()"
+          (keydown.enter)="normalizeHex()"
+        />
+      </div>
+      <input
+        #nativeColorInput
+        class="color-picker__native"
+        type="color"
+        [value]="value"
+        [disabled]="disabled"
+        [attr.aria-label]="label || 'Seleccionar color'"
+        (input)="onNativeInput($any($event.target).value)"
+      />
+    </div>
+  

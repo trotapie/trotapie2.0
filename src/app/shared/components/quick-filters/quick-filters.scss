@@ -1,0 +1,13 @@
+:host{display:block;margin:16px 0 22px}
+.quick-filter-label{display:block;margin-bottom:10px;color:var(--ink);font-size:12px;font-weight:500}
+.quick-filter-track{display:grid;grid-template-columns:repeat(min(6,var(--option-count)),minmax(0,1fr));gap:6px;padding:5px;border:1px solid var(--line);border-radius:18px;background:var(--surface)}
+button{position:relative;z-index:1;min-width:0;min-height:48px;padding:10px 16px;border:0;border-radius:13px;background:transparent;color:var(--muted);font-size:12px;font-weight:500;line-height:1.4;transition:background .18s,color .18s}
+button:hover{background:var(--muted-surface);color:var(--ink)}
+button{overflow-wrap:anywhere}
+button.selected{background:#137053;color:#fff;box-shadow:0 3px 10px #13705325}
+:host-context([data-theme='dark']) button.selected{background:var(--brand-soft);color:var(--brand);box-shadow:none}
+@media(max-width:1100px){.quick-filter-track{grid-template-columns:repeat(min(4,var(--option-count)),minmax(0,1fr))}}
+@media(max-width:600px){.quick-filter-track{grid-template-columns:repeat(min(2,var(--option-count)),minmax(0,1fr))}button{padding:10px;min-height:44px}}
+
+@media(max-width:350px){.quick-filter-track{grid-template-columns:minmax(0,1fr)}}
+@media(prefers-reduced-motion:reduce){button{transition:none}}

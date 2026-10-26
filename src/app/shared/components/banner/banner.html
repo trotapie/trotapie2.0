@@ -1,0 +1,5 @@
+<aside class="adviser-banner">
+  <img src="/brand/trotapie.png" alt="Trotapie" />
+  @if(empleado();as adviser){<div><strong>{{ adviser.nombre }}</strong><p>{{ adviser.cargo||'Tu asesor de viajes' }}</p></div><div class="contact-links">@if(emailHref()){<a [href]="emailHref()">{{ adviser.email }}</a>}@if(whatsappHref()){<a [href]="whatsappHref()" target="_blank" rel="noopener noreferrer">{{ adviser.telefono }}</a>}</div>}
+  @else{<p>Estamos contigo, de la idea al viaje.</p>}
+</aside>

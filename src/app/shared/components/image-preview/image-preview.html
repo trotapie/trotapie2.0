@@ -1,0 +1,11 @@
+<tp-dialog [open]="open()&&!editing()" [title]="title()" eyebrow="Vista previa" size="wide" placement="adaptive" closeLabel="Cerrar imagen" (closed)="closed.emit()" (hidden)="hidden()">
+  @if(open()&&validSource()&&!failed()){
+    <div class="preview-image" [attr.aria-busy]="loading()">
+      @if(loading()){<tp-screen-loader message="Cargando imagen…" />}
+      <img [src]="src().trim()" [alt]="title()" [class.is-loading]="loading()" (load)="loading.set(false)" (error)="failed.set(true);loading.set(false)" />
+    </div>
+  }@else if(open()){
+    <div class="preview-error" role="alert"><strong>No pudimos mostrar la imagen.</strong><p>Comprueba que la dirección sea pública y apunte directamente a una imagen.</p></div>
+  }
+@if(editable()){<div class="dialog-actions"><button tpButton icon="edit" variant="primary" [disabled]="busy()" (click)="edit()">Editar fotografía</button></div>}
+</tp-dialog>

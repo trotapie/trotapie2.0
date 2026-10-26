@@ -1,0 +1,42 @@
+<div class="time-picker">
+  <span class="time-picker__label" [id]="labelId">{{ label }}</span>
+  <button
+    type="button"
+    class="time-picker__trigger"
+    cdkOverlayOrigin #trigger="cdkOverlayOrigin"
+    [disabled]="disabled"
+    [attr.aria-labelledby]="labelId"
+    [attr.aria-expanded]="abierto"
+    aria-haspopup="dialog"
+    (click)="abierto ? cerrar() : abierto = true">
+    <span>{{ valorVisible }}</span>
+    <tp-icon name="clock" />
+  </button>
+
+  <ng-template cdkConnectedOverlay [cdkConnectedOverlayOrigin]="trigger" [cdkConnectedOverlayOpen]="abierto"
+    [cdkConnectedOverlayHasBackdrop]="true" [cdkConnectedOverlayBackdropClass]="'cdk-overlay-transparent-backdrop'"
+    [cdkConnectedOverlayPositions]="posiciones" [cdkConnectedOverlayPush]="true"
+    (overlayKeydown)="$event.key==='Escape' && cerrar()" (backdropClick)="cerrar()" (detach)="cerrar()">
+    <div tpMotion="menu" tpPopupKeyboard (dismissed)="cerrar()" class="time-picker-menu" role="dialog" aria-label="Selecciona la hora">
+      <p class="time-picker-menu__title">Selecciona la hora</p>
+      <div class="time-picker-menu__fields">
+        <app-tp-select-search label="Hora" [options]="horasOpciones" [showClear]="false"
+          [ngModel]="hora" (ngModelChange)="seleccionarHora($event)" [ngModelOptions]="{standalone: true}"></app-tp-select-search>
+        <app-tp-select-search label="Minutos" [options]="minutosOpciones" [showClear]="false"
+          [ngModel]="minuto" (ngModelChange)="seleccionarMinuto($event)" [ngModelOptions]="{standalone: true}"></app-tp-select-search>
+        <app-tp-select-search label="Período" [options]="periodosOpciones" [showClear]="false"
+          [ngModel]="periodo" (ngModelChange)="seleccionarPeriodo($event)" [ngModelOptions]="{standalone: true}"></app-tp-select-search>
+      </div>
+      <div class="time-picker-menu__actions">
+        @if (allowEmpty) {
+          <button type="button" (click)="limpiarHora(); cerrar()">
+            <tp-icon class="mr-1.5 icon-size-4" name="close"></tp-icon>Quitar hora
+          </button>
+        }
+        <button type="button" color="primary" (click)="sinHora && actualizarHora(); cerrar()">
+          <tp-icon class="mr-1.5 icon-size-4" name="check"></tp-icon>Listo
+        </button>
+      </div>
+    </div>
+  </ng-template>
+</div>

@@ -1,0 +1,16 @@
+<button #trigger type="button" class="language-trigger" aria-haspopup="menu" [attr.aria-expanded]="open()" [attr.aria-label]="text('Idioma: ', 'Language: ')+current().name" (click)="open.set(!open())">
+  <img [src]="current().flag" alt="" aria-hidden="true" /><span>{{ current().code.toUpperCase() }}</span><tp-icon name="chevron-down" />
+</button>
+@if(open()) {
+  <div tpMotion="menu" class="language-popover" role="menu" [attr.aria-label]="text('Selecciona un idioma', 'Choose a language')" (keydown)="move($event)">
+    <p>{{ text('Idioma', 'Language') }}</p>
+    @for(option of visibleOptions();track option.code) {
+      <button type="button" role="menuitemradio" [attr.aria-checked]="selectedCode()===option.code" [class.selected]="selectedCode()===option.code" (click)="select(option.code)">
+        <img [src]="option.flag" alt="" aria-hidden="true" />
+        <span class="language-name">{{ option.name }}<small>{{ option.code.toUpperCase() }}</small></span>
+        @if(selectedCode()===option.code){<tp-icon name="check" />}
+      </button>
+    }
+  </div>
+}
+

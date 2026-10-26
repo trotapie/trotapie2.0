@@ -1,0 +1,20 @@
+<div class="tariff-list">
+  @for(tariff of tariffs;track tariff.type){
+    @if(total(tariff.priceKey)!==null){
+      <section><header><h3>{{tariff.label}}</h3><div><small>Total MXN</small><strong>{{total(tariff.priceKey)|currency:'MXN':'symbol-narrow':'1.2-2'}}</strong></div></header>
+        <div class="tariff-table-wrap"><table><thead><tr><th scope="col">Habitación</th><th scope="col">Origen</th><th scope="col">Tipo</th><th scope="col">Precio</th>@if(tariff.percentKey){<th scope="col">% apartado</th>}</tr></thead><tbody>
+          @for(room of rooms();track $index;let i=$index){
+            @if(room[tariff.priceKey]!==null){<tr><th scope="row">Habitación {{i+1}}<small>{{room.detalle}}</small></th><td>{{originName(room,tariff.originKey)}}</td><td>{{roomName(room,tariff.roomKey)}}</td><td class="money">{{room[tariff.priceKey]|currency:'MXN':'symbol-narrow':'1.2-2'}}</td>@if(tariff.percentKey){<td>{{room[tariff.percentKey]}}%</td>}</tr>}
+          }
+        </tbody></table></div>
+        @if(tariff.type==='a_meses'){<p>Tipo de tarifa: {{rooms()[0]?.tipoTarifa==='apartado'?'Apartado':'No reembolsable'}}</p>}
+        @if(tariff.type==='con_seguro'&&quote().fecha_limite_seguro){<p>Fecha límite de apartado: {{dateText(quote().fecha_limite_seguro)}}</p>}
+        @if(tariff.type==='a_meses'&&rooms()[0]?.tipoTarifa==='apartado'&&quote().fecha_limite_meses){<p>Fecha límite: {{dateText(quote().fecha_limite_meses)}}</p>}
+        @for(room of rooms();track $index;let i=$index){
+          @if(room[tariff.priceKey]!==null&&room[tariff.policyKey]?.length){<details><summary>Políticas {{rooms().length>1?'· Habitación '+(i+1):'de esta tarifa'}}</summary><ul>@for(policy of room[tariff.policyKey];track $index){<li>{{policyText(policy)}}</li>}</ul></details>}
+        }
+      </section>
+    }
+  }
+  @if(tariffs.every(noPrices)){<p class="empty-rates">Todavía no hay tarifas capturadas.</p>}
+</div>

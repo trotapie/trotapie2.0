@@ -1,0 +1,5 @@
+<section class="international-filters" [attr.aria-label]="text('Filtros internacionales','International filters')">
+  <app-tp-select-search [label]="text('Continente / región','Continent / region')" [placeholder]="text('Todos los continentes','All continents')" [searchPlaceholder]="text('Buscar continente…','Find a continent…')" [options]="regions()" [disabled]="busy()" [ngModel]="region()" (ngModelChange)="regionChanged.emit(id($event))" />
+  <app-tp-select-search [label]="text('País','Country')" [placeholder]="text('Todos los países','All countries')" [searchPlaceholder]="text('Buscar país…','Find a country…')" [options]="countryOptions()" [disabled]="busy()" [ngModel]="country()" (ngModelChange)="countryChanged.emit(id($event))" />
+  @if(region()||country()){<button tpButton type="button" variant="quiet" icon="close" (click)="cleared.emit()">{{text('Limpiar ubicación','Clear location')}}</button>}
+</section>

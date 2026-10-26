@@ -1,0 +1,21 @@
+
+    .switch-row { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+    .switch-label { font-size: 14px; color: var(--ink); }
+     .switch { --switch-width: 46px; --switch-height: 24px; --switch-bg: rgb(131, 131, 131); --switch-checked-bg: var(--brand); --circle-diameter: 18px; --switch-offset: calc((var(--switch-height) - var(--circle-diameter)) / 2); --switch-transition: all .2s cubic-bezier(.27,.2,.25,1.51); --circle-bg: #fff; --circle-shadow: 1px 1px 2px rgba(146,146,146,.45); --circle-checked-shadow: -1px 1px 2px rgba(163,163,163,.45); display: inline-block; width: var(--switch-width); height: var(--switch-height); min-width: 0; min-height: 0; border: 0; padding: 0; background: transparent; line-height: 0; appearance: none; cursor: pointer; }
+     .switch:hover, .switch:active { transform: none; background: transparent; box-shadow: none; }
+    .switch svg { transition: var(--switch-transition); position: absolute; height: auto; }
+    .switch .checkmark { width: 10px; color: var(--switch-checked-bg); transform: scale(0); }
+    .switch .cross { width: 6px; color: var(--switch-bg); }
+    .slider { box-sizing: border-box; width: var(--switch-width); height: var(--switch-height); background: var(--switch-bg); border-radius: 999px; display: flex; align-items: center; position: relative; transition: var(--switch-transition); cursor: pointer; }
+    .circle { width: var(--circle-diameter); height: var(--circle-diameter); background: var(--circle-bg); border-radius: inherit; box-shadow: var(--circle-shadow); display: flex; align-items: center; justify-content: center; transition: var(--switch-transition); z-index: 1; position: absolute; left: var(--switch-offset); }
+    .slider::before { content: ''; position: absolute; width: calc(var(--circle-diameter) / 2); height: calc(var(--circle-diameter) / 4 - 1px); left: calc(var(--switch-offset) + var(--circle-diameter) / 4); background: var(--circle-bg); border-radius: 1px; transition: all .2s ease-in-out; }
+     .switch--checked .slider { background: var(--switch-checked-bg); }
+     .switch--checked .slider .checkmark { transform: scale(1); }
+     .switch--checked .slider .cross { transform: scale(0); }
+     .switch--checked .slider::before { left: calc(100% - var(--circle-diameter) / 2 - var(--circle-diameter) / 4 - var(--switch-offset)); }
+     .switch--checked .slider .circle { left: calc(100% - var(--circle-diameter) - var(--switch-offset)); box-shadow: var(--circle-checked-shadow); }
+     .switch:focus-visible .slider { outline: 2px solid var(--brand); outline-offset: 2px; }
+     .switch:disabled .slider { cursor: not-allowed; opacity: .55; }
+  
+
+.switch-row.stacked{flex-direction:column;align-items:flex-start;gap:12px}.stacked .switch-label{font-size:12px;color:var(--muted);line-height:1.5}

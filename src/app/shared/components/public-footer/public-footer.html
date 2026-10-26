@@ -1,0 +1,25 @@
+<footer class="site-footer">
+  <div class="footer-legal">
+    <span>Trotapie © {{ year }}</span>
+    <button class="privacy-link" type="button" (click)="openPrivacy()">{{ text('Aviso de Privacidad', 'Privacy notice') }}</button>
+  </div>
+  <div class="footer-socials">
+    <span>{{ text('Síguenos en', 'Follow us') }}</span>
+    <nav [attr.aria-label]="text('Redes sociales de Trotapie', 'Trotapie social networks')">
+      @for(social of socials;track social.name){
+        <a [href]="social.url" target="_blank" rel="noopener noreferrer" [attr.aria-label]="social.name" [attr.title]="social.name" class="social-link">
+          <img [src]="'/social/'+social.icon+'.svg'" alt="" aria-hidden="true" />
+        </a>
+      }
+    </nav>
+  </div>
+</footer>
+<tp-dialog [open]="privacyOpen()" [title]="text('Aviso de Privacidad', 'Privacy notice')" (closed)="privacyOpen.set(false)">
+  @if(privacyLoading()) {
+    <p role="status">{{ text('Consultando el documento…', 'Opening the document…') }}</p>
+  } @else if(privacyAvailable()) {
+    <a tpButton icon="quote" variant="primary" [href]="privacyUrl" target="_blank" rel="noopener noreferrer">{{ text('Abrir Aviso de Privacidad', 'Open privacy notice') }}</a>
+  } @else {
+    <p role="status">{{ text('El documento no está disponible por el momento. Intenta de nuevo más tarde.', 'The document is temporarily unavailable. Please try again later.') }}</p>
+  }
+</tp-dialog>

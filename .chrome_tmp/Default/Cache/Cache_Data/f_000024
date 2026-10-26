@@ -1,0 +1,723 @@
+import { injectQuery as __vite__injectQuery } from "/@vite/client";import { createHotContext as __vite__createHotContext } from "/@vite/client";import.meta.hot = __vite__createHotContext("/chunk-ADSYYU2J.js");import {
+  MotionDirective
+} from "/chunk-4C25L5N4.js";
+import {
+  __spreadProps,
+  __spreadValues
+} from "/chunk-CZJLB7T5.js";
+
+// src/app/shared/components/charts/tp-donut-chart/tp-donut-chart.component.ts
+import { Component, EventEmitter, Input, Output } from "/@fs/D:/Users/Alex_Saenz/Documents/Proyectos/Rediseño trotapie/Trotapie nuevo/.angular/cache/22.2.2/trotapie/vite/deps/@angular_core.js?v=e11bbf10";
+import { CommonModule } from "/@fs/D:/Users/Alex_Saenz/Documents/Proyectos/Rediseño trotapie/Trotapie nuevo/.angular/cache/22.2.2/trotapie/vite/deps/@angular_common.js?v=e11bbf10";
+import * as i0 from "/@fs/D:/Users/Alex_Saenz/Documents/Proyectos/Rediseño trotapie/Trotapie nuevo/.angular/cache/22.2.2/trotapie/vite/deps/@angular_core.js?v=e11bbf10";
+import * as i1 from "/@fs/D:/Users/Alex_Saenz/Documents/Proyectos/Rediseño trotapie/Trotapie nuevo/.angular/cache/22.2.2/trotapie/vite/deps/@angular_common.js?v=e11bbf10";
+function TpDonutChartComponent__svg_circle_4_Template(rf, ctx) {
+  if (rf & 1) {
+    const _r1 = i0.\u0275\u0275getCurrentView();
+    i0.\u0275\u0275namespaceSVG();
+    i0.\u0275\u0275elementStart(0, "circle", 11);
+    i0.\u0275\u0275listener("click", function TpDonutChartComponent__svg_circle_4_Template_circle_click_0_listener() {
+      const seg_r2 = i0.\u0275\u0275restoreView(_r1).$implicit;
+      const ctx_r2 = i0.\u0275\u0275nextContext();
+      return i0.\u0275\u0275resetView(ctx_r2.onSegmentClick(seg_r2));
+    })("mouseenter", function TpDonutChartComponent__svg_circle_4_Template_circle_mouseenter_0_listener() {
+      const idx_r4 = i0.\u0275\u0275restoreView(_r1).index;
+      const ctx_r2 = i0.\u0275\u0275nextContext();
+      return i0.\u0275\u0275resetView(ctx_r2.hoverSegment(idx_r4));
+    })("mouseleave", function TpDonutChartComponent__svg_circle_4_Template_circle_mouseleave_0_listener() {
+      i0.\u0275\u0275restoreView(_r1);
+      const ctx_r2 = i0.\u0275\u0275nextContext();
+      return i0.\u0275\u0275resetView(ctx_r2.hoverSegment(null));
+    });
+    i0.\u0275\u0275elementEnd();
+  }
+  if (rf & 2) {
+    const seg_r2 = ctx.$implicit;
+    const idx_r4 = ctx.index;
+    const ctx_r2 = i0.\u0275\u0275nextContext();
+    i0.\u0275\u0275attribute("stroke", seg_r2.color)("stroke-width", ctx_r2.activeSegmentIndex === idx_r4 ? 26 : 22)("stroke-dasharray", seg_r2.dashArray)("stroke-dashoffset", seg_r2.dashOffset);
+  }
+}
+function TpDonutChartComponent_span_11_Template(rf, ctx) {
+  if (rf & 1) {
+    i0.\u0275\u0275elementStart(0, "span", 12);
+    i0.\u0275\u0275text(1);
+    i0.\u0275\u0275elementEnd();
+  }
+  if (rf & 2) {
+    const ctx_r2 = i0.\u0275\u0275nextContext();
+    i0.\u0275\u0275advance();
+    i0.\u0275\u0275textInterpolate1("", ctx_r2.activeSegment.percentage, "%");
+  }
+}
+function TpDonutChartComponent_span_12_Template(rf, ctx) {
+  if (rf & 1) {
+    i0.\u0275\u0275elementStart(0, "span", 13);
+    i0.\u0275\u0275text(1, "Sin datos");
+    i0.\u0275\u0275elementEnd();
+  }
+}
+function TpDonutChartComponent_div_13_div_1_Template(rf, ctx) {
+  if (rf & 1) {
+    const _r5 = i0.\u0275\u0275getCurrentView();
+    i0.\u0275\u0275elementStart(0, "div", 16);
+    i0.\u0275\u0275listener("mouseenter", function TpDonutChartComponent_div_13_div_1_Template_div_mouseenter_0_listener() {
+      const idx_r6 = i0.\u0275\u0275restoreView(_r5).index;
+      const ctx_r2 = i0.\u0275\u0275nextContext(2);
+      return i0.\u0275\u0275resetView(ctx_r2.hoverSegment(idx_r6));
+    })("mouseleave", function TpDonutChartComponent_div_13_div_1_Template_div_mouseleave_0_listener() {
+      i0.\u0275\u0275restoreView(_r5);
+      const ctx_r2 = i0.\u0275\u0275nextContext(2);
+      return i0.\u0275\u0275resetView(ctx_r2.hoverSegment(null));
+    })("click", function TpDonutChartComponent_div_13_div_1_Template_div_click_0_listener() {
+      const seg_r7 = i0.\u0275\u0275restoreView(_r5).$implicit;
+      const ctx_r2 = i0.\u0275\u0275nextContext(2);
+      return i0.\u0275\u0275resetView(ctx_r2.onSegmentClick(seg_r7));
+    })("keydown.enter", function TpDonutChartComponent_div_13_div_1_Template_div_keydown_enter_0_listener() {
+      const seg_r7 = i0.\u0275\u0275restoreView(_r5).$implicit;
+      const ctx_r2 = i0.\u0275\u0275nextContext(2);
+      return i0.\u0275\u0275resetView(ctx_r2.onSegmentClick(seg_r7));
+    })("keydown.space", function TpDonutChartComponent_div_13_div_1_Template_div_keydown_space_0_listener($event) {
+      const seg_r7 = i0.\u0275\u0275restoreView(_r5).$implicit;
+      const ctx_r2 = i0.\u0275\u0275nextContext(2);
+      $event.preventDefault();
+      return i0.\u0275\u0275resetView(ctx_r2.onSegmentClick(seg_r7));
+    });
+    i0.\u0275\u0275element(1, "span", 17);
+    i0.\u0275\u0275elementStart(2, "span", 18);
+    i0.\u0275\u0275text(3);
+    i0.\u0275\u0275elementEnd();
+    i0.\u0275\u0275elementStart(4, "div", 19)(5, "strong", 20);
+    i0.\u0275\u0275text(6);
+    i0.\u0275\u0275pipe(7, "number");
+    i0.\u0275\u0275elementEnd();
+    i0.\u0275\u0275elementStart(8, "span", 21);
+    i0.\u0275\u0275text(9);
+    i0.\u0275\u0275elementEnd()()();
+  }
+  if (rf & 2) {
+    const seg_r7 = ctx.$implicit;
+    const idx_r6 = ctx.index;
+    const ctx_r2 = i0.\u0275\u0275nextContext(2);
+    i0.\u0275\u0275classProp("active", ctx_r2.activeSegmentIndex === idx_r6);
+    i0.\u0275\u0275advance();
+    i0.\u0275\u0275styleProp("background", seg_r7.color);
+    i0.\u0275\u0275advance(2);
+    i0.\u0275\u0275textInterpolate(seg_r7.label);
+    i0.\u0275\u0275advance(3);
+    i0.\u0275\u0275textInterpolate(i0.\u0275\u0275pipeBind3(7, 7, seg_r7.value, "1.0-0", "es-MX"));
+    i0.\u0275\u0275advance(3);
+    i0.\u0275\u0275textInterpolate1("(", seg_r7.percentage, "%)");
+  }
+}
+function TpDonutChartComponent_div_13_Template(rf, ctx) {
+  if (rf & 1) {
+    i0.\u0275\u0275elementStart(0, "div", 14);
+    i0.\u0275\u0275template(1, TpDonutChartComponent_div_13_div_1_Template, 10, 11, "div", 15);
+    i0.\u0275\u0275elementEnd();
+  }
+  if (rf & 2) {
+    const ctx_r2 = i0.\u0275\u0275nextContext();
+    i0.\u0275\u0275advance();
+    i0.\u0275\u0275property("ngForOf", ctx_r2.segments);
+  }
+}
+var TpDonutChartComponent = class _TpDonutChartComponent {
+  data = [];
+  title = "Total";
+  centerSubtext;
+  height = 280;
+  segmentClick = new EventEmitter();
+  defaultColors = ["#057a55", "#0ea5e9", "#6366f1", "#f59e0b", "#ef4444", "#ec4899", "#14b8a6"];
+  total = 0;
+  segments = [];
+  activeSegmentIndex = null;
+  circumference = 502.65;
+  // 2 * PI * 80
+  ngOnInit() {
+    this.recalculate();
+  }
+  ngOnChanges(changes) {
+    if (changes["data"]) {
+      this.recalculate();
+    }
+  }
+  recalculate() {
+    const validItems = (this.data || []).filter((item) => item && Number.isFinite(item.value));
+    this.total = validItems.reduce((sum, item) => sum + Math.max(item.value, 0), 0);
+    if (this.total === 0 || validItems.length === 0) {
+      this.segments = [];
+      return;
+    }
+    let currentOffset = 0;
+    this.segments = validItems.map((item, idx) => {
+      const val = Math.max(item.value, 0);
+      const frac = val / this.total;
+      const strokeLen = frac * this.circumference;
+      const color = item.color || this.defaultColors[idx % this.defaultColors.length];
+      const percentage = Number((frac * 100).toFixed(1));
+      const segment = {
+        label: item.label,
+        value: val,
+        color,
+        percentage,
+        dashArray: `${strokeLen} ${this.circumference}`,
+        dashOffset: -currentOffset,
+        rawIndex: idx
+      };
+      currentOffset += strokeLen;
+      return segment;
+    });
+  }
+  hoverSegment(idx) {
+    this.activeSegmentIndex = idx;
+  }
+  onSegmentClick(seg) {
+    this.segmentClick.emit({ label: seg.label, value: seg.value, index: seg.rawIndex });
+  }
+  get activeSegment() {
+    if (this.activeSegmentIndex === null || !this.segments[this.activeSegmentIndex]) {
+      return null;
+    }
+    return this.segments[this.activeSegmentIndex];
+  }
+  static \u0275fac = function TpDonutChartComponent_Factory(__ngFactoryType__) {
+    return new (__ngFactoryType__ || _TpDonutChartComponent)();
+  };
+  static \u0275cmp = /* @__PURE__ */ i0.\u0275\u0275defineComponent({ type: _TpDonutChartComponent, selectors: [["tp-donut-chart"]], inputs: { data: "data", title: "title", centerSubtext: "centerSubtext", height: "height" }, outputs: { segmentClick: "segmentClick" }, features: [i0.\u0275\u0275NgOnChangesFeature], decls: 14, vars: 14, consts: [[1, "tp-donut-container"], [1, "donut-visual-wrap"], ["viewBox", "0 0 200 200", 1, "tp-svg-donut"], ["cx", "100", "cy", "100", "r", "80", "fill", "transparent", "stroke-width", "22", 1, "donut-track"], ["cx", "100", "cy", "100", "r", "80", "fill", "transparent", "class", "donut-segment", 3, "click", "mouseenter", "mouseleave", 4, "ngFor", "ngForOf"], [1, "donut-center-label"], [1, "center-title"], [1, "center-value"], ["class", "center-sub", 4, "ngIf"], ["class", "center-empty", 4, "ngIf"], ["class", "donut-legend-wrap", 4, "ngIf"], ["cx", "100", "cy", "100", "r", "80", "fill", "transparent", 1, "donut-segment", 3, "click", "mouseenter", "mouseleave"], [1, "center-sub"], [1, "center-empty"], [1, "donut-legend-wrap"], ["class", "legend-item", "role", "button", "tabindex", "0", 3, "active", "mouseenter", "mouseleave", "click", "keydown.enter", "keydown.space", 4, "ngFor", "ngForOf"], ["role", "button", "tabindex", "0", 1, "legend-item", 3, "mouseenter", "mouseleave", "click", "keydown.enter", "keydown.space"], [1, "legend-dot"], [1, "legend-name"], [1, "legend-stats"], [1, "legend-val"], [1, "legend-pct"]], template: function TpDonutChartComponent_Template(rf, ctx) {
+    if (rf & 1) {
+      i0.\u0275\u0275elementStart(0, "div", 0)(1, "div", 1);
+      i0.\u0275\u0275namespaceSVG();
+      i0.\u0275\u0275elementStart(2, "svg", 2);
+      i0.\u0275\u0275element(3, "circle", 3);
+      i0.\u0275\u0275template(4, TpDonutChartComponent__svg_circle_4_Template, 1, 4, "circle", 4);
+      i0.\u0275\u0275elementEnd();
+      i0.\u0275\u0275namespaceHTML();
+      i0.\u0275\u0275elementStart(5, "div", 5)(6, "span", 6);
+      i0.\u0275\u0275text(7);
+      i0.\u0275\u0275elementEnd();
+      i0.\u0275\u0275elementStart(8, "strong", 7);
+      i0.\u0275\u0275text(9);
+      i0.\u0275\u0275pipe(10, "number");
+      i0.\u0275\u0275elementEnd();
+      i0.\u0275\u0275template(11, TpDonutChartComponent_span_11_Template, 2, 1, "span", 8)(12, TpDonutChartComponent_span_12_Template, 2, 0, "span", 9);
+      i0.\u0275\u0275elementEnd()();
+      i0.\u0275\u0275template(13, TpDonutChartComponent_div_13_Template, 2, 1, "div", 10);
+      i0.\u0275\u0275elementEnd();
+    }
+    if (rf & 2) {
+      i0.\u0275\u0275styleProp("height", ctx.height, "px");
+      i0.\u0275\u0275classProp("no-segments", ctx.segments.length === 0);
+      i0.\u0275\u0275advance(4);
+      i0.\u0275\u0275property("ngForOf", ctx.segments);
+      i0.\u0275\u0275advance(3);
+      i0.\u0275\u0275textInterpolate(ctx.activeSegment ? ctx.activeSegment.label : ctx.title);
+      i0.\u0275\u0275advance(2);
+      i0.\u0275\u0275textInterpolate(i0.\u0275\u0275pipeBind3(10, 10, ctx.activeSegment ? ctx.activeSegment.value : ctx.total, "1.0-0", "es-MX"));
+      i0.\u0275\u0275advance(2);
+      i0.\u0275\u0275property("ngIf", ctx.activeSegment);
+      i0.\u0275\u0275advance();
+      i0.\u0275\u0275property("ngIf", !ctx.activeSegment && ctx.total === 0);
+      i0.\u0275\u0275advance();
+      i0.\u0275\u0275property("ngIf", ctx.segments.length > 0);
+    }
+  }, dependencies: [CommonModule, i1.NgClass, i1.NgComponentOutlet, i1.NgForOf, i1.NgIf, i1.NgTemplateOutlet, i1.NgStyle, i1.NgSwitch, i1.NgSwitchCase, i1.NgSwitchDefault, i1.NgPlural, i1.NgPluralCase, i1.AsyncPipe, i1.UpperCasePipe, i1.LowerCasePipe, i1.JsonPipe, i1.SlicePipe, i1.DecimalPipe, i1.PercentPipe, i1.TitleCasePipe, i1.CurrencyPipe, i1.DatePipe, i1.I18nPluralPipe, i1.I18nSelectPipe, i1.KeyValuePipe], styles: ["\n[_nghost-%COMP%] {\n  display: block;\n  width: 100%;\n}\n.tp-donut-container[_ngcontent-%COMP%] {\n  display: flex;\n  align-items: center;\n  justify-content: space-around;\n  gap: 1.25rem;\n  width: 100%;\n}\n.tp-donut-container.no-segments[_ngcontent-%COMP%] {\n  justify-content: center;\n}\n.donut-visual-wrap[_ngcontent-%COMP%] {\n  position: relative;\n  width: 190px;\n  height: 190px;\n  flex-shrink: 0;\n}\n.tp-svg-donut[_ngcontent-%COMP%] {\n  width: 100%;\n  height: 100%;\n  transform: rotate(-90deg);\n  transform-origin: center;\n}\n.donut-track[_ngcontent-%COMP%] {\n  stroke: var(--%NS%line, rgba(226, 232, 240, 0.6));\n}\n.donut-segment[_ngcontent-%COMP%] {\n  cursor: pointer;\n  stroke-linecap: round;\n  transition:\n    stroke-width 0.25s ease,\n    opacity 0.25s ease,\n    stroke-dashoffset 0.4s ease;\n}\n.donut-segment[_ngcontent-%COMP%]:hover {\n  filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.15));\n}\n.donut-center-label[_ngcontent-%COMP%] {\n  position: absolute;\n  top: 50%;\n  left: 50%;\n  transform: translate(-50%, -50%);\n  display: flex;\n  flex-direction: column;\n  align-items: center;\n  justify-content: center;\n  text-align: center;\n  pointer-events: none;\n  width: 110px;\n}\n.donut-center-label[_ngcontent-%COMP%]   .center-title[_ngcontent-%COMP%] {\n  font-size: 0.72rem;\n  font-weight: 500;\n  color: var(--%NS%muted, #64748b);\n  max-width: 95px;\n  overflow: hidden;\n  text-overflow: ellipsis;\n  white-space: nowrap;\n}\n.donut-center-label[_ngcontent-%COMP%]   .center-value[_ngcontent-%COMP%] {\n  font-size: 1.65rem;\n  font-weight: 800;\n  line-height: 1.1;\n  color: var(--%NS%ink, #0f172a);\n  letter-spacing: -0.04em;\n}\n.donut-center-label[_ngcontent-%COMP%]   .center-sub[_ngcontent-%COMP%] {\n  font-size: 0.72rem;\n  font-weight: 700;\n  color: #057a55;\n  margin-top: 0.1rem;\n}\n.donut-center-label[_ngcontent-%COMP%]   .center-empty[_ngcontent-%COMP%] {\n  font-size: 0.72rem;\n  color: var(--%NS%muted, #64748b);\n  margin-top: 0.2rem;\n}\n.donut-legend-wrap[_ngcontent-%COMP%] {\n  display: flex;\n  flex-direction: column;\n  gap: 0.4rem;\n  overflow-y: auto;\n  max-height: 100%;\n  flex: 1;\n  min-width: 0;\n}\n.legend-item[_ngcontent-%COMP%] {\n  display: flex;\n  align-items: center;\n  justify-content: space-between;\n  gap: 0.65rem;\n  padding: 0.4rem 0.6rem;\n  border-radius: 0.65rem;\n  border: 1px solid transparent;\n  cursor: pointer;\n  transition: background 0.18s ease, border-color 0.18s ease;\n}\n.legend-item[_ngcontent-%COMP%]:hover, \n.legend-item.active[_ngcontent-%COMP%] {\n  background: var(--%NS%fuse-bg-default, rgba(241, 245, 249, 0.7));\n  border-color: var(--%NS%line, rgba(226, 232, 240, 0.8));\n}\n.legend-item[_ngcontent-%COMP%]   .legend-dot[_ngcontent-%COMP%] {\n  width: 0.55rem;\n  height: 0.55rem;\n  border-radius: 50%;\n  flex-shrink: 0;\n}\n.legend-item[_ngcontent-%COMP%]   .legend-name[_ngcontent-%COMP%] {\n  font-size: 0.8rem;\n  font-weight: 550;\n  color: var(--%NS%ink, #0f172a);\n  flex: 1;\n  overflow: hidden;\n  text-overflow: ellipsis;\n  white-space: nowrap;\n}\n.legend-item[_ngcontent-%COMP%]   .legend-stats[_ngcontent-%COMP%] {\n  display: flex;\n  align-items: baseline;\n  gap: 0.25rem;\n  flex-shrink: 0;\n}\n.legend-item[_ngcontent-%COMP%]   .legend-val[_ngcontent-%COMP%] {\n  font-size: 0.85rem;\n  font-weight: 700;\n  color: var(--%NS%ink, #0f172a);\n}\n.legend-item[_ngcontent-%COMP%]   .legend-pct[_ngcontent-%COMP%] {\n  font-size: 0.7rem;\n  color: var(--%NS%muted, #64748b);\n}\n@media (max-width: 600px) {\n  .tp-donut-container[_ngcontent-%COMP%] {\n    flex-direction: column;\n  }\n}\n[data-theme=dark][_nghost-%COMP%]   .donut-track[_ngcontent-%COMP%], [data-theme=dark]   [_nghost-%COMP%]   .donut-track[_ngcontent-%COMP%] {\n  stroke: rgba(241, 245, 249, 0.1);\n}\n[data-theme=dark][_nghost-%COMP%]   .legend-item[_ngcontent-%COMP%]:hover, [data-theme=dark]   [_nghost-%COMP%]   .legend-item[_ngcontent-%COMP%]:hover, \n[data-theme=dark][_nghost-%COMP%]   .legend-item.active[_ngcontent-%COMP%], [data-theme=dark]   [_nghost-%COMP%]   .legend-item.active[_ngcontent-%COMP%] {\n  background: rgba(30, 41, 59, 0.6);\n}\n/*# sourceMappingURL=tp-donut-chart.component.css.map */"] });
+};
+(() => {
+  (typeof ngDevMode === "undefined" || ngDevMode) && i0.\u0275setClassMetadata(TpDonutChartComponent, [{
+    type: Component,
+    args: [{ selector: "tp-donut-chart", standalone: true, imports: [CommonModule], template: `<div class="tp-donut-container" [class.no-segments]="segments.length === 0" [style.height.px]="height">
+  <!-- Left/Top Donut Circle -->
+  <div class="donut-visual-wrap">
+    <svg viewBox="0 0 200 200" class="tp-svg-donut">
+      <!-- Background Ring Track -->
+      <circle
+        cx="100"
+        cy="100"
+        r="80"
+        fill="transparent"
+        class="donut-track"
+        stroke-width="22"
+      />
+
+      <!-- Animated Donut Slices -->
+      <circle
+        *ngFor="let seg of segments; index as idx"
+        cx="100"
+        cy="100"
+        r="80"
+        fill="transparent"
+        [attr.stroke]="seg.color"
+        [attr.stroke-width]="activeSegmentIndex === idx ? 26 : 22"
+        [attr.stroke-dasharray]="seg.dashArray"
+        [attr.stroke-dashoffset]="seg.dashOffset"
+        class="donut-segment"
+        (click)="onSegmentClick(seg)"
+        (mouseenter)="hoverSegment(idx)"
+        (mouseleave)="hoverSegment(null)"
+      />
+    </svg>
+
+    <!-- Center Counter -->
+    <div class="donut-center-label">
+      <span class="center-title">{{ activeSegment ? activeSegment.label : title }}</span>
+      <strong class="center-value">{{ (activeSegment ? activeSegment.value : total) | number:'1.0-0':'es-MX' }}</strong>
+      <span *ngIf="activeSegment" class="center-sub">{{ activeSegment.percentage }}%</span>
+      <span *ngIf="!activeSegment && total === 0" class="center-empty">Sin datos</span>
+    </div>
+  </div>
+
+  <!-- Legend List -->
+  <div *ngIf="segments.length > 0" class="donut-legend-wrap">
+    <div
+      *ngFor="let seg of segments; index as idx"
+      class="legend-item"
+      [class.active]="activeSegmentIndex === idx"
+      (mouseenter)="hoverSegment(idx)"
+      (mouseleave)="hoverSegment(null)"
+      (click)="onSegmentClick(seg)"
+      role="button"
+      (keydown.enter)="onSegmentClick(seg)" (keydown.space)="$event.preventDefault();onSegmentClick(seg)" tabindex="0"
+    >
+      <span class="legend-dot" [style.background]="seg.color"></span>
+      <span class="legend-name">{{ seg.label }}</span>
+      <div class="legend-stats">
+        <strong class="legend-val">{{ seg.value | number:'1.0-0':'es-MX' }}</strong>
+        <span class="legend-pct">({{ seg.percentage }}%)</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+`, styles: ["/* src/app/shared/components/charts/tp-donut-chart/tp-donut-chart.component.scss */\n:host {\n  display: block;\n  width: 100%;\n}\n.tp-donut-container {\n  display: flex;\n  align-items: center;\n  justify-content: space-around;\n  gap: 1.25rem;\n  width: 100%;\n}\n.tp-donut-container.no-segments {\n  justify-content: center;\n}\n.donut-visual-wrap {\n  position: relative;\n  width: 190px;\n  height: 190px;\n  flex-shrink: 0;\n}\n.tp-svg-donut {\n  width: 100%;\n  height: 100%;\n  transform: rotate(-90deg);\n  transform-origin: center;\n}\n.donut-track {\n  stroke: var(--line, rgba(226, 232, 240, 0.6));\n}\n.donut-segment {\n  cursor: pointer;\n  stroke-linecap: round;\n  transition:\n    stroke-width 0.25s ease,\n    opacity 0.25s ease,\n    stroke-dashoffset 0.4s ease;\n}\n.donut-segment:hover {\n  filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.15));\n}\n.donut-center-label {\n  position: absolute;\n  top: 50%;\n  left: 50%;\n  transform: translate(-50%, -50%);\n  display: flex;\n  flex-direction: column;\n  align-items: center;\n  justify-content: center;\n  text-align: center;\n  pointer-events: none;\n  width: 110px;\n}\n.donut-center-label .center-title {\n  font-size: 0.72rem;\n  font-weight: 500;\n  color: var(--muted, #64748b);\n  max-width: 95px;\n  overflow: hidden;\n  text-overflow: ellipsis;\n  white-space: nowrap;\n}\n.donut-center-label .center-value {\n  font-size: 1.65rem;\n  font-weight: 800;\n  line-height: 1.1;\n  color: var(--ink, #0f172a);\n  letter-spacing: -0.04em;\n}\n.donut-center-label .center-sub {\n  font-size: 0.72rem;\n  font-weight: 700;\n  color: #057a55;\n  margin-top: 0.1rem;\n}\n.donut-center-label .center-empty {\n  font-size: 0.72rem;\n  color: var(--muted, #64748b);\n  margin-top: 0.2rem;\n}\n.donut-legend-wrap {\n  display: flex;\n  flex-direction: column;\n  gap: 0.4rem;\n  overflow-y: auto;\n  max-height: 100%;\n  flex: 1;\n  min-width: 0;\n}\n.legend-item {\n  display: flex;\n  align-items: center;\n  justify-content: space-between;\n  gap: 0.65rem;\n  padding: 0.4rem 0.6rem;\n  border-radius: 0.65rem;\n  border: 1px solid transparent;\n  cursor: pointer;\n  transition: background 0.18s ease, border-color 0.18s ease;\n}\n.legend-item:hover,\n.legend-item.active {\n  background: var(--fuse-bg-default, rgba(241, 245, 249, 0.7));\n  border-color: var(--line, rgba(226, 232, 240, 0.8));\n}\n.legend-item .legend-dot {\n  width: 0.55rem;\n  height: 0.55rem;\n  border-radius: 50%;\n  flex-shrink: 0;\n}\n.legend-item .legend-name {\n  font-size: 0.8rem;\n  font-weight: 550;\n  color: var(--ink, #0f172a);\n  flex: 1;\n  overflow: hidden;\n  text-overflow: ellipsis;\n  white-space: nowrap;\n}\n.legend-item .legend-stats {\n  display: flex;\n  align-items: baseline;\n  gap: 0.25rem;\n  flex-shrink: 0;\n}\n.legend-item .legend-val {\n  font-size: 0.85rem;\n  font-weight: 700;\n  color: var(--ink, #0f172a);\n}\n.legend-item .legend-pct {\n  font-size: 0.7rem;\n  color: var(--muted, #64748b);\n}\n@media (max-width: 600px) {\n  .tp-donut-container {\n    flex-direction: column;\n  }\n}\n:host-context([data-theme=dark]) .donut-track {\n  stroke: rgba(241, 245, 249, 0.1);\n}\n:host-context([data-theme=dark]) .legend-item:hover,\n:host-context([data-theme=dark]) .legend-item.active {\n  background: rgba(30, 41, 59, 0.6);\n}\n/*# sourceMappingURL=tp-donut-chart.component.css.map */\n"] }]
+  }], null, { data: [{
+    type: Input
+  }], title: [{
+    type: Input
+  }], centerSubtext: [{
+    type: Input
+  }], height: [{
+    type: Input
+  }], segmentClick: [{
+    type: Output
+  }] });
+})();
+(() => {
+  (typeof ngDevMode === "undefined" || ngDevMode) && i0.\u0275setClassDebugInfo(TpDonutChartComponent, { className: "TpDonutChartComponent", filePath: "src/app/shared/components/charts/tp-donut-chart/tp-donut-chart.component.ts", lineNumber: 17 });
+})();
+(() => {
+  const id = "src%2Fapp%2Fshared%2Fcomponents%2Fcharts%2Ftp-donut-chart%2Ftp-donut-chart.component.ts%40TpDonutChartComponent";
+  function TpDonutChartComponent_HmrLoad(t) {
+    import(
+      /* @vite-ignore */
+      __vite__injectQuery(i0.\u0275\u0275getReplaceMetadataURL(id, t, import.meta.url), 'import')
+    ).then((m) => m.default && i0.\u0275\u0275replaceMetadata(TpDonutChartComponent, m.default, [i0, i1], [CommonModule, Component, Input, Output], import.meta, id));
+  }
+  (typeof ngDevMode === "undefined" || ngDevMode) && TpDonutChartComponent_HmrLoad(Date.now());
+  (typeof ngDevMode === "undefined" || ngDevMode) && (import.meta.hot && import.meta.hot.on("angular:component-update", (d) => d.id === id && TpDonutChartComponent_HmrLoad(d.timestamp)));
+})();
+
+// src/app/shared/components/charts/tp-bar-chart/tp-bar-chart.component.ts
+import { Component as Component2, EventEmitter as EventEmitter2, Input as Input2, Output as Output2 } from "/@fs/D:/Users/Alex_Saenz/Documents/Proyectos/Rediseño trotapie/Trotapie nuevo/.angular/cache/22.2.2/trotapie/vite/deps/@angular_core.js?v=e11bbf10";
+import { CommonModule as CommonModule2 } from "/@fs/D:/Users/Alex_Saenz/Documents/Proyectos/Rediseño trotapie/Trotapie nuevo/.angular/cache/22.2.2/trotapie/vite/deps/@angular_common.js?v=e11bbf10";
+import * as i02 from "/@fs/D:/Users/Alex_Saenz/Documents/Proyectos/Rediseño trotapie/Trotapie nuevo/.angular/cache/22.2.2/trotapie/vite/deps/@angular_core.js?v=e11bbf10";
+import * as i12 from "/@fs/D:/Users/Alex_Saenz/Documents/Proyectos/Rediseño trotapie/Trotapie nuevo/.angular/cache/22.2.2/trotapie/vite/deps/@angular_common.js?v=e11bbf10";
+function TpBarChartComponent__svg_line_3_Template(rf, ctx) {
+  if (rf & 1) {
+    i02.\u0275\u0275namespaceSVG();
+    i02.\u0275\u0275element(0, "line", 10);
+  }
+  if (rf & 2) {
+    const grid_r1 = ctx.$implicit;
+    const ctx_r1 = i02.\u0275\u0275nextContext();
+    i02.\u0275\u0275attribute("x1", ctx_r1.paddingLeft)("y1", grid_r1.y)("x2", ctx_r1.width - ctx_r1.paddingRight)("y2", grid_r1.y);
+  }
+}
+function TpBarChartComponent__svg_g_4__svg_rect_1_Template(rf, ctx) {
+  if (rf & 1) {
+    i02.\u0275\u0275namespaceSVG();
+    i02.\u0275\u0275element(0, "rect", 14);
+  }
+  if (rf & 2) {
+    const bar_r4 = i02.\u0275\u0275nextContext().$implicit;
+    const ctx_r1 = i02.\u0275\u0275nextContext();
+    i02.\u0275\u0275attribute("x", bar_r4.x - 6)("y", ctx_r1.paddingTop - 10)("width", bar_r4.barWidth + 12)("height", ctx_r1.height - ctx_r1.paddingTop - ctx_r1.paddingBottom + 10);
+  }
+}
+function TpBarChartComponent__svg_g_4_Template(rf, ctx) {
+  if (rf & 1) {
+    const _r3 = i02.\u0275\u0275getCurrentView();
+    i02.\u0275\u0275namespaceSVG();
+    i02.\u0275\u0275elementStart(0, "g", 11);
+    i02.\u0275\u0275listener("click", function TpBarChartComponent__svg_g_4_Template_g_click_0_listener() {
+      const bar_r4 = i02.\u0275\u0275restoreView(_r3).$implicit;
+      const ctx_r1 = i02.\u0275\u0275nextContext();
+      return i02.\u0275\u0275resetView(ctx_r1.onBarClick(bar_r4));
+    })("mouseenter", function TpBarChartComponent__svg_g_4_Template_g_mouseenter_0_listener() {
+      const idx_r5 = i02.\u0275\u0275restoreView(_r3).index;
+      const ctx_r1 = i02.\u0275\u0275nextContext();
+      return i02.\u0275\u0275resetView(ctx_r1.hoverBar(idx_r5));
+    })("mouseleave", function TpBarChartComponent__svg_g_4_Template_g_mouseleave_0_listener() {
+      i02.\u0275\u0275restoreView(_r3);
+      const ctx_r1 = i02.\u0275\u0275nextContext();
+      return i02.\u0275\u0275resetView(ctx_r1.hoverBar(null));
+    });
+    i02.\u0275\u0275template(1, TpBarChartComponent__svg_g_4__svg_rect_1_Template, 1, 4, "rect", 12);
+    i02.\u0275\u0275element(2, "rect", 13);
+    i02.\u0275\u0275elementEnd();
+  }
+  if (rf & 2) {
+    const bar_r4 = ctx.$implicit;
+    const idx_r5 = ctx.index;
+    const ctx_r1 = i02.\u0275\u0275nextContext();
+    i02.\u0275\u0275advance();
+    i02.\u0275\u0275property("ngIf", ctx_r1.activeBarIndex === idx_r5);
+    i02.\u0275\u0275advance();
+    i02.\u0275\u0275classProp("active", ctx_r1.activeBarIndex === idx_r5);
+    i02.\u0275\u0275attribute("x", bar_r4.x)("y", bar_r4.y)("width", bar_r4.barWidth)("height", bar_r4.barHeight)("fill", bar_r4.color);
+  }
+}
+function TpBarChartComponent_div_6_Template(rf, ctx) {
+  if (rf & 1) {
+    i02.\u0275\u0275elementStart(0, "div", 15)(1, "strong");
+    i02.\u0275\u0275text(2);
+    i02.\u0275\u0275pipe(3, "number");
+    i02.\u0275\u0275elementEnd()();
+  }
+  if (rf & 2) {
+    const bar_r6 = ctx.$implicit;
+    i02.\u0275\u0275styleProp("left", bar_r6.xPercent, "%")("width", bar_r6.widthPercent, "%")("top", bar_r6.topPx - 22, "px");
+    i02.\u0275\u0275advance(2);
+    i02.\u0275\u0275textInterpolate(i02.\u0275\u0275pipeBind3(3, 7, bar_r6.value, "1.0-0", "es-MX"));
+  }
+}
+function TpBarChartComponent_div_8_Template(rf, ctx) {
+  if (rf & 1) {
+    i02.\u0275\u0275elementStart(0, "div", 16)(1, "span");
+    i02.\u0275\u0275text(2);
+    i02.\u0275\u0275elementEnd()();
+  }
+  if (rf & 2) {
+    const bar_r7 = ctx.$implicit;
+    i02.\u0275\u0275styleProp("left", bar_r7.xPercent, "%")("width", bar_r7.widthPercent, "%");
+    i02.\u0275\u0275advance(2);
+    i02.\u0275\u0275textInterpolate(bar_r7.label);
+  }
+}
+function TpBarChartComponent_div_9_Template(rf, ctx) {
+  if (rf & 1) {
+    i02.\u0275\u0275elementStart(0, "div", 17)(1, "span");
+    i02.\u0275\u0275text(2, "Sin datos para mostrar");
+    i02.\u0275\u0275elementEnd()();
+  }
+}
+var TpBarChartComponent = class _TpBarChartComponent {
+  data = [];
+  height = 280;
+  barClick = new EventEmitter2();
+  defaultColors = ["#0ea5e9", "#057a55", "#f59e0b", "#ef4444", "#6366f1"];
+  width = 800;
+  viewBox = "0 0 800 280";
+  paddingLeft = 30;
+  paddingRight = 30;
+  paddingTop = 35;
+  paddingBottom = 45;
+  bars = [];
+  gridLines = [];
+  activeBarIndex = null;
+  ngOnInit() {
+    this.recalculate();
+  }
+  ngOnChanges(changes) {
+    if (changes["data"] || changes["height"]) {
+      this.recalculate();
+    }
+  }
+  recalculate() {
+    const validItems = (this.data || []).filter((item) => item && Number.isFinite(item.value));
+    if (validItems.length === 0) {
+      this.bars = [];
+      this.gridLines = [];
+      return;
+    }
+    this.viewBox = `0 0 ${this.width} ${this.height}`;
+    const drawWidth = this.width - this.paddingLeft - this.paddingRight;
+    const drawHeight = this.height - this.paddingTop - this.paddingBottom;
+    const values = validItems.map((d) => d.value);
+    const maxVal = Math.max(...values, 1);
+    this.gridLines = [];
+    const steps = 4;
+    for (let i = 0; i <= steps; i++) {
+      const val = Math.round(maxVal / steps * i);
+      const y = this.paddingTop + drawHeight - val / maxVal * drawHeight;
+      this.gridLines.push({ y, value: val });
+    }
+    const count = validItems.length;
+    const slotWidth = drawWidth / count;
+    const barWidth = Math.min(slotWidth * 0.45, 52);
+    this.bars = validItems.map((item, idx) => {
+      const val = Math.max(item.value, 0);
+      const h = val / maxVal * drawHeight;
+      const x = this.paddingLeft + idx * slotWidth + (slotWidth - barWidth) / 2;
+      const y = this.paddingTop + drawHeight - h;
+      const color = item.color || this.defaultColors[idx % this.defaultColors.length];
+      return {
+        label: item.label,
+        value: val,
+        color,
+        x,
+        y,
+        barWidth,
+        barHeight: Math.max(h, 4),
+        xPercent: (x - this.paddingLeft) / drawWidth * 100,
+        widthPercent: barWidth / drawWidth * 100,
+        topPx: y,
+        rawIndex: idx
+      };
+    });
+  }
+  hoverBar(idx) {
+    this.activeBarIndex = idx;
+  }
+  onBarClick(bar) {
+    this.barClick.emit({ label: bar.label, value: bar.value, index: bar.rawIndex });
+  }
+  get activeBar() {
+    if (this.activeBarIndex === null || !this.bars[this.activeBarIndex]) {
+      return null;
+    }
+    return this.bars[this.activeBarIndex];
+  }
+  static \u0275fac = function TpBarChartComponent_Factory(__ngFactoryType__) {
+    return new (__ngFactoryType__ || _TpBarChartComponent)();
+  };
+  static \u0275cmp = /* @__PURE__ */ i02.\u0275\u0275defineComponent({ type: _TpBarChartComponent, selectors: [["tp-bar-chart"]], inputs: { data: "data", height: "height" }, outputs: { barClick: "barClick" }, features: [i02.\u0275\u0275NgOnChangesFeature], decls: 10, vars: 16, consts: [[1, "tp-chart-container"], ["preserveAspectRatio", "none", 1, "tp-svg-chart"], [1, "grid-group"], ["class", "grid-line", 4, "ngFor", "ngForOf"], ["class", "bar-node", 3, "click", "mouseenter", "mouseleave", 4, "ngFor", "ngForOf"], [1, "bar-values-overlay"], ["class", "bar-val-item", 3, "left", "width", "top", 4, "ngFor", "ngForOf"], [1, "bar-labels-overlay"], ["class", "bar-label-item", 3, "left", "width", 4, "ngFor", "ngForOf"], ["class", "empty-chart-overlay", 4, "ngIf"], [1, "grid-line"], [1, "bar-node", 3, "click", "mouseenter", "mouseleave"], ["rx", "8", "fill", "rgba(5, 122, 85, 0.06)", "class", "bar-hover-bg", 4, "ngIf"], ["rx", "6", "ry", "6", 1, "bar-rect"], ["rx", "8", "fill", "rgba(5, 122, 85, 0.06)", 1, "bar-hover-bg"], [1, "bar-val-item"], [1, "bar-label-item"], [1, "empty-chart-overlay"]], template: function TpBarChartComponent_Template(rf, ctx) {
+    if (rf & 1) {
+      i02.\u0275\u0275elementStart(0, "div", 0);
+      i02.\u0275\u0275namespaceSVG();
+      i02.\u0275\u0275elementStart(1, "svg", 1)(2, "g", 2);
+      i02.\u0275\u0275template(3, TpBarChartComponent__svg_line_3_Template, 1, 4, "line", 3);
+      i02.\u0275\u0275elementEnd();
+      i02.\u0275\u0275template(4, TpBarChartComponent__svg_g_4_Template, 3, 8, "g", 4);
+      i02.\u0275\u0275elementEnd();
+      i02.\u0275\u0275namespaceHTML();
+      i02.\u0275\u0275elementStart(5, "div", 5);
+      i02.\u0275\u0275template(6, TpBarChartComponent_div_6_Template, 4, 11, "div", 6);
+      i02.\u0275\u0275elementEnd();
+      i02.\u0275\u0275elementStart(7, "div", 7);
+      i02.\u0275\u0275template(8, TpBarChartComponent_div_8_Template, 3, 5, "div", 8);
+      i02.\u0275\u0275elementEnd();
+      i02.\u0275\u0275template(9, TpBarChartComponent_div_9_Template, 3, 0, "div", 9);
+      i02.\u0275\u0275elementEnd();
+    }
+    if (rf & 2) {
+      i02.\u0275\u0275styleProp("height", ctx.height, "px");
+      i02.\u0275\u0275advance();
+      i02.\u0275\u0275attribute("viewBox", ctx.viewBox);
+      i02.\u0275\u0275advance(2);
+      i02.\u0275\u0275property("ngForOf", ctx.gridLines);
+      i02.\u0275\u0275advance();
+      i02.\u0275\u0275property("ngForOf", ctx.bars);
+      i02.\u0275\u0275advance();
+      i02.\u0275\u0275styleProp("left", ctx.paddingLeft, "px")("right", ctx.paddingRight, "px");
+      i02.\u0275\u0275advance();
+      i02.\u0275\u0275property("ngForOf", ctx.bars);
+      i02.\u0275\u0275advance();
+      i02.\u0275\u0275styleProp("left", ctx.paddingLeft, "px")("right", ctx.paddingRight, "px");
+      i02.\u0275\u0275advance();
+      i02.\u0275\u0275property("ngForOf", ctx.bars);
+      i02.\u0275\u0275advance();
+      i02.\u0275\u0275property("ngIf", ctx.bars.length === 0);
+    }
+  }, dependencies: [CommonModule2, i12.NgClass, i12.NgComponentOutlet, i12.NgForOf, i12.NgIf, i12.NgTemplateOutlet, i12.NgStyle, i12.NgSwitch, i12.NgSwitchCase, i12.NgSwitchDefault, i12.NgPlural, i12.NgPluralCase, i12.AsyncPipe, i12.UpperCasePipe, i12.LowerCasePipe, i12.JsonPipe, i12.SlicePipe, i12.DecimalPipe, i12.PercentPipe, i12.TitleCasePipe, i12.CurrencyPipe, i12.DatePipe, i12.I18nPluralPipe, i12.I18nSelectPipe, i12.KeyValuePipe], styles: ["\n[_nghost-%COMP%] {\n  display: block;\n  width: 100%;\n}\n.tp-chart-container[_ngcontent-%COMP%] {\n  position: relative;\n  width: 100%;\n}\n.tp-svg-chart[_ngcontent-%COMP%] {\n  width: 100%;\n  height: 100%;\n  overflow: visible;\n}\n.grid-line[_ngcontent-%COMP%] {\n  stroke: var(--%NS%line, rgba(226, 232, 240, 0.6));\n  stroke-dasharray: 4 4;\n  stroke-width: 1;\n}\n.bar-node[_ngcontent-%COMP%] {\n  cursor: pointer;\n}\n.bar-node[_ngcontent-%COMP%]   .bar-rect[_ngcontent-%COMP%] {\n  transition:\n    transform 0.2s ease,\n    filter 0.2s ease,\n    opacity 0.2s ease;\n}\n.bar-node[_ngcontent-%COMP%]   .bar-rect[_ngcontent-%COMP%]:hover, \n.bar-node[_ngcontent-%COMP%]   .bar-rect.active[_ngcontent-%COMP%] {\n  filter: drop-shadow(0 6px 12px rgba(15, 23, 42, 0.15));\n  opacity: 0.95;\n}\n.bar-values-overlay[_ngcontent-%COMP%] {\n  position: absolute;\n  top: 0;\n  bottom: 0;\n  pointer-events: none;\n  z-index: 5;\n}\n.bar-val-item[_ngcontent-%COMP%] {\n  position: absolute;\n  display: flex;\n  justify-content: center;\n  align-items: center;\n  pointer-events: none;\n}\n.bar-val-item[_ngcontent-%COMP%]   strong[_ngcontent-%COMP%] {\n  font-size: 0.88rem;\n  font-family: inherit;\n  color: var(--%NS%ink, #0f172a);\n  font-weight: 800;\n  line-height: 1;\n  white-space: nowrap;\n}\n.bar-labels-overlay[_ngcontent-%COMP%] {\n  position: absolute;\n  bottom: 8px;\n  height: 22px;\n  pointer-events: none;\n  z-index: 5;\n}\n.bar-label-item[_ngcontent-%COMP%] {\n  position: absolute;\n  display: flex;\n  justify-content: center;\n  align-items: center;\n  pointer-events: none;\n}\n.bar-label-item[_ngcontent-%COMP%]   span[_ngcontent-%COMP%] {\n  font-size: 0.8rem;\n  font-family: inherit;\n  font-weight: 650;\n  color: var(--%NS%muted, #64748b);\n  white-space: nowrap;\n}\n.empty-chart-overlay[_ngcontent-%COMP%] {\n  position: absolute;\n  inset: 0;\n  display: flex;\n  align-items: center;\n  justify-content: center;\n  color: var(--%NS%muted, #64748b);\n  font-size: 0.88rem;\n  font-weight: 500;\n}\n[data-theme=dark][_nghost-%COMP%]   .grid-line[_ngcontent-%COMP%], [data-theme=dark]   [_nghost-%COMP%]   .grid-line[_ngcontent-%COMP%] {\n  stroke: rgba(241, 245, 249, 0.1);\n}\n[data-theme=dark][_nghost-%COMP%]   .bar-val-item[_ngcontent-%COMP%]   strong[_ngcontent-%COMP%], [data-theme=dark]   [_nghost-%COMP%]   .bar-val-item[_ngcontent-%COMP%]   strong[_ngcontent-%COMP%] {\n  color: #f1f5f9;\n}\n[data-theme=dark][_nghost-%COMP%]   .bar-label-item[_ngcontent-%COMP%]   span[_ngcontent-%COMP%], [data-theme=dark]   [_nghost-%COMP%]   .bar-label-item[_ngcontent-%COMP%]   span[_ngcontent-%COMP%] {\n  color: #94a3b8;\n}\n/*# sourceMappingURL=tp-bar-chart.component.css.map */"] });
+};
+(() => {
+  (typeof ngDevMode === "undefined" || ngDevMode) && i02.\u0275setClassMetadata(TpBarChartComponent, [{
+    type: Component2,
+    args: [{ selector: "tp-bar-chart", standalone: true, imports: [CommonModule2], template: `<div class="tp-chart-container" [style.height.px]="height">
+  <!-- SVG Vector Grid & Bars Layer -->
+  <svg [attr.viewBox]="viewBox" class="tp-svg-chart" preserveAspectRatio="none">
+    <!-- Grid Lines -->
+    <g class="grid-group">
+      <line
+        *ngFor="let grid of gridLines"
+        [attr.x1]="paddingLeft"
+        [attr.y1]="grid.y"
+        [attr.x2]="width - paddingRight"
+        [attr.y2]="grid.y"
+        class="grid-line"
+      />
+    </g>
+
+    <!-- Bars -->
+    <g *ngFor="let bar of bars; index as idx" class="bar-node" (click)="onBarClick(bar)" (mouseenter)="hoverBar(idx)" (mouseleave)="hoverBar(null)">
+      <!-- Hover Background Glow -->
+      <rect
+        *ngIf="activeBarIndex === idx"
+        [attr.x]="bar.x - 6"
+        [attr.y]="paddingTop - 10"
+        [attr.width]="bar.barWidth + 12"
+        [attr.height]="height - paddingTop - paddingBottom + 10"
+        rx="8"
+        fill="rgba(5, 122, 85, 0.06)"
+        class="bar-hover-bg"
+      />
+
+      <!-- Bar Rect -->
+      <rect
+        [attr.x]="bar.x"
+        [attr.y]="bar.y"
+        [attr.width]="bar.barWidth"
+        [attr.height]="bar.barHeight"
+        rx="6"
+        ry="6"
+        [attr.fill]="bar.color"
+        class="bar-rect"
+        [class.active]="activeBarIndex === idx"
+      />
+    </g>
+  </svg>
+
+  <!-- HTML Top Value Badges Overlay (Crisp Browser Font) -->
+  <div class="bar-values-overlay" [style.left.px]="paddingLeft" [style.right.px]="paddingRight">
+    <div
+      *ngFor="let bar of bars; index as idx"
+      class="bar-val-item"
+      [style.left.%]="bar.xPercent"
+      [style.width.%]="bar.widthPercent"
+      [style.top.px]="bar.topPx - 22"
+    >
+      <strong>{{ bar.value | number:'1.0-0':'es-MX' }}</strong>
+    </div>
+  </div>
+
+  <!-- HTML Bottom Category Labels Overlay (Crisp Browser Font) -->
+  <div class="bar-labels-overlay" [style.left.px]="paddingLeft" [style.right.px]="paddingRight">
+    <div
+      *ngFor="let bar of bars; index as idx"
+      class="bar-label-item"
+      [style.left.%]="bar.xPercent"
+      [style.width.%]="bar.widthPercent"
+    >
+      <span>{{ bar.label }}</span>
+    </div>
+  </div>
+
+  <div *ngIf="bars.length === 0" class="empty-chart-overlay">
+    <span>Sin datos para mostrar</span>
+  </div>
+</div>
+
+
+`, styles: ["/* src/app/shared/components/charts/tp-bar-chart/tp-bar-chart.component.scss */\n:host {\n  display: block;\n  width: 100%;\n}\n.tp-chart-container {\n  position: relative;\n  width: 100%;\n}\n.tp-svg-chart {\n  width: 100%;\n  height: 100%;\n  overflow: visible;\n}\n.grid-line {\n  stroke: var(--line, rgba(226, 232, 240, 0.6));\n  stroke-dasharray: 4 4;\n  stroke-width: 1;\n}\n.bar-node {\n  cursor: pointer;\n}\n.bar-node .bar-rect {\n  transition:\n    transform 0.2s ease,\n    filter 0.2s ease,\n    opacity 0.2s ease;\n}\n.bar-node .bar-rect:hover,\n.bar-node .bar-rect.active {\n  filter: drop-shadow(0 6px 12px rgba(15, 23, 42, 0.15));\n  opacity: 0.95;\n}\n.bar-values-overlay {\n  position: absolute;\n  top: 0;\n  bottom: 0;\n  pointer-events: none;\n  z-index: 5;\n}\n.bar-val-item {\n  position: absolute;\n  display: flex;\n  justify-content: center;\n  align-items: center;\n  pointer-events: none;\n}\n.bar-val-item strong {\n  font-size: 0.88rem;\n  font-family: inherit;\n  color: var(--ink, #0f172a);\n  font-weight: 800;\n  line-height: 1;\n  white-space: nowrap;\n}\n.bar-labels-overlay {\n  position: absolute;\n  bottom: 8px;\n  height: 22px;\n  pointer-events: none;\n  z-index: 5;\n}\n.bar-label-item {\n  position: absolute;\n  display: flex;\n  justify-content: center;\n  align-items: center;\n  pointer-events: none;\n}\n.bar-label-item span {\n  font-size: 0.8rem;\n  font-family: inherit;\n  font-weight: 650;\n  color: var(--muted, #64748b);\n  white-space: nowrap;\n}\n.empty-chart-overlay {\n  position: absolute;\n  inset: 0;\n  display: flex;\n  align-items: center;\n  justify-content: center;\n  color: var(--muted, #64748b);\n  font-size: 0.88rem;\n  font-weight: 500;\n}\n:host-context([data-theme=dark]) .grid-line {\n  stroke: rgba(241, 245, 249, 0.1);\n}\n:host-context([data-theme=dark]) .bar-val-item strong {\n  color: #f1f5f9;\n}\n:host-context([data-theme=dark]) .bar-label-item span {\n  color: #94a3b8;\n}\n/*# sourceMappingURL=tp-bar-chart.component.css.map */\n"] }]
+  }], null, { data: [{
+    type: Input2
+  }], height: [{
+    type: Input2
+  }], barClick: [{
+    type: Output2
+  }] });
+})();
+(() => {
+  (typeof ngDevMode === "undefined" || ngDevMode) && i02.\u0275setClassDebugInfo(TpBarChartComponent, { className: "TpBarChartComponent", filePath: "src/app/shared/components/charts/tp-bar-chart/tp-bar-chart.component.ts", lineNumber: 17 });
+})();
+(() => {
+  const id = "src%2Fapp%2Fshared%2Fcomponents%2Fcharts%2Ftp-bar-chart%2Ftp-bar-chart.component.ts%40TpBarChartComponent";
+  function TpBarChartComponent_HmrLoad(t) {
+    import(
+      /* @vite-ignore */
+      __vite__injectQuery(i02.\u0275\u0275getReplaceMetadataURL(id, t, import.meta.url), 'import')
+    ).then((m) => m.default && i02.\u0275\u0275replaceMetadata(TpBarChartComponent, m.default, [i02, i12], [CommonModule2, Component2, Input2, Output2], import.meta, id));
+  }
+  (typeof ngDevMode === "undefined" || ngDevMode) && TpBarChartComponent_HmrLoad(Date.now());
+  (typeof ngDevMode === "undefined" || ngDevMode) && (import.meta.hot && import.meta.hot.on("angular:component-update", (d) => d.id === id && TpBarChartComponent_HmrLoad(d.timestamp)));
+})();
+
+// src/app/features/admin/dashboard/components/dashboard-statistics/dashboard-statistics.ts
+import { Component as Component3, computed, input } from "/@fs/D:/Users/Alex_Saenz/Documents/Proyectos/Rediseño trotapie/Trotapie nuevo/.angular/cache/22.2.2/trotapie/vite/deps/@angular_core.js?v=e11bbf10";
+import * as i03 from "/@fs/D:/Users/Alex_Saenz/Documents/Proyectos/Rediseño trotapie/Trotapie nuevo/.angular/cache/22.2.2/trotapie/vite/deps/@angular_core.js?v=e11bbf10";
+var DashboardStatistics = class _DashboardStatistics {
+  snapshot = input.required(
+    ...ngDevMode ? [{ debugName: "snapshot" }] : (
+      /* istanbul ignore next */
+      []
+    )
+  );
+  distribution = computed(
+    () => {
+      const { total, pending, quoted } = this.snapshot();
+      if (total === null || pending === null || quoted === null)
+        return [];
+      const other = Math.max(0, total - pending - quoted);
+      return [{ label: "Cotizadas", value: quoted, color: "var(--brand)" }, { label: "Pendientes", value: pending, color: "#dfa877" }, ...other ? [{ label: "Otros estados", value: other, color: "#8a9e98" }] : []];
+    },
+    ...ngDevMode ? [{ debugName: "distribution" }] : (
+      /* istanbul ignore next */
+      []
+    )
+  );
+  hotels = computed(
+    () => {
+      const counts = /* @__PURE__ */ new Map();
+      for (const record of this.snapshot().recent) {
+        const hotel = String(record.raw["hotel_nombre"] || record.raw["nombre_hotel"] || "Sin hotel asignado");
+        counts.set(hotel, (counts.get(hotel) || 0) + 1);
+      }
+      return [...counts].sort((a, b) => b[1] - a[1]).map(([label, value]) => ({ label, value, color: "var(--brand)" }));
+    },
+    ...ngDevMode ? [{ debugName: "hotels" }] : (
+      /* istanbul ignore next */
+      []
+    )
+  );
+  summary = computed(
+    () => this.distribution().map((item) => `${item.label}: ${item.value}`).join(". "),
+    ...ngDevMode ? [{ debugName: "summary" }] : (
+      /* istanbul ignore next */
+      []
+    )
+  );
+  hotelBars = computed(
+    () => this.hotels().map((hotel, index) => __spreadProps(__spreadValues({}, hotel), { label: `Hotel ${index + 1}` })),
+    ...ngDevMode ? [{ debugName: "hotelBars" }] : (
+      /* istanbul ignore next */
+      []
+    )
+  );
+  static \u0275fac = function DashboardStatistics_Factory(__ngFactoryType__) {
+    return new (__ngFactoryType__ || _DashboardStatistics)();
+  };
+  static \u0275cmp = /* @__PURE__ */ i03.\u0275\u0275defineComponent({ type: _DashboardStatistics, selectors: [["tp-dashboard-statistics"]], inputs: { snapshot: [1, "snapshot"] }, decls: 0, vars: 0, template: function DashboardStatistics_Template(rf, ctx) {
+  }, dependencies: [TpDonutChartComponent, TpBarChartComponent, MotionDirective], styles: ["\n[_nghost-%COMP%] {\n  display: block;\n  margin: 28px 0;\n}\n.statistics-heading[_ngcontent-%COMP%] {\n  display: flex;\n  align-items: center;\n  justify-content: space-between;\n  gap: 16px;\n  margin-bottom: 18px;\n}\nh2[_ngcontent-%COMP%] {\n  margin: 8px 0 0;\n  font-size: 26px;\n  letter-spacing: -0.04em;\n}\n.scope[_ngcontent-%COMP%] {\n  background: var(--%NS%muted-surface);\n  padding: 8px 14px;\n  border-radius: 999px;\n  color: var(--%NS%muted);\n  font-size: 11px;\n  white-space: nowrap;\n}\n.statistics-grid[_ngcontent-%COMP%] {\n  display: grid;\n  grid-template-columns: minmax(0, 1fr) minmax(0, 1.3fr);\n  gap: 16px;\n}\n.stat-panel[_ngcontent-%COMP%] {\n  background: var(--%NS%surface);\n  border-radius: 26px;\n  padding: 24px;\n  min-width: 0;\n}\nh3[_ngcontent-%COMP%] {\n  font-size: 18px;\n  font-weight: 500;\n  margin: 0 0 8px;\n  letter-spacing: -0.02em;\n}\np[_ngcontent-%COMP%] {\n  color: var(--%NS%muted);\n  font-size: 12px;\n  line-height: 1.7;\n  margin: 0 0 16px;\n}\n.footnote[_ngcontent-%COMP%] {\n  border-top: 1px solid var(--%NS%line);\n  padding-top: 14px;\n  margin: 16px 0 0;\n  font-size: 11px;\n}\n.hotel-legend[_ngcontent-%COMP%] {\n  list-style: none;\n  margin: 18px 0 0;\n  padding: 0;\n  display: grid;\n  gap: 8px;\n}\n.hotel-legend[_ngcontent-%COMP%]   li[_ngcontent-%COMP%] {\n  display: flex;\n  justify-content: space-between;\n  gap: 16px;\n  font-size: 12px;\n  color: var(--%NS%muted);\n}\n.hotel-legend[_ngcontent-%COMP%]   strong[_ngcontent-%COMP%] {\n  color: var(--%NS%ink);\n}\n.empty-chart[_ngcontent-%COMP%] {\n  min-height: 240px;\n  display: flex;\n  flex-direction: column;\n  justify-content: center;\n  align-items: center;\n  gap: 14px;\n  text-align: center;\n}\n.empty-chart[_ngcontent-%COMP%]   strong[_ngcontent-%COMP%] {\n  font-size: 14px;\n  font-weight: 500;\n}\n.empty-chart[_ngcontent-%COMP%]   p[_ngcontent-%COMP%] {\n  max-width: 290px;\n  margin: 0;\n}\n.empty-ring[_ngcontent-%COMP%] {\n  width: 86px;\n  height: 86px;\n  border: 12px solid var(--%NS%line);\n  border-radius: 50%;\n}\n.empty-bars[_ngcontent-%COMP%] {\n  display: flex;\n  align-items: flex-end;\n  gap: 12px;\n  height: 86px;\n}\n.empty-bars[_ngcontent-%COMP%]   i[_ngcontent-%COMP%] {\n  width: 24px;\n  height: 44px;\n  background: var(--%NS%line);\n  border-radius: 7px;\n}\n.empty-bars[_ngcontent-%COMP%]   i[_ngcontent-%COMP%]:nth-child(2) {\n  height: 80px;\n}\n.empty-bars[_ngcontent-%COMP%]   i[_ngcontent-%COMP%]:nth-child(3) {\n  height: 60px;\n}\n@media (max-width: 900px) {\n  .statistics-grid[_ngcontent-%COMP%] {\n    grid-template-columns: 1fr;\n  }\n}\n@media (max-width: 600px) {\n  .stat-panel[_ngcontent-%COMP%] {\n    padding: 20px;\n    border-radius: 22px;\n  }\n  h2[_ngcontent-%COMP%] {\n    font-size: 22px;\n  }\n  .statistics-heading[_ngcontent-%COMP%] {\n    align-items: flex-start;\n  }\n  .scope[_ngcontent-%COMP%] {\n    display: none;\n  }\n}\n/*# sourceMappingURL=dashboard-statistics.css.map */"] });
+};
+(() => {
+  (typeof ngDevMode === "undefined" || ngDevMode) && i03.\u0275setClassMetadata(DashboardStatistics, [{
+    type: Component3,
+    args: [{ selector: "tp-dashboard-statistics", imports: [TpDonutChartComponent, TpBarChartComponent, MotionDirective], template: '<!-- <section class="statistics" aria-labelledby="statistics-title">\n  <div class="statistics-heading"><div><span class="eyebrow">Tu agencia en n\xFAmeros</span><h2 id="statistics-title">Estad\xEDsticas de la operaci\xF3n</h2></div><span class="scope">Resumen actual</span></div>\n  <div class="statistics-grid">\n    <article class="stat-panel" tpMotion="card">\n      <h3>Estado de las solicitudes</h3><p>Distribuci\xF3n del total registrado.</p>\n      @if(snapshot().total!==null) {\n        <div [attr.aria-label]="summary()"><tp-donut-chart [data]="distribution()" title="Solicitudes" [height]="250" /></div>\n        @if(snapshot().total===0){<p class="empty-note">Todav\xEDa no hay solicitudes registradas.</p>}\n      } @else {<div class="empty-chart"><span class="empty-ring"></span><strong>Estad\xEDsticas privadas</strong><p>Los totales se muestran cuando tu cuenta tiene acceso al resumen de la agencia.</p></div>}\n    </article>\n    <article class="stat-panel" tpMotion="card">\n      <h3>Hoteles en solicitudes recientes</h3><p>Basado en las \xFAltimas {{snapshot().recent.length}} solicitudes disponibles.</p>\n      @if(hotels().length) {\n        <tp-bar-chart [data]="hotelBars()" [height]="220" />\n        <ul class="hotel-legend">@for(hotel of hotels();track hotel.label){<li><span>{{$index+1}} \xB7 {{hotel.label}}</span><strong>{{hotel.value}}</strong></li>}</ul>\n      } @else {<div class="empty-chart"><span class="empty-bars" aria-hidden="true"><i></i><i></i><i></i></span><strong>Tu actividad aparecer\xE1 aqu\xED</strong><p>Las solicitudes recientes permitir\xE1n comparar los hoteles consultados.</p></div>}\n      <p class="footnote">Cada solicitud cuenta una vez. Esta gr\xE1fica representa actividad reciente, no ventas.</p>\n    </article>\n  </div>\n</section> -->\n', styles: ["/* src/app/features/admin/dashboard/components/dashboard-statistics/dashboard-statistics.scss */\n:host {\n  display: block;\n  margin: 28px 0;\n}\n.statistics-heading {\n  display: flex;\n  align-items: center;\n  justify-content: space-between;\n  gap: 16px;\n  margin-bottom: 18px;\n}\nh2 {\n  margin: 8px 0 0;\n  font-size: 26px;\n  letter-spacing: -0.04em;\n}\n.scope {\n  background: var(--muted-surface);\n  padding: 8px 14px;\n  border-radius: 999px;\n  color: var(--muted);\n  font-size: 11px;\n  white-space: nowrap;\n}\n.statistics-grid {\n  display: grid;\n  grid-template-columns: minmax(0, 1fr) minmax(0, 1.3fr);\n  gap: 16px;\n}\n.stat-panel {\n  background: var(--surface);\n  border-radius: 26px;\n  padding: 24px;\n  min-width: 0;\n}\nh3 {\n  font-size: 18px;\n  font-weight: 500;\n  margin: 0 0 8px;\n  letter-spacing: -0.02em;\n}\np {\n  color: var(--muted);\n  font-size: 12px;\n  line-height: 1.7;\n  margin: 0 0 16px;\n}\n.footnote {\n  border-top: 1px solid var(--line);\n  padding-top: 14px;\n  margin: 16px 0 0;\n  font-size: 11px;\n}\n.hotel-legend {\n  list-style: none;\n  margin: 18px 0 0;\n  padding: 0;\n  display: grid;\n  gap: 8px;\n}\n.hotel-legend li {\n  display: flex;\n  justify-content: space-between;\n  gap: 16px;\n  font-size: 12px;\n  color: var(--muted);\n}\n.hotel-legend strong {\n  color: var(--ink);\n}\n.empty-chart {\n  min-height: 240px;\n  display: flex;\n  flex-direction: column;\n  justify-content: center;\n  align-items: center;\n  gap: 14px;\n  text-align: center;\n}\n.empty-chart strong {\n  font-size: 14px;\n  font-weight: 500;\n}\n.empty-chart p {\n  max-width: 290px;\n  margin: 0;\n}\n.empty-ring {\n  width: 86px;\n  height: 86px;\n  border: 12px solid var(--line);\n  border-radius: 50%;\n}\n.empty-bars {\n  display: flex;\n  align-items: flex-end;\n  gap: 12px;\n  height: 86px;\n}\n.empty-bars i {\n  width: 24px;\n  height: 44px;\n  background: var(--line);\n  border-radius: 7px;\n}\n.empty-bars i:nth-child(2) {\n  height: 80px;\n}\n.empty-bars i:nth-child(3) {\n  height: 60px;\n}\n@media (max-width: 900px) {\n  .statistics-grid {\n    grid-template-columns: 1fr;\n  }\n}\n@media (max-width: 600px) {\n  .stat-panel {\n    padding: 20px;\n    border-radius: 22px;\n  }\n  h2 {\n    font-size: 22px;\n  }\n  .statistics-heading {\n    align-items: flex-start;\n  }\n  .scope {\n    display: none;\n  }\n}\n/*# sourceMappingURL=dashboard-statistics.css.map */\n"] }]
+  }], null, { snapshot: [{ type: i03.Input, args: [{ isSignal: true, alias: "snapshot", required: true }] }] });
+})();
+(() => {
+  (typeof ngDevMode === "undefined" || ngDevMode) && i03.\u0275setClassDebugInfo(DashboardStatistics, { className: "DashboardStatistics", filePath: "src/app/features/admin/dashboard/components/dashboard-statistics/dashboard-statistics.ts", lineNumber: 10 });
+})();
+(() => {
+  const id = "src%2Fapp%2Ffeatures%2Fadmin%2Fdashboard%2Fcomponents%2Fdashboard-statistics%2Fdashboard-statistics.ts%40DashboardStatistics";
+  function DashboardStatistics_HmrLoad(t) {
+    import(
+      /* @vite-ignore */
+      __vite__injectQuery(i03.\u0275\u0275getReplaceMetadataURL(id, t, import.meta.url), 'import')
+    ).then((m) => m.default && i03.\u0275\u0275replaceMetadata(DashboardStatistics, m.default, [i03], [TpDonutChartComponent, TpBarChartComponent, MotionDirective, Component3], import.meta, id));
+  }
+  (typeof ngDevMode === "undefined" || ngDevMode) && DashboardStatistics_HmrLoad(Date.now());
+  (typeof ngDevMode === "undefined" || ngDevMode) && (import.meta.hot && import.meta.hot.on("angular:component-update", (d) => d.id === id && DashboardStatistics_HmrLoad(d.timestamp)));
+})();
+
+export {
+  TpDonutChartComponent,
+  TpBarChartComponent,
+  DashboardStatistics
+};
+//# debugId=18742afe-0d61-5e8f-9133-f18880869feb
+
+
+//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbInNyYy9hcHAvc2hhcmVkL2NvbXBvbmVudHMvY2hhcnRzL3RwLWRvbnV0LWNoYXJ0L3RwLWRvbnV0LWNoYXJ0LmNvbXBvbmVudC50cyIsInNyYy9hcHAvc2hhcmVkL2NvbXBvbmVudHMvY2hhcnRzL3RwLWRvbnV0LWNoYXJ0L3RwLWRvbnV0LWNoYXJ0LmNvbXBvbmVudC5odG1sIiwic3JjL2FwcC9zaGFyZWQvY29tcG9uZW50cy9jaGFydHMvdHAtYmFyLWNoYXJ0L3RwLWJhci1jaGFydC5jb21wb25lbnQudHMiLCJzcmMvYXBwL3NoYXJlZC9jb21wb25lbnRzL2NoYXJ0cy90cC1iYXItY2hhcnQvdHAtYmFyLWNoYXJ0LmNvbXBvbmVudC5odG1sIiwic3JjL2FwcC9mZWF0dXJlcy9hZG1pbi9kYXNoYm9hcmQvY29tcG9uZW50cy9kYXNoYm9hcmQtc3RhdGlzdGljcy9kYXNoYm9hcmQtc3RhdGlzdGljcy50cyJdLCJzb3VyY2VzQ29udGVudCI6WyJpbXBvcnQgeyBDb21wb25lbnQsIEV2ZW50RW1pdHRlciwgSW5wdXQsIE9uQ2hhbmdlcywgT25Jbml0LCBPdXRwdXQsIFNpbXBsZUNoYW5nZXMgfSBmcm9tICdAYW5ndWxhci9jb3JlJztcbmltcG9ydCB7IENvbW1vbk1vZHVsZSB9IGZyb20gJ0Bhbmd1bGFyL2NvbW1vbic7XG5cbmV4cG9ydCBpbnRlcmZhY2UgVHBEb251dFNlZ21lbnQge1xuICBsYWJlbDogc3RyaW5nO1xuICB2YWx1ZTogbnVtYmVyO1xuICBjb2xvcj86IHN0cmluZztcbn1cblxuQENvbXBvbmVudCh7XG4gIHNlbGVjdG9yOiAndHAtZG9udXQtY2hhcnQnLFxuICBzdGFuZGFsb25lOiB0cnVlLFxuICBpbXBvcnRzOiBbQ29tbW9uTW9kdWxlXSxcbiAgdGVtcGxhdGVVcmw6ICcuL3RwLWRvbnV0LWNoYXJ0LmNvbXBvbmVudC5odG1sJyxcbiAgc3R5bGVVcmw6ICcuL3RwLWRvbnV0LWNoYXJ0LmNvbXBvbmVudC5zY3NzJ1xufSlcbmV4cG9ydCBjbGFzcyBUcERvbnV0Q2hhcnRDb21wb25lbnQgaW1wbGVtZW50cyBPbkluaXQsIE9uQ2hhbmdlcyB7XG4gIEBJbnB1dCgpIGRhdGE6IFRwRG9udXRTZWdtZW50W10gPSBbXTtcbiAgQElucHV0KCkgdGl0bGUgPSAnVG90YWwnO1xuICBASW5wdXQoKSBjZW50ZXJTdWJ0ZXh0Pzogc3RyaW5nO1xuICBASW5wdXQoKSBoZWlnaHQgPSAyODA7XG4gIEBPdXRwdXQoKSBzZWdtZW50Q2xpY2sgPSBuZXcgRXZlbnRFbWl0dGVyPHsgbGFiZWw6IHN0cmluZzsgdmFsdWU6IG51bWJlcjsgaW5kZXg6IG51bWJlciB9PigpO1xuXG4gIGRlZmF1bHRDb2xvcnMgPSBbJyMwNTdhNTUnLCAnIzBlYTVlOScsICcjNjM2NmYxJywgJyNmNTllMGInLCAnI2VmNDQ0NCcsICcjZWM0ODk5JywgJyMxNGI4YTYnXTtcbiAgXG4gIHRvdGFsID0gMDtcbiAgc2VnbWVudHM6IHtcbiAgICBsYWJlbDogc3RyaW5nO1xuICAgIHZhbHVlOiBudW1iZXI7XG4gICAgY29sb3I6IHN0cmluZztcbiAgICBwZXJjZW50YWdlOiBudW1iZXI7XG4gICAgZGFzaEFycmF5OiBzdHJpbmc7XG4gICAgZGFzaE9mZnNldDogbnVtYmVyO1xuICAgIHJhd0luZGV4OiBudW1iZXI7XG4gIH1bXSA9IFtdO1xuXG4gIGFjdGl2ZVNlZ21lbnRJbmRleDogbnVtYmVyIHwgbnVsbCA9IG51bGw7XG4gIGNpcmN1bWZlcmVuY2UgPSA1MDIuNjU7IC8vIDIgKiBQSSAqIDgwXG5cbiAgbmdPbkluaXQoKTogdm9pZCB7XG4gICAgdGhpcy5yZWNhbGN1bGF0ZSgpO1xuICB9XG5cbiAgbmdPbkNoYW5nZXMoY2hhbmdlczogU2ltcGxlQ2hhbmdlcyk6IHZvaWQge1xuICAgIGlmIChjaGFuZ2VzWydkYXRhJ10pIHtcbiAgICAgIHRoaXMucmVjYWxjdWxhdGUoKTtcbiAgICB9XG4gIH1cblxuICByZWNhbGN1bGF0ZSgpOiB2b2lkIHtcbiAgICBjb25zdCB2YWxpZEl0ZW1zID0gKHRoaXMuZGF0YSB8fCBbXSkuZmlsdGVyKGl0ZW0gPT4gaXRlbSAmJiBOdW1iZXIuaXNGaW5pdGUoaXRlbS52YWx1ZSkpO1xuXG4gICAgdGhpcy50b3RhbCA9IHZhbGlkSXRlbXMucmVkdWNlKChzdW0sIGl0ZW0pID0+IHN1bSArIE1hdGgubWF4KGl0ZW0udmFsdWUsIDApLCAwKTtcbiAgICBcbiAgICBpZiAodGhpcy50b3RhbCA9PT0gMCB8fCB2YWxpZEl0ZW1zLmxlbmd0aCA9PT0gMCkge1xuICAgICAgdGhpcy5zZWdtZW50cyA9IFtdO1xuICAgICAgcmV0dXJuO1xuICAgIH1cblxuICAgIGxldCBjdXJyZW50T2Zmc2V0ID0gMDtcblxuICAgIHRoaXMuc2VnbWVudHMgPSB2YWxpZEl0ZW1zLm1hcCgoaXRlbSwgaWR4KSA9PiB7XG4gICAgICBjb25zdCB2YWwgPSBNYXRoLm1heChpdGVtLnZhbHVlLCAwKTtcbiAgICAgIGNvbnN0IGZyYWMgPSB2YWwgLyB0aGlzLnRvdGFsO1xuICAgICAgY29uc3Qgc3Ryb2tlTGVuID0gZnJhYyAqIHRoaXMuY2lyY3VtZmVyZW5jZTtcbiAgICAgIGNvbnN0IGNvbG9yID0gaXRlbS5jb2xvciB8fCB0aGlzLmRlZmF1bHRDb2xvcnNbaWR4ICUgdGhpcy5kZWZhdWx0Q29sb3JzLmxlbmd0aF07XG4gICAgICBjb25zdCBwZXJjZW50YWdlID0gTnVtYmVyKChmcmFjICogMTAwKS50b0ZpeGVkKDEpKTtcblxuICAgICAgY29uc3Qgc2VnbWVudCA9IHtcbiAgICAgICAgbGFiZWw6IGl0ZW0ubGFiZWwsXG4gICAgICAgIHZhbHVlOiB2YWwsXG4gICAgICAgIGNvbG9yLFxuICAgICAgICBwZXJjZW50YWdlLFxuICAgICAgICBkYXNoQXJyYXk6IGAke3N0cm9rZUxlbn0gJHt0aGlzLmNpcmN1bWZlcmVuY2V9YCxcbiAgICAgICAgZGFzaE9mZnNldDogLWN1cnJlbnRPZmZzZXQsXG4gICAgICAgIHJhd0luZGV4OiBpZHgsXG4gICAgICB9O1xuXG4gICAgICBjdXJyZW50T2Zmc2V0ICs9IHN0cm9rZUxlbjtcbiAgICAgIHJldHVybiBzZWdtZW50O1xuICAgIH0pO1xuICB9XG5cbiAgaG92ZXJTZWdtZW50KGlkeDogbnVtYmVyIHwgbnVsbCk6IHZvaWQge1xuICAgIHRoaXMuYWN0aXZlU2VnbWVudEluZGV4ID0gaWR4O1xuICB9XG5cbiAgb25TZWdtZW50Q2xpY2soc2VnOiB7IGxhYmVsOiBzdHJpbmc7IHZhbHVlOiBudW1iZXI7IHJhd0luZGV4OiBudW1iZXIgfSk6IHZvaWQge1xuICAgIHRoaXMuc2VnbWVudENsaWNrLmVtaXQoeyBsYWJlbDogc2VnLmxhYmVsLCB2YWx1ZTogc2VnLnZhbHVlLCBpbmRleDogc2VnLnJhd0luZGV4IH0pO1xuICB9XG5cbiAgZ2V0IGFjdGl2ZVNlZ21lbnQoKSB7XG4gICAgaWYgKHRoaXMuYWN0aXZlU2VnbWVudEluZGV4ID09PSBudWxsIHx8ICF0aGlzLnNlZ21lbnRzW3RoaXMuYWN0aXZlU2VnbWVudEluZGV4XSkge1xuICAgICAgcmV0dXJuIG51bGw7XG4gICAgfVxuICAgIHJldHVybiB0aGlzLnNlZ21lbnRzW3RoaXMuYWN0aXZlU2VnbWVudEluZGV4XTtcbiAgfVxufVxuXG5cbiIsIjxkaXYgY2xhc3M9XCJ0cC1kb251dC1jb250YWluZXJcIiBbY2xhc3Mubm8tc2VnbWVudHNdPVwic2VnbWVudHMubGVuZ3RoID09PSAwXCIgW3N0eWxlLmhlaWdodC5weF09XCJoZWlnaHRcIj5cbiAgPCEtLSBMZWZ0L1RvcCBEb251dCBDaXJjbGUgLS0+XG4gIDxkaXYgY2xhc3M9XCJkb251dC12aXN1YWwtd3JhcFwiPlxuICAgIDxzdmcgdmlld0JveD1cIjAgMCAyMDAgMjAwXCIgY2xhc3M9XCJ0cC1zdmctZG9udXRcIj5cbiAgICAgIDwhLS0gQmFja2dyb3VuZCBSaW5nIFRyYWNrIC0tPlxuICAgICAgPGNpcmNsZVxuICAgICAgICBjeD1cIjEwMFwiXG4gICAgICAgIGN5PVwiMTAwXCJcbiAgICAgICAgcj1cIjgwXCJcbiAgICAgICAgZmlsbD1cInRyYW5zcGFyZW50XCJcbiAgICAgICAgY2xhc3M9XCJkb251dC10cmFja1wiXG4gICAgICAgIHN0cm9rZS13aWR0aD1cIjIyXCJcbiAgICAgIC8+XG5cbiAgICAgIDwhLS0gQW5pbWF0ZWQgRG9udXQgU2xpY2VzIC0tPlxuICAgICAgPGNpcmNsZVxuICAgICAgICAqbmdGb3I9XCJsZXQgc2VnIG9mIHNlZ21lbnRzOyBpbmRleCBhcyBpZHhcIlxuICAgICAgICBjeD1cIjEwMFwiXG4gICAgICAgIGN5PVwiMTAwXCJcbiAgICAgICAgcj1cIjgwXCJcbiAgICAgICAgZmlsbD1cInRyYW5zcGFyZW50XCJcbiAgICAgICAgW2F0dHIuc3Ryb2tlXT1cInNlZy5jb2xvclwiXG4gICAgICAgIFthdHRyLnN0cm9rZS13aWR0aF09XCJhY3RpdmVTZWdtZW50SW5kZXggPT09IGlkeCA/IDI2IDogMjJcIlxuICAgICAgICBbYXR0ci5zdHJva2UtZGFzaGFycmF5XT1cInNlZy5kYXNoQXJyYXlcIlxuICAgICAgICBbYXR0ci5zdHJva2UtZGFzaG9mZnNldF09XCJzZWcuZGFzaE9mZnNldFwiXG4gICAgICAgIGNsYXNzPVwiZG9udXQtc2VnbWVudFwiXG4gICAgICAgIChjbGljayk9XCJvblNlZ21lbnRDbGljayhzZWcpXCJcbiAgICAgICAgKG1vdXNlZW50ZXIpPVwiaG92ZXJTZWdtZW50KGlkeClcIlxuICAgICAgICAobW91c2VsZWF2ZSk9XCJob3ZlclNlZ21lbnQobnVsbClcIlxuICAgICAgLz5cbiAgICA8L3N2Zz5cblxuICAgIDwhLS0gQ2VudGVyIENvdW50ZXIgLS0+XG4gICAgPGRpdiBjbGFzcz1cImRvbnV0LWNlbnRlci1sYWJlbFwiPlxuICAgICAgPHNwYW4gY2xhc3M9XCJjZW50ZXItdGl0bGVcIj57eyBhY3RpdmVTZWdtZW50ID8gYWN0aXZlU2VnbWVudC5sYWJlbCA6IHRpdGxlIH19PC9zcGFuPlxuICAgICAgPHN0cm9uZyBjbGFzcz1cImNlbnRlci12YWx1ZVwiPnt7IChhY3RpdmVTZWdtZW50ID8gYWN0aXZlU2VnbWVudC52YWx1ZSA6IHRvdGFsKSB8IG51bWJlcjonMS4wLTAnOidlcy1NWCcgfX08L3N0cm9uZz5cbiAgICAgIDxzcGFuICpuZ0lmPVwiYWN0aXZlU2VnbWVudFwiIGNsYXNzPVwiY2VudGVyLXN1YlwiPnt7IGFjdGl2ZVNlZ21lbnQucGVyY2VudGFnZSB9fSU8L3NwYW4+XG4gICAgICA8c3BhbiAqbmdJZj1cIiFhY3RpdmVTZWdtZW50ICYmIHRvdGFsID09PSAwXCIgY2xhc3M9XCJjZW50ZXItZW1wdHlcIj5TaW4gZGF0b3M8L3NwYW4+XG4gICAgPC9kaXY+XG4gIDwvZGl2PlxuXG4gIDwhLS0gTGVnZW5kIExpc3QgLS0+XG4gIDxkaXYgKm5nSWY9XCJzZWdtZW50cy5sZW5ndGggPiAwXCIgY2xhc3M9XCJkb251dC1sZWdlbmQtd3JhcFwiPlxuICAgIDxkaXZcbiAgICAgICpuZ0Zvcj1cImxldCBzZWcgb2Ygc2VnbWVudHM7IGluZGV4IGFzIGlkeFwiXG4gICAgICBjbGFzcz1cImxlZ2VuZC1pdGVtXCJcbiAgICAgIFtjbGFzcy5hY3RpdmVdPVwiYWN0aXZlU2VnbWVudEluZGV4ID09PSBpZHhcIlxuICAgICAgKG1vdXNlZW50ZXIpPVwiaG92ZXJTZWdtZW50KGlkeClcIlxuICAgICAgKG1vdXNlbGVhdmUpPVwiaG92ZXJTZWdtZW50KG51bGwpXCJcbiAgICAgIChjbGljayk9XCJvblNlZ21lbnRDbGljayhzZWcpXCJcbiAgICAgIHJvbGU9XCJidXR0b25cIlxuICAgICAgKGtleWRvd24uZW50ZXIpPVwib25TZWdtZW50Q2xpY2soc2VnKVwiIChrZXlkb3duLnNwYWNlKT1cIiRldmVudC5wcmV2ZW50RGVmYXVsdCgpO29uU2VnbWVudENsaWNrKHNlZylcIiB0YWJpbmRleD1cIjBcIlxuICAgID5cbiAgICAgIDxzcGFuIGNsYXNzPVwibGVnZW5kLWRvdFwiIFtzdHlsZS5iYWNrZ3JvdW5kXT1cInNlZy5jb2xvclwiPjwvc3Bhbj5cbiAgICAgIDxzcGFuIGNsYXNzPVwibGVnZW5kLW5hbWVcIj57eyBzZWcubGFiZWwgfX08L3NwYW4+XG4gICAgICA8ZGl2IGNsYXNzPVwibGVnZW5kLXN0YXRzXCI+XG4gICAgICAgIDxzdHJvbmcgY2xhc3M9XCJsZWdlbmQtdmFsXCI+e3sgc2VnLnZhbHVlIHwgbnVtYmVyOicxLjAtMCc6J2VzLU1YJyB9fTwvc3Ryb25nPlxuICAgICAgICA8c3BhbiBjbGFzcz1cImxlZ2VuZC1wY3RcIj4oe3sgc2VnLnBlcmNlbnRhZ2UgfX0lKTwvc3Bhbj5cbiAgICAgIDwvZGl2PlxuICAgIDwvZGl2PlxuICA8L2Rpdj5cbjwvZGl2PlxuXG5cbiIsImltcG9ydCB7IENvbXBvbmVudCwgRXZlbnRFbWl0dGVyLCBJbnB1dCwgT25DaGFuZ2VzLCBPbkluaXQsIE91dHB1dCwgU2ltcGxlQ2hhbmdlcyB9IGZyb20gJ0Bhbmd1bGFyL2NvcmUnO1xuaW1wb3J0IHsgQ29tbW9uTW9kdWxlIH0gZnJvbSAnQGFuZ3VsYXIvY29tbW9uJztcblxuZXhwb3J0IGludGVyZmFjZSBUcEJhckl0ZW0ge1xuICBsYWJlbDogc3RyaW5nO1xuICB2YWx1ZTogbnVtYmVyO1xuICBjb2xvcj86IHN0cmluZztcbn1cblxuQENvbXBvbmVudCh7XG4gIHNlbGVjdG9yOiAndHAtYmFyLWNoYXJ0JyxcbiAgc3RhbmRhbG9uZTogdHJ1ZSxcbiAgaW1wb3J0czogW0NvbW1vbk1vZHVsZV0sXG4gIHRlbXBsYXRlVXJsOiAnLi90cC1iYXItY2hhcnQuY29tcG9uZW50Lmh0bWwnLFxuICBzdHlsZVVybDogJy4vdHAtYmFyLWNoYXJ0LmNvbXBvbmVudC5zY3NzJ1xufSlcbmV4cG9ydCBjbGFzcyBUcEJhckNoYXJ0Q29tcG9uZW50IGltcGxlbWVudHMgT25Jbml0LCBPbkNoYW5nZXMge1xuICBASW5wdXQoKSBkYXRhOiBUcEJhckl0ZW1bXSA9IFtdO1xuICBASW5wdXQoKSBoZWlnaHQgPSAyODA7XG4gIEBPdXRwdXQoKSBiYXJDbGljayA9IG5ldyBFdmVudEVtaXR0ZXI8eyBsYWJlbDogc3RyaW5nOyB2YWx1ZTogbnVtYmVyOyBpbmRleDogbnVtYmVyIH0+KCk7XG5cbiAgZGVmYXVsdENvbG9ycyA9IFsnIzBlYTVlOScsICcjMDU3YTU1JywgJyNmNTllMGInLCAnI2VmNDQ0NCcsICcjNjM2NmYxJ107XG4gIFxuICB3aWR0aCA9IDgwMDtcbiAgdmlld0JveCA9ICcwIDAgODAwIDI4MCc7XG4gIFxuICBwYWRkaW5nTGVmdCA9IDMwO1xuICBwYWRkaW5nUmlnaHQgPSAzMDtcbiAgcGFkZGluZ1RvcCA9IDM1O1xuICBwYWRkaW5nQm90dG9tID0gNDU7XG4gIFxuICBiYXJzOiB7XG4gICAgbGFiZWw6IHN0cmluZztcbiAgICB2YWx1ZTogbnVtYmVyO1xuICAgIGNvbG9yOiBzdHJpbmc7XG4gICAgeDogbnVtYmVyO1xuICAgIHk6IG51bWJlcjtcbiAgICBiYXJXaWR0aDogbnVtYmVyO1xuICAgIGJhckhlaWdodDogbnVtYmVyO1xuICAgIHhQZXJjZW50OiBudW1iZXI7XG4gICAgd2lkdGhQZXJjZW50OiBudW1iZXI7XG4gICAgdG9wUHg6IG51bWJlcjtcbiAgICByYXdJbmRleDogbnVtYmVyO1xuICB9W10gPSBbXTtcblxuICBncmlkTGluZXM6IHsgeTogbnVtYmVyOyB2YWx1ZTogbnVtYmVyIH1bXSA9IFtdO1xuICBhY3RpdmVCYXJJbmRleDogbnVtYmVyIHwgbnVsbCA9IG51bGw7XG5cbiAgbmdPbkluaXQoKTogdm9pZCB7XG4gICAgdGhpcy5yZWNhbGN1bGF0ZSgpO1xuICB9XG5cbiAgbmdPbkNoYW5nZXMoY2hhbmdlczogU2ltcGxlQ2hhbmdlcyk6IHZvaWQge1xuICAgIGlmIChjaGFuZ2VzWydkYXRhJ10gfHwgY2hhbmdlc1snaGVpZ2h0J10pIHtcbiAgICAgIHRoaXMucmVjYWxjdWxhdGUoKTtcbiAgICB9XG4gIH1cblxuICByZWNhbGN1bGF0ZSgpOiB2b2lkIHtcbiAgICBjb25zdCB2YWxpZEl0ZW1zID0gKHRoaXMuZGF0YSB8fCBbXSkuZmlsdGVyKGl0ZW0gPT4gaXRlbSAmJiBOdW1iZXIuaXNGaW5pdGUoaXRlbS52YWx1ZSkpO1xuXG4gICAgaWYgKHZhbGlkSXRlbXMubGVuZ3RoID09PSAwKSB7XG4gICAgICB0aGlzLmJhcnMgPSBbXTtcbiAgICAgIHRoaXMuZ3JpZExpbmVzID0gW107XG4gICAgICByZXR1cm47XG4gICAgfVxuXG4gICAgdGhpcy52aWV3Qm94ID0gYDAgMCAke3RoaXMud2lkdGh9ICR7dGhpcy5oZWlnaHR9YDtcblxuICAgIGNvbnN0IGRyYXdXaWR0aCA9IHRoaXMud2lkdGggLSB0aGlzLnBhZGRpbmdMZWZ0IC0gdGhpcy5wYWRkaW5nUmlnaHQ7XG4gICAgY29uc3QgZHJhd0hlaWdodCA9IHRoaXMuaGVpZ2h0IC0gdGhpcy5wYWRkaW5nVG9wIC0gdGhpcy5wYWRkaW5nQm90dG9tO1xuXG4gICAgY29uc3QgdmFsdWVzID0gdmFsaWRJdGVtcy5tYXAoZCA9PiBkLnZhbHVlKTtcbiAgICBjb25zdCBtYXhWYWwgPSBNYXRoLm1heCguLi52YWx1ZXMsIDEpO1xuXG4gICAgLy8gSG9yaXpvbnRhbCBHcmlkIGxpbmVzICg0IHN0ZXBzKVxuICAgIHRoaXMuZ3JpZExpbmVzID0gW107XG4gICAgY29uc3Qgc3RlcHMgPSA0O1xuICAgIGZvciAobGV0IGkgPSAwOyBpIDw9IHN0ZXBzOyBpKyspIHtcbiAgICAgIGNvbnN0IHZhbCA9IE1hdGgucm91bmQoKG1heFZhbCAvIHN0ZXBzKSAqIGkpO1xuICAgICAgY29uc3QgeSA9IHRoaXMucGFkZGluZ1RvcCArIGRyYXdIZWlnaHQgLSAodmFsIC8gbWF4VmFsKSAqIGRyYXdIZWlnaHQ7XG4gICAgICB0aGlzLmdyaWRMaW5lcy5wdXNoKHsgeSwgdmFsdWU6IHZhbCB9KTtcbiAgICB9XG5cbiAgICBjb25zdCBjb3VudCA9IHZhbGlkSXRlbXMubGVuZ3RoO1xuICAgIGNvbnN0IHNsb3RXaWR0aCA9IGRyYXdXaWR0aCAvIGNvdW50O1xuICAgIGNvbnN0IGJhcldpZHRoID0gTWF0aC5taW4oc2xvdFdpZHRoICogMC40NSwgNTIpO1xuXG4gICAgdGhpcy5iYXJzID0gdmFsaWRJdGVtcy5tYXAoKGl0ZW0sIGlkeCkgPT4ge1xuICAgICAgY29uc3QgdmFsID0gTWF0aC5tYXgoaXRlbS52YWx1ZSwgMCk7XG4gICAgICBjb25zdCBoID0gKHZhbCAvIG1heFZhbCkgKiBkcmF3SGVpZ2h0O1xuICAgICAgY29uc3QgeCA9IHRoaXMucGFkZGluZ0xlZnQgKyBpZHggKiBzbG90V2lkdGggKyAoc2xvdFdpZHRoIC0gYmFyV2lkdGgpIC8gMjtcbiAgICAgIGNvbnN0IHkgPSB0aGlzLnBhZGRpbmdUb3AgKyBkcmF3SGVpZ2h0IC0gaDtcbiAgICAgIGNvbnN0IGNvbG9yID0gaXRlbS5jb2xvciB8fCB0aGlzLmRlZmF1bHRDb2xvcnNbaWR4ICUgdGhpcy5kZWZhdWx0Q29sb3JzLmxlbmd0aF07XG5cbiAgICAgIHJldHVybiB7XG4gICAgICAgIGxhYmVsOiBpdGVtLmxhYmVsLFxuICAgICAgICB2YWx1ZTogdmFsLFxuICAgICAgICBjb2xvcixcbiAgICAgICAgeCxcbiAgICAgICAgeSxcbiAgICAgICAgYmFyV2lkdGgsXG4gICAgICAgIGJhckhlaWdodDogTWF0aC5tYXgoaCwgNCksXG4gICAgICAgIHhQZXJjZW50OiAoKHggLSB0aGlzLnBhZGRpbmdMZWZ0KSAvIGRyYXdXaWR0aCkgKiAxMDAsXG4gICAgICAgIHdpZHRoUGVyY2VudDogKGJhcldpZHRoIC8gZHJhd1dpZHRoKSAqIDEwMCxcbiAgICAgICAgdG9wUHg6IHksXG4gICAgICAgIHJhd0luZGV4OiBpZHgsXG4gICAgICB9O1xuICAgIH0pO1xuICB9XG5cbiAgaG92ZXJCYXIoaWR4OiBudW1iZXIgfCBudWxsKTogdm9pZCB7XG4gICAgdGhpcy5hY3RpdmVCYXJJbmRleCA9IGlkeDtcbiAgfVxuXG4gIG9uQmFyQ2xpY2soYmFyOiB7IGxhYmVsOiBzdHJpbmc7IHZhbHVlOiBudW1iZXI7IHJhd0luZGV4OiBudW1iZXIgfSk6IHZvaWQge1xuICAgIHRoaXMuYmFyQ2xpY2suZW1pdCh7IGxhYmVsOiBiYXIubGFiZWwsIHZhbHVlOiBiYXIudmFsdWUsIGluZGV4OiBiYXIucmF3SW5kZXggfSk7XG4gIH1cblxuICBnZXQgYWN0aXZlQmFyKCkge1xuICAgIGlmICh0aGlzLmFjdGl2ZUJhckluZGV4ID09PSBudWxsIHx8ICF0aGlzLmJhcnNbdGhpcy5hY3RpdmVCYXJJbmRleF0pIHtcbiAgICAgIHJldHVybiBudWxsO1xuICAgIH1cbiAgICByZXR1cm4gdGhpcy5iYXJzW3RoaXMuYWN0aXZlQmFySW5kZXhdO1xuICB9XG59XG5cblxuIiwiPGRpdiBjbGFzcz1cInRwLWNoYXJ0LWNvbnRhaW5lclwiIFtzdHlsZS5oZWlnaHQucHhdPVwiaGVpZ2h0XCI+XG4gIDwhLS0gU1ZHIFZlY3RvciBHcmlkICYgQmFycyBMYXllciAtLT5cbiAgPHN2ZyBbYXR0ci52aWV3Qm94XT1cInZpZXdCb3hcIiBjbGFzcz1cInRwLXN2Zy1jaGFydFwiIHByZXNlcnZlQXNwZWN0UmF0aW89XCJub25lXCI+XG4gICAgPCEtLSBHcmlkIExpbmVzIC0tPlxuICAgIDxnIGNsYXNzPVwiZ3JpZC1ncm91cFwiPlxuICAgICAgPGxpbmVcbiAgICAgICAgKm5nRm9yPVwibGV0IGdyaWQgb2YgZ3JpZExpbmVzXCJcbiAgICAgICAgW2F0dHIueDFdPVwicGFkZGluZ0xlZnRcIlxuICAgICAgICBbYXR0ci55MV09XCJncmlkLnlcIlxuICAgICAgICBbYXR0ci54Ml09XCJ3aWR0aCAtIHBhZGRpbmdSaWdodFwiXG4gICAgICAgIFthdHRyLnkyXT1cImdyaWQueVwiXG4gICAgICAgIGNsYXNzPVwiZ3JpZC1saW5lXCJcbiAgICAgIC8+XG4gICAgPC9nPlxuXG4gICAgPCEtLSBCYXJzIC0tPlxuICAgIDxnICpuZ0Zvcj1cImxldCBiYXIgb2YgYmFyczsgaW5kZXggYXMgaWR4XCIgY2xhc3M9XCJiYXItbm9kZVwiIChjbGljayk9XCJvbkJhckNsaWNrKGJhcilcIiAobW91c2VlbnRlcik9XCJob3ZlckJhcihpZHgpXCIgKG1vdXNlbGVhdmUpPVwiaG92ZXJCYXIobnVsbClcIj5cbiAgICAgIDwhLS0gSG92ZXIgQmFja2dyb3VuZCBHbG93IC0tPlxuICAgICAgPHJlY3RcbiAgICAgICAgKm5nSWY9XCJhY3RpdmVCYXJJbmRleCA9PT0gaWR4XCJcbiAgICAgICAgW2F0dHIueF09XCJiYXIueCAtIDZcIlxuICAgICAgICBbYXR0ci55XT1cInBhZGRpbmdUb3AgLSAxMFwiXG4gICAgICAgIFthdHRyLndpZHRoXT1cImJhci5iYXJXaWR0aCArIDEyXCJcbiAgICAgICAgW2F0dHIuaGVpZ2h0XT1cImhlaWdodCAtIHBhZGRpbmdUb3AgLSBwYWRkaW5nQm90dG9tICsgMTBcIlxuICAgICAgICByeD1cIjhcIlxuICAgICAgICBmaWxsPVwicmdiYSg1LCAxMjIsIDg1LCAwLjA2KVwiXG4gICAgICAgIGNsYXNzPVwiYmFyLWhvdmVyLWJnXCJcbiAgICAgIC8+XG5cbiAgICAgIDwhLS0gQmFyIFJlY3QgLS0+XG4gICAgICA8cmVjdFxuICAgICAgICBbYXR0ci54XT1cImJhci54XCJcbiAgICAgICAgW2F0dHIueV09XCJiYXIueVwiXG4gICAgICAgIFthdHRyLndpZHRoXT1cImJhci5iYXJXaWR0aFwiXG4gICAgICAgIFthdHRyLmhlaWdodF09XCJiYXIuYmFySGVpZ2h0XCJcbiAgICAgICAgcng9XCI2XCJcbiAgICAgICAgcnk9XCI2XCJcbiAgICAgICAgW2F0dHIuZmlsbF09XCJiYXIuY29sb3JcIlxuICAgICAgICBjbGFzcz1cImJhci1yZWN0XCJcbiAgICAgICAgW2NsYXNzLmFjdGl2ZV09XCJhY3RpdmVCYXJJbmRleCA9PT0gaWR4XCJcbiAgICAgIC8+XG4gICAgPC9nPlxuICA8L3N2Zz5cblxuICA8IS0tIEhUTUwgVG9wIFZhbHVlIEJhZGdlcyBPdmVybGF5IChDcmlzcCBCcm93c2VyIEZvbnQpIC0tPlxuICA8ZGl2IGNsYXNzPVwiYmFyLXZhbHVlcy1vdmVybGF5XCIgW3N0eWxlLmxlZnQucHhdPVwicGFkZGluZ0xlZnRcIiBbc3R5bGUucmlnaHQucHhdPVwicGFkZGluZ1JpZ2h0XCI+XG4gICAgPGRpdlxuICAgICAgKm5nRm9yPVwibGV0IGJhciBvZiBiYXJzOyBpbmRleCBhcyBpZHhcIlxuICAgICAgY2xhc3M9XCJiYXItdmFsLWl0ZW1cIlxuICAgICAgW3N0eWxlLmxlZnQuJV09XCJiYXIueFBlcmNlbnRcIlxuICAgICAgW3N0eWxlLndpZHRoLiVdPVwiYmFyLndpZHRoUGVyY2VudFwiXG4gICAgICBbc3R5bGUudG9wLnB4XT1cImJhci50b3BQeCAtIDIyXCJcbiAgICA+XG4gICAgICA8c3Ryb25nPnt7IGJhci52YWx1ZSB8IG51bWJlcjonMS4wLTAnOidlcy1NWCcgfX08L3N0cm9uZz5cbiAgICA8L2Rpdj5cbiAgPC9kaXY+XG5cbiAgPCEtLSBIVE1MIEJvdHRvbSBDYXRlZ29yeSBMYWJlbHMgT3ZlcmxheSAoQ3Jpc3AgQnJvd3NlciBGb250KSAtLT5cbiAgPGRpdiBjbGFzcz1cImJhci1sYWJlbHMtb3ZlcmxheVwiIFtzdHlsZS5sZWZ0LnB4XT1cInBhZGRpbmdMZWZ0XCIgW3N0eWxlLnJpZ2h0LnB4XT1cInBhZGRpbmdSaWdodFwiPlxuICAgIDxkaXZcbiAgICAgICpuZ0Zvcj1cImxldCBiYXIgb2YgYmFyczsgaW5kZXggYXMgaWR4XCJcbiAgICAgIGNsYXNzPVwiYmFyLWxhYmVsLWl0ZW1cIlxuICAgICAgW3N0eWxlLmxlZnQuJV09XCJiYXIueFBlcmNlbnRcIlxuICAgICAgW3N0eWxlLndpZHRoLiVdPVwiYmFyLndpZHRoUGVyY2VudFwiXG4gICAgPlxuICAgICAgPHNwYW4+e3sgYmFyLmxhYmVsIH19PC9zcGFuPlxuICAgIDwvZGl2PlxuICA8L2Rpdj5cblxuICA8ZGl2ICpuZ0lmPVwiYmFycy5sZW5ndGggPT09IDBcIiBjbGFzcz1cImVtcHR5LWNoYXJ0LW92ZXJsYXlcIj5cbiAgICA8c3Bhbj5TaW4gZGF0b3MgcGFyYSBtb3N0cmFyPC9zcGFuPlxuICA8L2Rpdj5cbjwvZGl2PlxuXG5cbiIsImltcG9ydCB7IENvbXBvbmVudCwgY29tcHV0ZWQsIGlucHV0IH0gZnJvbSAnQGFuZ3VsYXIvY29yZSc7XG5pbXBvcnQgeyBUcmF2ZWxSZWNvcmQgfSBmcm9tICcuLi8uLi8uLi8uLi8uLi9kYXRhL21vZGVscy90cmF2ZWwtcmVjb3JkJztcbmltcG9ydCB7IFRwRG9udXRDaGFydENvbXBvbmVudCB9IGZyb20gJy4uLy4uLy4uLy4uLy4uL3NoYXJlZC9jb21wb25lbnRzL2NoYXJ0cy90cC1kb251dC1jaGFydC90cC1kb251dC1jaGFydC5jb21wb25lbnQnO1xuaW1wb3J0IHsgVHBCYXJDaGFydENvbXBvbmVudCB9IGZyb20gJy4uLy4uLy4uLy4uLy4uL3NoYXJlZC9jb21wb25lbnRzL2NoYXJ0cy90cC1iYXItY2hhcnQvdHAtYmFyLWNoYXJ0LmNvbXBvbmVudCc7XG5pbXBvcnQgeyBNb3Rpb25EaXJlY3RpdmUgfSBmcm9tICcuLi8uLi8uLi8uLi8uLi9zaGFyZWQvZGlyZWN0aXZlcy9tb3Rpb24uZGlyZWN0aXZlJztcblxuZXhwb3J0IGludGVyZmFjZSBEYXNoYm9hcmRTbmFwc2hvdCB7IHRvdGFsOm51bWJlcnxudWxsOyBwZW5kaW5nOm51bWJlcnxudWxsOyBxdW90ZWQ6bnVtYmVyfG51bGw7IHJlY2VudDpUcmF2ZWxSZWNvcmRbXTsgfVxuXG5AQ29tcG9uZW50KHtzZWxlY3RvcjondHAtZGFzaGJvYXJkLXN0YXRpc3RpY3MnLGltcG9ydHM6W1RwRG9udXRDaGFydENvbXBvbmVudCxUcEJhckNoYXJ0Q29tcG9uZW50LE1vdGlvbkRpcmVjdGl2ZV0sdGVtcGxhdGVVcmw6Jy4vZGFzaGJvYXJkLXN0YXRpc3RpY3MuaHRtbCcsc3R5bGVVcmw6Jy4vZGFzaGJvYXJkLXN0YXRpc3RpY3Muc2Nzcyd9KVxuZXhwb3J0IGNsYXNzIERhc2hib2FyZFN0YXRpc3RpY3Mge1xuICBzbmFwc2hvdD1pbnB1dC5yZXF1aXJlZDxEYXNoYm9hcmRTbmFwc2hvdD4oKTtcbiAgZGlzdHJpYnV0aW9uPWNvbXB1dGVkKCgpPT57XG4gICAgY29uc3Qge3RvdGFsLHBlbmRpbmcscXVvdGVkfT10aGlzLnNuYXBzaG90KCk7XG4gICAgaWYodG90YWw9PT1udWxsfHxwZW5kaW5nPT09bnVsbHx8cXVvdGVkPT09bnVsbClyZXR1cm4gW107XG4gICAgY29uc3Qgb3RoZXI9TWF0aC5tYXgoMCx0b3RhbC1wZW5kaW5nLXF1b3RlZCk7XG4gICAgcmV0dXJuIFt7bGFiZWw6J0NvdGl6YWRhcycsdmFsdWU6cXVvdGVkLGNvbG9yOid2YXIoLS1icmFuZCknfSx7bGFiZWw6J1BlbmRpZW50ZXMnLHZhbHVlOnBlbmRpbmcsY29sb3I6JyNkZmE4NzcnfSwuLi4ob3RoZXI/W3tsYWJlbDonT3Ryb3MgZXN0YWRvcycsdmFsdWU6b3RoZXIsY29sb3I6JyM4YTllOTgnfV06W10pXTtcbiAgfSk7XG4gIGhvdGVscz1jb21wdXRlZCgoKT0+e1xuICAgIGNvbnN0IGNvdW50cz1uZXcgTWFwPHN0cmluZyxudW1iZXI+KCk7XG4gICAgZm9yKGNvbnN0IHJlY29yZCBvZiB0aGlzLnNuYXBzaG90KCkucmVjZW50KXtjb25zdCBob3RlbD1TdHJpbmcocmVjb3JkLnJhd1snaG90ZWxfbm9tYnJlJ118fHJlY29yZC5yYXdbJ25vbWJyZV9ob3RlbCddfHwnU2luIGhvdGVsIGFzaWduYWRvJyk7Y291bnRzLnNldChob3RlbCwoY291bnRzLmdldChob3RlbCl8fDApKzEpO31cbiAgICByZXR1cm4gWy4uLmNvdW50c10uc29ydCgoYSxiKT0+YlsxXS1hWzFdKS5tYXAoKFtsYWJlbCx2YWx1ZV0pPT4oe2xhYmVsLHZhbHVlLGNvbG9yOid2YXIoLS1icmFuZCknfSkpO1xuICB9KTtcbiAgc3VtbWFyeT1jb21wdXRlZCgoKT0+dGhpcy5kaXN0cmlidXRpb24oKS5tYXAoaXRlbT0+YCR7aXRlbS5sYWJlbH06ICR7aXRlbS52YWx1ZX1gKS5qb2luKCcuICcpKTtcbiAgaG90ZWxCYXJzPWNvbXB1dGVkKCgpPT50aGlzLmhvdGVscygpLm1hcCgoaG90ZWwsaW5kZXgpPT4oey4uLmhvdGVsLGxhYmVsOmBIb3RlbCAke2luZGV4KzF9YH0pKSk7XG59XG4iXSwibWFwcGluZ3MiOiI7Ozs7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OzZFQUFuQixzQkFBbUIsV0FBQSxDQUFBLENBQUEseUJBQUEsQ0FBQSxHQUFBLFFBQUEsRUFBQSxVQUFBLENBQUEsR0FBQSxVQUFBLEVBQUEsR0FBQSxPQUFBLEdBQUEsTUFBQSxHQUFBLFVBQUEsU0FBQSw2QkFBQSxJQUFBLEtBQUE7RUFBQSxHQUFBLGNBQUEsQ0FEd0IsdUJBQXNCLHFCQUFvQixlQUFlLEdBQUEsUUFBQSxDQUFBLDY2RkFBQSxFQUFBLENBQUE7OztnRkFDcEcscUJBQW1CLENBQUE7VUFEL0JDO3VCQUFvQiwyQkFBeUIsU0FBUyxDQUFDLHVCQUFzQixxQkFBb0IsZUFBZSxHQUFDLFVBQUEsaXhEQUFBLFFBQUEsQ0FBQSxxNEVBQUEsRUFBQSxDQUFBOzs7O2lGQUNyRyxxQkFBbUIsRUFBQSxXQUFBLHVCQUFBLFVBQUEsNEZBQUEsWUFBQSxHQUFBLENBQUE7QUFBQSxHQUFBOzs7Ozs7OytEQUFuQixxQkFBbUIsRUFBQSxTQUFBLENBQUFDLEdBQUEsR0FBQSxDQUFBLHVCQUFBLHFCQUFBLGlCQUFBRCxVQUFBLEdBQUEsYUFBQSxFQUFBLENBQUE7RUFBQTtBQUFBLEdBQUEsT0FBQSxjQUFBLGVBQUEsY0FBQSw0QkFBQSxLQUFBLElBQUEsQ0FBQTtBQUFBLEdBQUEsT0FBQSxjQUFBLGVBQUEsZUFBQSxZQUFBLE9BQUEsWUFBQSxJQUFBLEdBQUEsNEJBQUEsQ0FBQSxNQUFBLEVBQUEsT0FBQSxNQUFBLDRCQUFBLEVBQUEsU0FBQSxDQUFBO0FBQUEsR0FBQTsiLCJuYW1lcyI6WyJDb21wb25lbnQiLCJFdmVudEVtaXR0ZXIiLCJJbnB1dCIsIk91dHB1dCIsIkNvbW1vbk1vZHVsZSIsImkwIiwiaTEiLCJDb21wb25lbnQiLCJDb21wb25lbnQiLCJpMCJdLCJkZWJ1Z0lkIjoiMTg3NDJhZmUtMGQ2MS01ZThmLTkxMzMtZjE4ODgwODY5ZmViIn0=

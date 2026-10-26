@@ -1,0 +1,102 @@
+<div class="tp-location-map">
+  <div #markerTemplate hidden aria-hidden="true">
+    <div class="tp-map-marker-shape">
+      <svg viewBox="0 0 40 48" aria-hidden="true">
+        <path
+          d="M20 2C10 2 3 9 3 19c0 13 17 27 17 27s17-14 17-27C37 9 30 2 20 2Z"
+          fill="#137053"
+          stroke="white"
+          stroke-width="3"
+        />
+        <circle cx="20" cy="19" r="6" fill="white" />
+      </svg>
+    </div>
+  </div>
+  @if (point()) {
+    <div class="tp-map-stage">
+      <div
+        #canvas
+        class="tp-map-canvas"
+        role="region"
+        [attr.aria-label]="text('Mapa de ', 'Map of ') + name()"
+      ></div>
+      <div
+        class="tp-map-zoom"
+        role="group"
+        [attr.aria-label]="text('Acercar o alejar mapa', 'Map zoom controls')"
+      >
+        <button
+          tpButton
+          variant="icon"
+          icon="plus"
+          [disabled]="level() >= 19"
+          (click)="changeZoom(1)"
+          [attr.aria-label]="text('Acercar mapa', 'Zoom in')"
+        ></button>
+        <button
+          tpButton
+          variant="icon"
+          [disabled]="level() <= 3"
+          (click)="changeZoom(-1)"
+          [attr.aria-label]="text('Alejar mapa', 'Zoom out')"
+        >
+          −
+        </button>
+      </div>
+      <button tpButton icon="pin" class="tp-map-center" (click)="center()">
+        {{ text('Volver al punto', 'Back to location') }}
+      </button>
+      <a
+        class="tp-map-credit"
+        href="https://www.openstreetmap.org/copyright"
+        target="_blank"
+        rel="noopener noreferrer"
+        >© OpenStreetMap</a
+      >
+      @if (loading()) {
+        <div class="tp-map-status" role="status">
+          <span class="tp-map-loader"></span>{{ text('Cargando mapa…', 'Loading map…') }}
+        </div>
+      }
+      @if (error()) {
+        <div class="tp-map-error">
+          <tp-state mode="error" [message]="error()" (retry)="retry()" />
+        </div>
+      }
+    </div>
+  } @else {
+    <tp-state
+      [title]="text('Ubicación por confirmar', 'Location to be confirmed')"
+      [message]="
+        text(
+          'Este lugar todavía no tiene un punto exacto registrado. Puedes consultar el enlace del mapa si está disponible.',
+          'This place does not have an exact point recorded yet. You can use the map link if available.'
+        )
+      "
+    />
+  }
+  <div class="tp-map-footer">
+    <div>
+      <strong>{{ name() }}</strong>
+      <p>
+        {{
+          text(
+            'Explora los alrededores de tu próximo viaje.',
+            'Explore the surroundings of your next trip.'
+          )
+        }}
+      </p>
+    </div>
+    @if (externalUrl()) {
+      <a
+        tpButton
+        icon="arrow"
+        variant="quiet"
+        [href]="externalUrl()"
+        target="_blank"
+        rel="noopener noreferrer"
+        >{{ text('Abrir en Maps', 'Open in Maps') }}</a
+      >
+    }
+  </div>
+</div>

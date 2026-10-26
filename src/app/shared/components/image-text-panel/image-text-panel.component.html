@@ -1,0 +1,10 @@
+
+    @if (presentacion.efecto_activo || presentacion.oscurecer_fondo) {
+      <div class="panel" aria-hidden="true"
+        [class.panel--glass]="presentacion.oscurecer_fondo"
+        [style.background-color]="colorFondo"
+        [style.backdrop-filter]="filtroFondo"
+        [style.-webkit-backdrop-filter]="filtroFondo"></div>
+    }
+    <div class="content"><ng-content></ng-content></div>
+  

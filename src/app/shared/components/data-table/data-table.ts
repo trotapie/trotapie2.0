@@ -1,0 +1,5 @@
+import {CatalogIcon} from '../catalog-icon/catalog-icon';
+import {Component,input,output} from '@angular/core';import {DatePipe} from '@angular/common';import {Badge} from '../badge/badge';import {Button} from '../button/button';import type {TravelRecord} from '../../../data/facades/travel-data.service';
+import {TpActionsMenuComponent,TpActionMenuItem} from '../tp-actions-menu/tp-actions-menu.component';
+@Component({selector:'tp-data-table',imports:[CatalogIcon,Badge,TpActionsMenuComponent,DatePipe],templateUrl: './data-table.html', styleUrl: './data-table.scss'})
+export class DataTable {stickyHeader=input(false);records=input<TravelRecord[]>([]);title=input('Nombre');columns=input<{key:string;label:string}[]>([]);actionable=input(true);actions=input<(record:TravelRecord)=>TpActionMenuItem[]>(()=>[{id:'open',label:'Consultar registro',icon:'arrow'}]);selected=output<TravelRecord>();actionSelected=output<{id:string;record:TravelRecord}>();act(id:string,record:TravelRecord){this.actionSelected.emit({id,record});if(id==='open')this.selected.emit(record);}imageError(e:Event){(e.target as HTMLImageElement).src='/brand/iso.png';}}

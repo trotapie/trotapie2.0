@@ -1,0 +1,33 @@
+<button type="button" class="image-card" (click)="selected.emit(record())">
+  <div class="image-card-photo" [class.image-card-photo-contain]="containImage()">
+    @if (record().image) {
+      <img
+        [src]="record().image"
+        [alt]="record().title"
+        loading="lazy"
+        decoding="async"
+        (load)="imageLoaded($event)"
+        (error)="imageError($event)"
+      />
+    } @else if(record().raw['icono']){<tp-catalog-icon class="card-catalog-icon" [value]="record().raw['icono']"/>} @else {
+      <tp-icon name="landscape" />
+    }
+    <span class="card-arrow"><tp-icon name="arrow" /></span>
+  </div>
+  <div class="image-card-body">
+    @if (record().subtitle) {
+      <span class="image-card-kicker">{{ record().subtitle }}</span>
+    }
+    <h3 [class.has-stars]="starCount()">{{ record().title }}</h3>
+    @if(starCount()){<span class="hotel-stars" role="img" [attr.aria-label]="starCount()+' estrellas'">@for(star of starIcons();track star.index){<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m12 2 3 6 7 1-5 5 1 8-6-4-6 4 1-8-5-5 7-1z" fill="none" stroke="currentColor" stroke-width="1.5" [style.opacity]="star.clip ? 0.25 : 1"/><path d="m12 2 3 6 7 1-5 5 1 8-6-4-6 4 1-8-5-5 7-1z" fill="none" stroke="currentColor" stroke-width="1.5" [style.clip-path]="'inset(0 '+star.clip+'% 0 0)'"/></svg>}<small>{{starCount()}}</small></span>}
+    @if(country()){<span class="image-card-country"><tp-icon name="globe" />{{country()}}</span>}
+    <div class="image-card-bottom" [class.has-actions]="hasActions()">
+      @if (showStatus() && record().status) {
+        <tp-badge [label]="record().status" />
+      } @else {
+        <span>{{ label() }}</span>
+      }
+      @if(!hasActions()){<tp-icon name="right" />}
+    </div>
+  </div>
+</button>

@@ -1,0 +1,595 @@
+import { injectQuery as __vite__injectQuery } from "/@vite/client";import { createHotContext as __vite__createHotContext } from "/@vite/client";import.meta.hot = __vite__createHotContext("/chunk-3QHJRALN.js");import {
+  Button
+} from "/chunk-2SX6KAKA.js";
+import {
+  Icon
+} from "/chunk-DHOAVJG5.js";
+import {
+  LanguageService
+} from "/chunk-E5EWXR6G.js";
+
+// src/app/core/utils/random-sample.ts
+function randomSample(items, count) {
+  const pool = [...items];
+  const size = Math.min(Math.max(0, Math.floor(count)), pool.length);
+  for (let index = 0; index < size; index++) {
+    const chosen = index + Math.floor(Math.random() * (pool.length - index));
+    [pool[index], pool[chosen]] = [pool[chosen], pool[index]];
+  }
+  return pool.slice(0, size);
+}
+function shuffleArray(items) {
+  return randomSample(items, items.length);
+}
+
+// src/app/shared/components/photo-carousel/photo-carousel.ts
+import { Component, ElementRef, DestroyRef, afterNextRender, afterRenderEffect, computed, inject, input, linkedSignal, signal } from "/@fs/D:/Users/Alex_Saenz/Documents/Proyectos/Rediseño trotapie/Trotapie nuevo/.angular/cache/22.2.2/trotapie/vite/deps/@angular_core.js?v=e11bbf10";
+import { gsap } from "/@fs/D:/Users/Alex_Saenz/Documents/Proyectos/Rediseño trotapie/Trotapie nuevo/.angular/cache/22.2.2/trotapie/vite/deps/gsap.js?v=e11bbf10";
+import * as i0 from "/@fs/D:/Users/Alex_Saenz/Documents/Proyectos/Rediseño trotapie/Trotapie nuevo/.angular/cache/22.2.2/trotapie/vite/deps/@angular_core.js?v=e11bbf10";
+function PhotoCarousel_Conditional_1_Conditional_1_Template(rf, ctx) {
+  if (rf & 1) {
+    i0.\u0275\u0275elementStart(0, "span", 3);
+    i0.\u0275\u0275element(1, "tp-icon", 5);
+    i0.\u0275\u0275text(2);
+    i0.\u0275\u0275elementEnd();
+  }
+  if (rf & 2) {
+    const photo_r3 = i0.\u0275\u0275nextContext();
+    i0.\u0275\u0275advance(2);
+    i0.\u0275\u0275textInterpolate(photo_r3.location);
+  }
+}
+function PhotoCarousel_Conditional_1_Conditional_2_Conditional_1_Template(rf, ctx) {
+  if (rf & 1) {
+    i0.\u0275\u0275elementStart(0, "span", 6);
+    i0.\u0275\u0275text(1);
+    i0.\u0275\u0275elementEnd();
+  }
+  if (rf & 2) {
+    const ctx_r1 = i0.\u0275\u0275nextContext(3);
+    i0.\u0275\u0275advance();
+    i0.\u0275\u0275textInterpolate(ctx_r1.eyebrow());
+  }
+}
+function PhotoCarousel_Conditional_1_Conditional_2_Conditional_2_Template(rf, ctx) {
+  if (rf & 1) {
+    i0.\u0275\u0275elementStart(0, "h2");
+    i0.\u0275\u0275text(1);
+    i0.\u0275\u0275elementEnd();
+  }
+  if (rf & 2) {
+    const photo_r3 = i0.\u0275\u0275nextContext(2);
+    const ctx_r1 = i0.\u0275\u0275nextContext();
+    i0.\u0275\u0275advance();
+    i0.\u0275\u0275textInterpolate(ctx_r1.headline() || photo_r3.title);
+  }
+}
+function PhotoCarousel_Conditional_1_Conditional_2_Conditional_3_Template(rf, ctx) {
+  if (rf & 1) {
+    i0.\u0275\u0275elementStart(0, "p");
+    i0.\u0275\u0275text(1);
+    i0.\u0275\u0275elementEnd();
+  }
+  if (rf & 2) {
+    const photo_r3 = i0.\u0275\u0275nextContext(2);
+    i0.\u0275\u0275advance();
+    i0.\u0275\u0275textInterpolate(photo_r3.description);
+  }
+}
+function PhotoCarousel_Conditional_1_Conditional_2_Template(rf, ctx) {
+  if (rf & 1) {
+    i0.\u0275\u0275elementStart(0, "div", 4);
+    i0.\u0275\u0275conditionalCreate(1, PhotoCarousel_Conditional_1_Conditional_2_Conditional_1_Template, 2, 1, "span", 6);
+    i0.\u0275\u0275conditionalCreate(2, PhotoCarousel_Conditional_1_Conditional_2_Conditional_2_Template, 2, 1, "h2");
+    i0.\u0275\u0275conditionalCreate(3, PhotoCarousel_Conditional_1_Conditional_2_Conditional_3_Template, 2, 1, "p");
+    i0.\u0275\u0275elementEnd();
+  }
+  if (rf & 2) {
+    const photo_r3 = i0.\u0275\u0275nextContext();
+    const ctx_r1 = i0.\u0275\u0275nextContext();
+    i0.\u0275\u0275advance();
+    i0.\u0275\u0275conditional(ctx_r1.eyebrow() ? 1 : -1);
+    i0.\u0275\u0275advance();
+    i0.\u0275\u0275conditional(photo_r3.title || ctx_r1.headline() ? 2 : -1);
+    i0.\u0275\u0275advance();
+    i0.\u0275\u0275conditional(photo_r3.description ? 3 : -1);
+  }
+}
+function PhotoCarousel_Conditional_1_Conditional_3_Conditional_6_Template(rf, ctx) {
+  if (rf & 1) {
+    i0.\u0275\u0275namespaceSVG();
+    i0.\u0275\u0275elementStart(0, "svg", 11);
+    i0.\u0275\u0275element(1, "path", 13);
+    i0.\u0275\u0275elementEnd();
+  }
+}
+function PhotoCarousel_Conditional_1_Conditional_3_Conditional_7_Template(rf, ctx) {
+  if (rf & 1) {
+    i0.\u0275\u0275namespaceSVG();
+    i0.\u0275\u0275elementStart(0, "svg", 11);
+    i0.\u0275\u0275element(1, "path", 14);
+    i0.\u0275\u0275elementEnd();
+  }
+}
+function PhotoCarousel_Conditional_1_Conditional_3_Template(rf, ctx) {
+  if (rf & 1) {
+    const _r4 = i0.\u0275\u0275getCurrentView();
+    i0.\u0275\u0275element(0, "img", 7);
+    i0.\u0275\u0275elementStart(1, "div", 8)(2, "button", 9);
+    i0.\u0275\u0275listener("click", function PhotoCarousel_Conditional_1_Conditional_3_Template_button_click_2_listener() {
+      i0.\u0275\u0275restoreView(_r4);
+      const ctx_r1 = i0.\u0275\u0275nextContext(2);
+      return i0.\u0275\u0275resetView(ctx_r1.move(-1));
+    });
+    i0.\u0275\u0275elementEnd();
+    i0.\u0275\u0275elementStart(3, "span");
+    i0.\u0275\u0275text(4);
+    i0.\u0275\u0275elementEnd();
+    i0.\u0275\u0275elementStart(5, "button", 10);
+    i0.\u0275\u0275listener("click", function PhotoCarousel_Conditional_1_Conditional_3_Template_button_click_5_listener() {
+      i0.\u0275\u0275restoreView(_r4);
+      const ctx_r1 = i0.\u0275\u0275nextContext(2);
+      return i0.\u0275\u0275resetView(ctx_r1.paused.set(!ctx_r1.paused()));
+    });
+    i0.\u0275\u0275conditionalCreate(6, PhotoCarousel_Conditional_1_Conditional_3_Conditional_6_Template, 2, 0, "svg", 11)(7, PhotoCarousel_Conditional_1_Conditional_3_Conditional_7_Template, 2, 0, "svg", 11);
+    i0.\u0275\u0275elementEnd();
+    i0.\u0275\u0275elementStart(8, "button", 12);
+    i0.\u0275\u0275listener("click", function PhotoCarousel_Conditional_1_Conditional_3_Template_button_click_8_listener() {
+      i0.\u0275\u0275restoreView(_r4);
+      const ctx_r1 = i0.\u0275\u0275nextContext(2);
+      return i0.\u0275\u0275resetView(ctx_r1.move(1));
+    });
+    i0.\u0275\u0275elementEnd()();
+  }
+  if (rf & 2) {
+    const ctx_r1 = i0.\u0275\u0275nextContext(2);
+    i0.\u0275\u0275property("src", ctx_r1.nextPhoto()?.src);
+    i0.\u0275\u0275advance(2);
+    i0.\u0275\u0275attribute("aria-label", ctx_r1.text("Foto anterior", "Previous photo"));
+    i0.\u0275\u0275advance();
+    i0.\u0275\u0275attribute("aria-label", ctx_r1.text("Foto ", "Photo ") + (ctx_r1.index() + 1) + ctx_r1.text(" de ", " of ") + ctx_r1.orderedPhotos().length);
+    i0.\u0275\u0275advance();
+    i0.\u0275\u0275textInterpolate2("", ctx_r1.index() + 1, " / ", ctx_r1.orderedPhotos().length);
+    i0.\u0275\u0275advance();
+    i0.\u0275\u0275attribute("aria-label", ctx_r1.paused() ? ctx_r1.text("Reproducir carrusel", "Play carousel") : ctx_r1.text("Pausar carrusel", "Pause carousel"))("aria-pressed", ctx_r1.paused());
+    i0.\u0275\u0275advance();
+    i0.\u0275\u0275conditional(ctx_r1.paused() ? 6 : 7);
+    i0.\u0275\u0275advance(2);
+    i0.\u0275\u0275attribute("aria-label", ctx_r1.text("Foto siguiente", "Next photo"));
+  }
+}
+function PhotoCarousel_Conditional_1_Template(rf, ctx) {
+  if (rf & 1) {
+    const _r1 = i0.\u0275\u0275getCurrentView();
+    i0.\u0275\u0275elementStart(0, "img", 2);
+    i0.\u0275\u0275listener("error", function PhotoCarousel_Conditional_1_Template_img_error_0_listener($event) {
+      i0.\u0275\u0275restoreView(_r1);
+      const ctx_r1 = i0.\u0275\u0275nextContext();
+      return i0.\u0275\u0275resetView(ctx_r1.imageError($event));
+    });
+    i0.\u0275\u0275elementEnd();
+    i0.\u0275\u0275conditionalCreate(1, PhotoCarousel_Conditional_1_Conditional_1_Template, 3, 1, "span", 3);
+    i0.\u0275\u0275conditionalCreate(2, PhotoCarousel_Conditional_1_Conditional_2_Template, 4, 3, "div", 4);
+    i0.\u0275\u0275conditionalCreate(3, PhotoCarousel_Conditional_1_Conditional_3_Template, 9, 9);
+  }
+  if (rf & 2) {
+    const photo_r3 = ctx;
+    const ctx_r1 = i0.\u0275\u0275nextContext();
+    i0.\u0275\u0275property("src", photo_r3.src)("alt", photo_r3.location || photo_r3.title || ctx_r1.label());
+    i0.\u0275\u0275advance();
+    i0.\u0275\u0275conditional(photo_r3.location ? 1 : -1);
+    i0.\u0275\u0275advance();
+    i0.\u0275\u0275conditional(photo_r3.title || photo_r3.description || ctx_r1.headline() ? 2 : -1);
+    i0.\u0275\u0275advance();
+    i0.\u0275\u0275conditional(ctx_r1.orderedPhotos().length > 1 ? 3 : -1);
+  }
+}
+function PhotoCarousel_Conditional_2_Template(rf, ctx) {
+  if (rf & 1) {
+    i0.\u0275\u0275element(0, "tp-icon", 1);
+  }
+}
+var PhotoCarousel = class _PhotoCarousel {
+  photos = input(
+    [],
+    ...ngDevMode ? [{ debugName: "photos" }] : (
+      /* istanbul ignore next */
+      []
+    )
+  );
+  shuffle = input(
+    false,
+    ...ngDevMode ? [{ debugName: "shuffle" }] : (
+      /* istanbul ignore next */
+      []
+    )
+  );
+  label = input(
+    "Galer\xEDa del destino",
+    ...ngDevMode ? [{ debugName: "label" }] : (
+      /* istanbul ignore next */
+      []
+    )
+  );
+  autoplay = input(
+    true,
+    ...ngDevMode ? [{ debugName: "autoplay" }] : (
+      /* istanbul ignore next */
+      []
+    )
+  );
+  english = input(
+    false,
+    ...ngDevMode ? [{ debugName: "english" }] : (
+      /* istanbul ignore next */
+      []
+    )
+  );
+  variant = input(
+    "gallery",
+    ...ngDevMode ? [{ debugName: "variant" }] : (
+      /* istanbul ignore next */
+      []
+    )
+  );
+  headline = input(
+    "",
+    ...ngDevMode ? [{ debugName: "headline" }] : (
+      /* istanbul ignore next */
+      []
+    )
+  );
+  eyebrow = input(
+    "",
+    ...ngDevMode ? [{ debugName: "eyebrow" }] : (
+      /* istanbul ignore next */
+      []
+    )
+  );
+  intervalMs = input(
+    3e3,
+    ...ngDevMode ? [{ debugName: "intervalMs" }] : (
+      /* istanbul ignore next */
+      []
+    )
+  );
+  startIndex = input(
+    0,
+    ...ngDevMode ? [{ debugName: "startIndex" }] : (
+      /* istanbul ignore next */
+      []
+    )
+  );
+  orderedPhotos = linkedSignal(
+    () => {
+      const raw = this.photos();
+      if (!this.shuffle() || raw.length <= 1)
+        return [...raw];
+      return shuffleArray(raw);
+    },
+    ...ngDevMode ? [{ debugName: "orderedPhotos" }] : (
+      /* istanbul ignore next */
+      []
+    )
+  );
+  index = linkedSignal(
+    () => {
+      this.orderedPhotos();
+      return Math.min(Math.max(0, this.startIndex()), Math.max(0, this.orderedPhotos().length - 1));
+    },
+    ...ngDevMode ? [{ debugName: "index" }] : (
+      /* istanbul ignore next */
+      []
+    )
+  );
+  current = computed(
+    () => this.orderedPhotos()[this.index()],
+    ...ngDevMode ? [{ debugName: "current" }] : (
+      /* istanbul ignore next */
+      []
+    )
+  );
+  nextPhoto = computed(
+    () => this.orderedPhotos()[(this.index() + 1) % this.orderedPhotos().length],
+    ...ngDevMode ? [{ debugName: "nextPhoto" }] : (
+      /* istanbul ignore next */
+      []
+    )
+  );
+  reducedMotion = signal(
+    true,
+    ...ngDevMode ? [{ debugName: "reducedMotion" }] : (
+      /* istanbul ignore next */
+      []
+    )
+  );
+  paused = linkedSignal(
+    () => this.reducedMotion(),
+    ...ngDevMode ? [{ debugName: "paused" }] : (
+      /* istanbul ignore next */
+      []
+    )
+  );
+  hovering = signal(
+    false,
+    ...ngDevMode ? [{ debugName: "hovering" }] : (
+      /* istanbul ignore next */
+      []
+    )
+  );
+  focused = signal(
+    false,
+    ...ngDevMode ? [{ debugName: "focused" }] : (
+      /* istanbul ignore next */
+      []
+    )
+  );
+  visible = signal(
+    false,
+    ...ngDevMode ? [{ debugName: "visible" }] : (
+      /* istanbul ignore next */
+      []
+    )
+  );
+  hidden = signal(
+    false,
+    ...ngDevMode ? [{ debugName: "hidden" }] : (
+      /* istanbul ignore next */
+      []
+    )
+  );
+  canAutoplay = computed(
+    () => this.orderedPhotos().length > 1 && this.autoplay(),
+    ...ngDevMode ? [{ debugName: "canAutoplay" }] : (
+      /* istanbul ignore next */
+      []
+    )
+  );
+  isPaused = computed(
+    () => this.paused() || this.hovering() || this.focused() || !this.visible() || this.hidden(),
+    ...ngDevMode ? [{ debugName: "isPaused" }] : (
+      /* istanbul ignore next */
+      []
+    )
+  );
+  element = inject(ElementRef);
+  destroy = inject(DestroyRef);
+  constructor() {
+    afterNextRender(() => {
+      this.visibilityChanged();
+      const motion = matchMedia("(prefers-reduced-motion: reduce)");
+      this.reducedMotion.set(motion.matches);
+      const changed = () => this.reducedMotion.set(motion.matches);
+      motion.addEventListener("change", changed);
+      const observer = new IntersectionObserver(([entry]) => this.visible.set(entry.isIntersecting));
+      observer.observe(this.element.nativeElement);
+      this.destroy.onDestroy(() => {
+        observer.disconnect();
+        motion.removeEventListener("change", changed);
+      });
+    });
+    afterRenderEffect((onCleanup) => {
+      this.index();
+      const image = this.element.nativeElement.querySelector(".carousel-photo");
+      if (!image || this.reducedMotion())
+        return;
+      gsap.fromTo(image, { opacity: 0.62, scale: 1.025 }, { opacity: 1, scale: 1, duration: 0.7, ease: "power2.out" });
+      onCleanup(() => gsap.killTweensOf(image));
+    });
+  }
+  reshuffle() {
+    if (!this.shuffle() || this.photos().length <= 1)
+      return;
+    const currentList = this.orderedPhotos();
+    const lastPhoto = currentList[currentList.length - 1];
+    const nextList = shuffleArray(this.photos());
+    if (nextList.length > 1 && nextList[0].src === lastPhoto?.src) {
+      const swapIdx = 1 + Math.floor(Math.random() * (nextList.length - 1));
+      [nextList[0], nextList[swapIdx]] = [nextList[swapIdx], nextList[0]];
+    }
+    this.orderedPhotos.set(nextList);
+  }
+  move(direction) {
+    const count = this.orderedPhotos().length;
+    if (count <= 1)
+      return;
+    const next = this.index() + direction;
+    if (next >= count) {
+      if (this.shuffle()) {
+        this.reshuffle();
+      }
+      this.index.set(0);
+    } else if (next < 0) {
+      this.index.set(count - 1);
+    } else {
+      this.index.set(next);
+    }
+  }
+  onProgressEnd() {
+    if (this.canAutoplay() && !this.isPaused()) {
+      this.move(1);
+    }
+  }
+  focusOut(event) {
+    if (!(event.relatedTarget instanceof Node) || !this.element.nativeElement.contains(event.relatedTarget))
+      this.focused.set(false);
+  }
+  visibilityChanged() {
+    this.hidden.set(document.hidden);
+  }
+  langService = inject(LanguageService);
+  text(es, en) {
+    return this.langService.translateText(es, en);
+  }
+  imageError(event) {
+    const image = event.target;
+    if (!image.src.endsWith("/brand/iso.png"))
+      image.src = "/brand/iso.png";
+  }
+  static \u0275fac = function PhotoCarousel_Factory(__ngFactoryType__) {
+    return new (__ngFactoryType__ || _PhotoCarousel)();
+  };
+  static \u0275cmp = /* @__PURE__ */ i0.\u0275\u0275defineComponent({ type: _PhotoCarousel, selectors: [["tp-photo-carousel"]], hostBindings: function PhotoCarousel_HostBindings(rf, ctx) {
+    if (rf & 1) {
+      i0.\u0275\u0275listener("mouseenter", function PhotoCarousel_mouseenter_HostBindingHandler() {
+        return ctx.hovering.set(true);
+      })("mouseleave", function PhotoCarousel_mouseleave_HostBindingHandler() {
+        return ctx.hovering.set(false);
+      })("focusin", function PhotoCarousel_focusin_HostBindingHandler() {
+        return ctx.focused.set(true);
+      })("focusout", function PhotoCarousel_focusout_HostBindingHandler($event) {
+        return ctx.focusOut($event);
+      })("visibilitychange", function PhotoCarousel_visibilitychange_HostBindingHandler() {
+        return ctx.visibilityChanged();
+      }, i0.\u0275\u0275resolveDocument);
+    }
+  }, inputs: { photos: [1, "photos"], shuffle: [1, "shuffle"], label: [1, "label"], autoplay: [1, "autoplay"], english: [1, "english"], variant: [1, "variant"], headline: [1, "headline"], eyebrow: [1, "eyebrow"], intervalMs: [1, "intervalMs"], startIndex: [1, "startIndex"] }, decls: 3, vars: 5, consts: [["role", "region", 1, "photo-carousel"], ["name", "landscape"], ["fetchpriority", "high", "decoding", "async", 1, "carousel-photo", 3, "error", "src", "alt"], [1, "carousel-location"], [1, "carousel-caption"], ["name", "pin"], [1, "carousel-eyebrow"], ["alt", "", "aria-hidden", "true", "decoding", "async", "fetchpriority", "low", 1, "carousel-preload", 3, "src"], [1, "carousel-controls"], ["tpButton", "", "variant", "icon", "icon", "left", 3, "click"], ["tpButton", "", "variant", "icon", 3, "click"], ["viewBox", "0 0 24 24", "aria-hidden", "true"], ["tpButton", "", "variant", "icon", "icon", "right", 3, "click"], ["d", "m8 5 11 7-11 7Z", "fill", "currentColor"], ["d", "M8 5v14M16 5v14", "stroke", "currentColor", "stroke-width", "3"]], template: function PhotoCarousel_Template(rf, ctx) {
+    if (rf & 1) {
+      i0.\u0275\u0275elementStart(0, "div", 0);
+      i0.\u0275\u0275conditionalCreate(1, PhotoCarousel_Conditional_1_Template, 4, 5)(2, PhotoCarousel_Conditional_2_Template, 1, 0, "tp-icon", 1);
+      i0.\u0275\u0275elementEnd();
+    }
+    if (rf & 2) {
+      let tmp_3_0;
+      i0.\u0275\u0275classProp("hero-carousel", ctx.variant() === "hero");
+      i0.\u0275\u0275attribute("aria-roledescription", ctx.text("carrusel", "carousel"))("aria-label", ctx.label());
+      i0.\u0275\u0275advance();
+      i0.\u0275\u0275conditional((tmp_3_0 = ctx.current()) ? 1 : 2, tmp_3_0);
+    }
+  }, dependencies: [Button, Icon], styles: ["\n[_nghost-%COMP%] {\n  display: block;\n  height: 100%;\n  min-width: 0;\n}\n.photo-carousel[_ngcontent-%COMP%] {\n  position: relative;\n  height: 100%;\n  overflow: hidden;\n  display: grid;\n  place-items: center;\n  background: var(--%NS%brand-soft);\n  color: var(--%NS%brand);\n}\n.carousel-photo[_ngcontent-%COMP%] {\n  position: absolute;\n  inset: 0;\n  width: 100%;\n  height: 100%;\n  object-fit: cover;\n}\n.carousel-preload[_ngcontent-%COMP%] {\n  position: absolute;\n  width: 1px;\n  height: 1px;\n  opacity: 0;\n  pointer-events: none;\n}\n.carousel-caption[_ngcontent-%COMP%] {\n  position: absolute;\n  inset: auto 0 0;\n  padding: 52px 24px 82px;\n  color: white;\n  background: linear-gradient(transparent, rgba(16, 39, 31, 0.8));\n  pointer-events: none;\n}\n.carousel-caption[_ngcontent-%COMP%]   h2[_ngcontent-%COMP%] {\n  font-size: clamp(20px, 2.3vw, 28px);\n  line-height: 1.2;\n}\n.carousel-location[_ngcontent-%COMP%] {\n  position: absolute;\n  top: 24px;\n  left: 24px;\n  display: flex;\n  align-items: center;\n  gap: 8px;\n  padding: 10px 14px;\n  border-radius: 999px;\n  background: #fff;\n  color: #30392e;\n  font-size: 11px;\n}\n.carousel-location[_ngcontent-%COMP%]   tp-icon[_ngcontent-%COMP%] {\n  width: 16px;\n  height: 16px;\n}\n.carousel-eyebrow[_ngcontent-%COMP%] {\n  display: block;\n  margin-bottom: 12px;\n  font-size: 11px;\n}\n.hero-carousel[_ngcontent-%COMP%]   .carousel-caption[_ngcontent-%COMP%] {\n  padding: 70px 32px 84px;\n}\n.hero-carousel[_ngcontent-%COMP%]   .carousel-caption[_ngcontent-%COMP%]   h2[_ngcontent-%COMP%] {\n  max-width: 300px;\n  font-size: 38px;\n  line-height: 1.15;\n  letter-spacing: -0.04em;\n}\n.carousel-caption[_ngcontent-%COMP%]   p[_ngcontent-%COMP%] {\n  color: white;\n  font-size: 12px;\n  line-height: 1.6;\n  margin-top: 8px;\n  display: -webkit-box;\n  -webkit-line-clamp: 2;\n  -webkit-box-orient: vertical;\n  overflow: hidden;\n}\n.carousel-controls[_ngcontent-%COMP%] {\n  position: absolute;\n  bottom: 16px;\n  right: 16px;\n  display: flex;\n  align-items: center;\n  gap: 4px;\n  padding: 4px;\n  border-radius: 999px;\n  background: rgba(0, 0, 0, 0.35);\n  backdrop-filter: blur(12px);\n  -webkit-backdrop-filter: blur(12px);\n  border: 1px solid rgba(255, 255, 255, 0.15);\n  color: white;\n}\n.carousel-controls[_ngcontent-%COMP%]   .btn[_ngcontent-%COMP%] {\n  width: 42px;\n  min-height: 42px;\n  background: transparent;\n  color: white;\n  padding: 10px;\n}\n.carousel-controls[_ngcontent-%COMP%]   .btn[_ngcontent-%COMP%]:hover {\n  background: rgba(255, 255, 255, 0.1254901961);\n}\n.carousel-controls[_ngcontent-%COMP%]   span[_ngcontent-%COMP%] {\n  min-width: 42px;\n  text-align: center;\n  font-size: 11px;\n}\n.carousel-controls[_ngcontent-%COMP%]   svg[_ngcontent-%COMP%] {\n  width: 18px;\n  height: 18px;\n}\n@media (max-width: 600px) {\n  .hero-carousel[_ngcontent-%COMP%]   .carousel-caption[_ngcontent-%COMP%] {\n    padding: 52px 24px 80px;\n  }\n  .hero-carousel[_ngcontent-%COMP%]   .carousel-caption[_ngcontent-%COMP%]   h2[_ngcontent-%COMP%] {\n    font-size: 32px;\n  }\n  .carousel-location[_ngcontent-%COMP%] {\n    top: 18px;\n    left: 18px;\n  }\n  .carousel-caption[_ngcontent-%COMP%] {\n    padding: 40px 18px 78px;\n  }\n  .carousel-controls[_ngcontent-%COMP%] {\n    right: 12px;\n    bottom: 12px;\n  }\n}\n.carousel-progress-track[_ngcontent-%COMP%] {\n  position: absolute;\n  bottom: 0;\n  left: 0;\n  right: 0;\n  height: 4px;\n  background: rgba(255, 255, 255, 0.28);\n  overflow: hidden;\n  z-index: 5;\n  pointer-events: none;\n}\n.carousel-progress-bar[_ngcontent-%COMP%] {\n  height: 100%;\n  width: 100%;\n  transform-origin: left center;\n  transform: scaleX(0);\n  background: #ffffff;\n  box-shadow: 0 0 10px rgba(255, 255, 255, 0.85);\n  animation: _ngcontent-%COMP%_carousel-fill var(--%NS%carousel-duration, 3000ms) linear forwards;\n  will-change: transform;\n}\n.carousel-progress-bar.is-paused[_ngcontent-%COMP%] {\n  animation-play-state: paused;\n}\n@keyframes _ngcontent-%COMP%_carousel-fill {\n  from {\n    transform: scaleX(0);\n  }\n  to {\n    transform: scaleX(1);\n  }\n}\n@media (prefers-reduced-motion: reduce) {\n  .carousel-progress-bar[_ngcontent-%COMP%] {\n    animation: _ngcontent-%COMP%_carousel-fill var(--%NS%carousel-duration, 3000ms) linear forwards !important;\n  }\n}\n/*# sourceMappingURL=photo-carousel.css.map */"] });
+};
+(() => {
+  (typeof ngDevMode === "undefined" || ngDevMode) && i0.\u0275setClassMetadata(PhotoCarousel, [{
+    type: Component,
+    args: [{ selector: "tp-photo-carousel", imports: [Button, Icon], host: {
+      "(mouseenter)": "hovering.set(true)",
+      "(mouseleave)": "hovering.set(false)",
+      "(focusin)": "focused.set(true)",
+      "(focusout)": "focusOut($event)",
+      "(document:visibilitychange)": "visibilityChanged()"
+    }, template: `<div
+  class="photo-carousel"
+  [class.hero-carousel]="variant() === 'hero'"
+  role="region"
+  [attr.aria-roledescription]="text('carrusel', 'carousel')"
+  [attr.aria-label]="label()"
+>
+  @if (current(); as photo) {
+    <img
+      class="carousel-photo"
+      [src]="photo.src"
+      [alt]="photo.location || photo.title || label()"
+      fetchpriority="high"
+      decoding="async"
+      (error)="imageError($event)"
+    />
+    @if (photo.location) {
+      <span class="carousel-location"><tp-icon name="pin" />{{ photo.location }}</span>
+    }
+    @if (photo.title || photo.description || headline()) {
+      <div class="carousel-caption">
+        @if (eyebrow()) { <span class="carousel-eyebrow">{{ eyebrow() }}</span> }
+        @if (photo.title || headline()) {
+          <h2>{{ headline() || photo.title }}</h2>
+        }
+        @if (photo.description) {
+          <p>{{ photo.description }}</p>
+        }
+      </div>
+    }
+    @if (orderedPhotos().length > 1) {
+      <img
+        class="carousel-preload"
+        [src]="nextPhoto()?.src"
+        alt=""
+        aria-hidden="true"
+        decoding="async"
+        fetchpriority="low"
+      />
+      <div class="carousel-controls">
+        <button
+          tpButton
+          variant="icon"
+          icon="left"
+          (click)="move(-1)"
+          [attr.aria-label]="text('Foto anterior', 'Previous photo')"
+        ></button>
+        <span
+          [attr.aria-label]="
+            text('Foto ', 'Photo ') + (index() + 1) + text(' de ', ' of ') + orderedPhotos().length
+          "
+          >{{ index() + 1 }} / {{ orderedPhotos().length }}</span
+        >
+        <button
+          tpButton
+          variant="icon"
+          (click)="paused.set(!paused())"
+          [attr.aria-label]="
+            paused()
+              ? text('Reproducir carrusel', 'Play carousel')
+              : text('Pausar carrusel', 'Pause carousel')
+          "
+          [attr.aria-pressed]="paused()"
+        >
+          @if (paused()) {
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="m8 5 11 7-11 7Z" fill="currentColor" />
+            </svg>
+          } @else {
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M8 5v14M16 5v14" stroke="currentColor" stroke-width="3" />
+            </svg>
+          }
+        </button>
+        <button
+          tpButton
+          variant="icon"
+          icon="right"
+          (click)="move(1)"
+          [attr.aria-label]="text('Foto siguiente', 'Next photo')"
+        ></button>
+      </div>
+      <!-- @if (canAutoplay()) {
+        <div class="carousel-progress-track" aria-hidden="true">
+          @for (p of [index()]; track p) {
+            <div
+              class="carousel-progress-bar"
+              [class.is-paused]="isPaused()"
+              [style.--carousel-duration]="intervalMs() + 'ms'"
+              (animationend)="onProgressEnd()"
+            ></div>
+          }
+        </div>
+      } -->
+    }
+  } @else {
+    <tp-icon name="landscape" />
+  }
+</div>
+`, styles: ["/* src/app/shared/components/photo-carousel/photo-carousel.scss */\n:host {\n  display: block;\n  height: 100%;\n  min-width: 0;\n}\n.photo-carousel {\n  position: relative;\n  height: 100%;\n  overflow: hidden;\n  display: grid;\n  place-items: center;\n  background: var(--brand-soft);\n  color: var(--brand);\n}\n.carousel-photo {\n  position: absolute;\n  inset: 0;\n  width: 100%;\n  height: 100%;\n  object-fit: cover;\n}\n.carousel-preload {\n  position: absolute;\n  width: 1px;\n  height: 1px;\n  opacity: 0;\n  pointer-events: none;\n}\n.carousel-caption {\n  position: absolute;\n  inset: auto 0 0;\n  padding: 52px 24px 82px;\n  color: white;\n  background: linear-gradient(transparent, rgba(16, 39, 31, 0.8));\n  pointer-events: none;\n}\n.carousel-caption h2 {\n  font-size: clamp(20px, 2.3vw, 28px);\n  line-height: 1.2;\n}\n.carousel-location {\n  position: absolute;\n  top: 24px;\n  left: 24px;\n  display: flex;\n  align-items: center;\n  gap: 8px;\n  padding: 10px 14px;\n  border-radius: 999px;\n  background: #fff;\n  color: #30392e;\n  font-size: 11px;\n}\n.carousel-location tp-icon {\n  width: 16px;\n  height: 16px;\n}\n.carousel-eyebrow {\n  display: block;\n  margin-bottom: 12px;\n  font-size: 11px;\n}\n.hero-carousel .carousel-caption {\n  padding: 70px 32px 84px;\n}\n.hero-carousel .carousel-caption h2 {\n  max-width: 300px;\n  font-size: 38px;\n  line-height: 1.15;\n  letter-spacing: -0.04em;\n}\n.carousel-caption p {\n  color: white;\n  font-size: 12px;\n  line-height: 1.6;\n  margin-top: 8px;\n  display: -webkit-box;\n  -webkit-line-clamp: 2;\n  -webkit-box-orient: vertical;\n  overflow: hidden;\n}\n.carousel-controls {\n  position: absolute;\n  bottom: 16px;\n  right: 16px;\n  display: flex;\n  align-items: center;\n  gap: 4px;\n  padding: 4px;\n  border-radius: 999px;\n  background: rgba(0, 0, 0, 0.35);\n  backdrop-filter: blur(12px);\n  -webkit-backdrop-filter: blur(12px);\n  border: 1px solid rgba(255, 255, 255, 0.15);\n  color: white;\n}\n.carousel-controls .btn {\n  width: 42px;\n  min-height: 42px;\n  background: transparent;\n  color: white;\n  padding: 10px;\n}\n.carousel-controls .btn:hover {\n  background: rgba(255, 255, 255, 0.1254901961);\n}\n.carousel-controls span {\n  min-width: 42px;\n  text-align: center;\n  font-size: 11px;\n}\n.carousel-controls svg {\n  width: 18px;\n  height: 18px;\n}\n@media (max-width: 600px) {\n  .hero-carousel .carousel-caption {\n    padding: 52px 24px 80px;\n  }\n  .hero-carousel .carousel-caption h2 {\n    font-size: 32px;\n  }\n  .carousel-location {\n    top: 18px;\n    left: 18px;\n  }\n  .carousel-caption {\n    padding: 40px 18px 78px;\n  }\n  .carousel-controls {\n    right: 12px;\n    bottom: 12px;\n  }\n}\n.carousel-progress-track {\n  position: absolute;\n  bottom: 0;\n  left: 0;\n  right: 0;\n  height: 4px;\n  background: rgba(255, 255, 255, 0.28);\n  overflow: hidden;\n  z-index: 5;\n  pointer-events: none;\n}\n.carousel-progress-bar {\n  height: 100%;\n  width: 100%;\n  transform-origin: left center;\n  transform: scaleX(0);\n  background: #ffffff;\n  box-shadow: 0 0 10px rgba(255, 255, 255, 0.85);\n  animation: carousel-fill var(--carousel-duration, 3000ms) linear forwards;\n  will-change: transform;\n}\n.carousel-progress-bar.is-paused {\n  animation-play-state: paused;\n}\n@keyframes carousel-fill {\n  from {\n    transform: scaleX(0);\n  }\n  to {\n    transform: scaleX(1);\n  }\n}\n@media (prefers-reduced-motion: reduce) {\n  .carousel-progress-bar {\n    animation: carousel-fill var(--carousel-duration, 3000ms) linear forwards !important;\n  }\n}\n/*# sourceMappingURL=photo-carousel.css.map */\n"] }]
+  }], () => [], { photos: [{ type: i0.Input, args: [{ isSignal: true, alias: "photos", required: false }] }], shuffle: [{ type: i0.Input, args: [{ isSignal: true, alias: "shuffle", required: false }] }], label: [{ type: i0.Input, args: [{ isSignal: true, alias: "label", required: false }] }], autoplay: [{ type: i0.Input, args: [{ isSignal: true, alias: "autoplay", required: false }] }], english: [{ type: i0.Input, args: [{ isSignal: true, alias: "english", required: false }] }], variant: [{ type: i0.Input, args: [{ isSignal: true, alias: "variant", required: false }] }], headline: [{ type: i0.Input, args: [{ isSignal: true, alias: "headline", required: false }] }], eyebrow: [{ type: i0.Input, args: [{ isSignal: true, alias: "eyebrow", required: false }] }], intervalMs: [{ type: i0.Input, args: [{ isSignal: true, alias: "intervalMs", required: false }] }], startIndex: [{ type: i0.Input, args: [{ isSignal: true, alias: "startIndex", required: false }] }] });
+})();
+(() => {
+  (typeof ngDevMode === "undefined" || ngDevMode) && i0.\u0275setClassDebugInfo(PhotoCarousel, { className: "PhotoCarousel", filePath: "src/app/shared/components/photo-carousel/photo-carousel.ts", lineNumber: 34 });
+})();
+(() => {
+  const id = "src%2Fapp%2Fshared%2Fcomponents%2Fphoto-carousel%2Fphoto-carousel.ts%40PhotoCarousel";
+  function PhotoCarousel_HmrLoad(t) {
+    import(
+      /* @vite-ignore */
+      __vite__injectQuery(i0.\u0275\u0275getReplaceMetadataURL(id, t, import.meta.url), 'import')
+    ).then((m) => m.default && i0.\u0275\u0275replaceMetadata(PhotoCarousel, m.default, [i0], [Button, Icon, Component], import.meta, id));
+  }
+  (typeof ngDevMode === "undefined" || ngDevMode) && PhotoCarousel_HmrLoad(Date.now());
+  (typeof ngDevMode === "undefined" || ngDevMode) && (import.meta.hot && import.meta.hot.on("angular:component-update", (d) => d.id === id && PhotoCarousel_HmrLoad(d.timestamp)));
+})();
+
+export {
+  randomSample,
+  shuffleArray,
+  PhotoCarousel
+};
+//# debugId=f987d5b5-fee6-5790-a02f-4ac709c64005
+
+
+//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbInNyYy9hcHAvY29yZS91dGlscy9yYW5kb20tc2FtcGxlLnRzIiwic3JjL2FwcC9zaGFyZWQvY29tcG9uZW50cy9waG90by1jYXJvdXNlbC9waG90by1jYXJvdXNlbC50cyIsInNyYy9hcHAvc2hhcmVkL2NvbXBvbmVudHMvcGhvdG8tY2Fyb3VzZWwvcGhvdG8tY2Fyb3VzZWwuaHRtbCJdLCJzb3VyY2VzQ29udGVudCI6WyIvKiogQ2hvb3NlIGRpc3RpbmN0IGVudHJpZXMgd2l0aG91dCBjaGFuZ2luZyB0aGUgc291cmNlIG9yIHNodWZmbGluZyB0aGUgZW50aXJlIGxpc3QuICovXG5leHBvcnQgZnVuY3Rpb24gcmFuZG9tU2FtcGxlPFQ+KGl0ZW1zOiByZWFkb25seSBUW10sIGNvdW50OiBudW1iZXIpOiBUW10ge1xuICBjb25zdCBwb29sID0gWy4uLml0ZW1zXTtcbiAgY29uc3Qgc2l6ZSA9IE1hdGgubWluKE1hdGgubWF4KDAsIE1hdGguZmxvb3IoY291bnQpKSwgcG9vbC5sZW5ndGgpO1xuICBmb3IgKGxldCBpbmRleCA9IDA7IGluZGV4IDwgc2l6ZTsgaW5kZXgrKykge1xuICAgIGNvbnN0IGNob3NlbiA9IGluZGV4ICsgTWF0aC5mbG9vcihNYXRoLnJhbmRvbSgpICogKHBvb2wubGVuZ3RoIC0gaW5kZXgpKTtcbiAgICBbcG9vbFtpbmRleF0sIHBvb2xbY2hvc2VuXV0gPSBbcG9vbFtjaG9zZW5dLCBwb29sW2luZGV4XV07XG4gIH1cbiAgcmV0dXJuIHBvb2wuc2xpY2UoMCwgc2l6ZSk7XG59XG5cbmV4cG9ydCBmdW5jdGlvbiBzaHVmZmxlQXJyYXk8VD4oaXRlbXM6IHJlYWRvbmx5IFRbXSk6IFRbXSB7XG4gIHJldHVybiByYW5kb21TYW1wbGUoaXRlbXMsIGl0ZW1zLmxlbmd0aCk7XG59XG4iLCJpbXBvcnQge1xuICBDb21wb25lbnQsXG4gIEVsZW1lbnRSZWYsXG4gIERlc3Ryb3lSZWYsXG4gIGFmdGVyTmV4dFJlbmRlcixcbiAgYWZ0ZXJSZW5kZXJFZmZlY3QsXG4gIGNvbXB1dGVkLFxuICBlZmZlY3QsXG4gIGluamVjdCxcbiAgaW5wdXQsXG4gIGxpbmtlZFNpZ25hbCxcbiAgc2lnbmFsLFxufSBmcm9tICdAYW5ndWxhci9jb3JlJztcbmltcG9ydCB7IEJ1dHRvbiB9IGZyb20gJy4uL2J1dHRvbi9idXR0b24nO1xuaW1wb3J0IHsgSWNvbiB9IGZyb20gJy4uL2ljb24vaWNvbic7XG5pbXBvcnQgdHlwZSB7IENhcm91c2VsUGhvdG8gfSBmcm9tICcuL21vZGVscy9jYXJvdXNlbC1waG90byc7XG5pbXBvcnQgeyBMYW5ndWFnZVNlcnZpY2UgfSBmcm9tICcuLi8uLi8uLi9jb3JlL3NlcnZpY2VzL2xhbmd1YWdlLnNlcnZpY2UnO1xuaW1wb3J0IHsgc2h1ZmZsZUFycmF5IH0gZnJvbSAnLi4vLi4vLi4vY29yZS91dGlscy9yYW5kb20tc2FtcGxlJztcbmltcG9ydCB7IGdzYXAgfSBmcm9tICdnc2FwJztcblxuQENvbXBvbmVudCh7XG4gIHNlbGVjdG9yOiAndHAtcGhvdG8tY2Fyb3VzZWwnLFxuICBpbXBvcnRzOiBbQnV0dG9uLCBJY29uXSxcbiAgdGVtcGxhdGVVcmw6ICcuL3Bob3RvLWNhcm91c2VsLmh0bWwnLFxuICBzdHlsZVVybDogJy4vcGhvdG8tY2Fyb3VzZWwuc2NzcycsXG4gIGhvc3Q6IHtcbiAgICAnKG1vdXNlZW50ZXIpJzogJ2hvdmVyaW5nLnNldCh0cnVlKScsXG4gICAgJyhtb3VzZWxlYXZlKSc6ICdob3ZlcmluZy5zZXQoZmFsc2UpJyxcbiAgICAnKGZvY3VzaW4pJzogJ2ZvY3VzZWQuc2V0KHRydWUpJyxcbiAgICAnKGZvY3Vzb3V0KSc6ICdmb2N1c091dCgkZXZlbnQpJyxcbiAgICAnKGRvY3VtZW50OnZpc2liaWxpdHljaGFuZ2UpJzogJ3Zpc2liaWxpdHlDaGFuZ2VkKCknLFxuICB9LFxufSlcbmV4cG9ydCBjbGFzcyBQaG90b0Nhcm91c2VsIHtcbiAgcGhvdG9zID0gaW5wdXQ8Q2Fyb3VzZWxQaG90b1tdPihbXSk7XG4gIHNodWZmbGUgPSBpbnB1dChmYWxzZSk7XG4gIGxhYmVsID0gaW5wdXQoJ0dhbGVyw61hIGRlbCBkZXN0aW5vJyk7XG4gIGF1dG9wbGF5ID0gaW5wdXQodHJ1ZSk7XG4gIGVuZ2xpc2ggPSBpbnB1dChmYWxzZSk7XG4gIHZhcmlhbnQgPSBpbnB1dDwnZ2FsbGVyeScgfCAnaGVybyc+KCdnYWxsZXJ5Jyk7XG4gIGhlYWRsaW5lID0gaW5wdXQoJycpO1xuICBleWVicm93ID0gaW5wdXQoJycpO1xuICBpbnRlcnZhbE1zID0gaW5wdXQoMzAwMCk7XG4gIHN0YXJ0SW5kZXggPSBpbnB1dCgwKTtcbiAgb3JkZXJlZFBob3RvcyA9IGxpbmtlZFNpZ25hbDxDYXJvdXNlbFBob3RvW10+KCgpID0+IHtcbiAgICBjb25zdCByYXcgPSB0aGlzLnBob3RvcygpO1xuICAgIGlmICghdGhpcy5zaHVmZmxlKCkgfHwgcmF3Lmxlbmd0aCA8PSAxKSByZXR1cm4gWy4uLnJhd107XG4gICAgcmV0dXJuIHNodWZmbGVBcnJheShyYXcpO1xuICB9KTtcbiAgaW5kZXggPSBsaW5rZWRTaWduYWwoKCkgPT4ge1xuICAgIHRoaXMub3JkZXJlZFBob3RvcygpO1xuICAgIHJldHVybiBNYXRoLm1pbihNYXRoLm1heCgwLCB0aGlzLnN0YXJ0SW5kZXgoKSksIE1hdGgubWF4KDAsIHRoaXMub3JkZXJlZFBob3RvcygpLmxlbmd0aCAtIDEpKTtcbiAgfSk7XG4gIGN1cnJlbnQgPSBjb21wdXRlZCgoKSA9PiB0aGlzLm9yZGVyZWRQaG90b3MoKVt0aGlzLmluZGV4KCldKTtcbiAgbmV4dFBob3RvID0gY29tcHV0ZWQoKCkgPT4gdGhpcy5vcmRlcmVkUGhvdG9zKClbKHRoaXMuaW5kZXgoKSArIDEpICUgdGhpcy5vcmRlcmVkUGhvdG9zKCkubGVuZ3RoXSk7XG4gIHJlZHVjZWRNb3Rpb24gPSBzaWduYWwodHJ1ZSk7XG4gIHBhdXNlZCA9IGxpbmtlZFNpZ25hbCgoKSA9PiB0aGlzLnJlZHVjZWRNb3Rpb24oKSk7XG4gIGhvdmVyaW5nID0gc2lnbmFsKGZhbHNlKTtcbiAgZm9jdXNlZCA9IHNpZ25hbChmYWxzZSk7XG4gIHZpc2libGUgPSBzaWduYWwoZmFsc2UpO1xuICBoaWRkZW4gPSBzaWduYWwoZmFsc2UpO1xuICBjYW5BdXRvcGxheSA9IGNvbXB1dGVkKCgpID0+IHRoaXMub3JkZXJlZFBob3RvcygpLmxlbmd0aCA+IDEgJiYgdGhpcy5hdXRvcGxheSgpKTtcbiAgaXNQYXVzZWQgPSBjb21wdXRlZCgoKSA9PlxuICAgIHRoaXMucGF1c2VkKCkgfHxcbiAgICB0aGlzLmhvdmVyaW5nKCkgfHxcbiAgICB0aGlzLmZvY3VzZWQoKSB8fFxuICAgICF0aGlzLnZpc2libGUoKSB8fFxuICAgIHRoaXMuaGlkZGVuKClcbiAgKTtcbiAgcHJpdmF0ZSBlbGVtZW50ID0gaW5qZWN0PEVsZW1lbnRSZWY8SFRNTEVsZW1lbnQ+PihFbGVtZW50UmVmKTtcbiAgcHJpdmF0ZSBkZXN0cm95ID0gaW5qZWN0KERlc3Ryb3lSZWYpO1xuXG4gIGNvbnN0cnVjdG9yKCkge1xuICAgIGFmdGVyTmV4dFJlbmRlcigoKSA9PiB7XG4gICAgICB0aGlzLnZpc2liaWxpdHlDaGFuZ2VkKCk7XG4gICAgICBjb25zdCBtb3Rpb24gPSBtYXRjaE1lZGlhKCcocHJlZmVycy1yZWR1Y2VkLW1vdGlvbjogcmVkdWNlKScpO1xuICAgICAgdGhpcy5yZWR1Y2VkTW90aW9uLnNldChtb3Rpb24ubWF0Y2hlcyk7XG4gICAgICBjb25zdCBjaGFuZ2VkID0gKCkgPT4gdGhpcy5yZWR1Y2VkTW90aW9uLnNldChtb3Rpb24ubWF0Y2hlcyk7XG4gICAgICBtb3Rpb24uYWRkRXZlbnRMaXN0ZW5lcignY2hhbmdlJywgY2hhbmdlZCk7XG4gICAgICBjb25zdCBvYnNlcnZlciA9IG5ldyBJbnRlcnNlY3Rpb25PYnNlcnZlcigoW2VudHJ5XSkgPT5cbiAgICAgICAgdGhpcy52aXNpYmxlLnNldChlbnRyeS5pc0ludGVyc2VjdGluZyksXG4gICAgICApO1xuICAgICAgb2JzZXJ2ZXIub2JzZXJ2ZSh0aGlzLmVsZW1lbnQubmF0aXZlRWxlbWVudCk7XG4gICAgICB0aGlzLmRlc3Ryb3kub25EZXN0cm95KCgpID0+IHtcbiAgICAgICAgb2JzZXJ2ZXIuZGlzY29ubmVjdCgpO1xuICAgICAgICBtb3Rpb24ucmVtb3ZlRXZlbnRMaXN0ZW5lcignY2hhbmdlJywgY2hhbmdlZCk7XG4gICAgICB9KTtcbiAgICB9KTtcbiAgICBhZnRlclJlbmRlckVmZmVjdCgob25DbGVhbnVwKSA9PiB7XG4gICAgICB0aGlzLmluZGV4KCk7XG4gICAgICBjb25zdCBpbWFnZSA9IHRoaXMuZWxlbWVudC5uYXRpdmVFbGVtZW50LnF1ZXJ5U2VsZWN0b3I8SFRNTEVsZW1lbnQ+KCcuY2Fyb3VzZWwtcGhvdG8nKTtcbiAgICAgIGlmICghaW1hZ2UgfHwgdGhpcy5yZWR1Y2VkTW90aW9uKCkpIHJldHVybjtcbiAgICAgIGdzYXAuZnJvbVRvKGltYWdlLCB7IG9wYWNpdHk6IDAuNjIsIHNjYWxlOiAxLjAyNSB9LCB7IG9wYWNpdHk6IDEsIHNjYWxlOiAxLCBkdXJhdGlvbjogMC43LCBlYXNlOiAncG93ZXIyLm91dCcgfSk7XG4gICAgICBvbkNsZWFudXAoKCkgPT4gZ3NhcC5raWxsVHdlZW5zT2YoaW1hZ2UpKTtcbiAgICB9KTtcbiAgfVxuXG4gIHJlc2h1ZmZsZSgpIHtcbiAgICBpZiAoIXRoaXMuc2h1ZmZsZSgpIHx8IHRoaXMucGhvdG9zKCkubGVuZ3RoIDw9IDEpIHJldHVybjtcbiAgICBjb25zdCBjdXJyZW50TGlzdCA9IHRoaXMub3JkZXJlZFBob3RvcygpO1xuICAgIGNvbnN0IGxhc3RQaG90byA9IGN1cnJlbnRMaXN0W2N1cnJlbnRMaXN0Lmxlbmd0aCAtIDFdO1xuICAgIGNvbnN0IG5leHRMaXN0ID0gc2h1ZmZsZUFycmF5KHRoaXMucGhvdG9zKCkpO1xuICAgIGlmIChuZXh0TGlzdC5sZW5ndGggPiAxICYmIG5leHRMaXN0WzBdLnNyYyA9PT0gbGFzdFBob3RvPy5zcmMpIHtcbiAgICAgIGNvbnN0IHN3YXBJZHggPSAxICsgTWF0aC5mbG9vcihNYXRoLnJhbmRvbSgpICogKG5leHRMaXN0Lmxlbmd0aCAtIDEpKTtcbiAgICAgIFtuZXh0TGlzdFswXSwgbmV4dExpc3Rbc3dhcElkeF1dID0gW25leHRMaXN0W3N3YXBJZHhdLCBuZXh0TGlzdFswXV07XG4gICAgfVxuICAgIHRoaXMub3JkZXJlZFBob3Rvcy5zZXQobmV4dExpc3QpO1xuICB9XG5cbiAgbW92ZShkaXJlY3Rpb246IG51bWJlcikge1xuICAgIGNvbnN0IGNvdW50ID0gdGhpcy5vcmRlcmVkUGhvdG9zKCkubGVuZ3RoO1xuICAgIGlmIChjb3VudCA8PSAxKSByZXR1cm47XG4gICAgY29uc3QgbmV4dCA9IHRoaXMuaW5kZXgoKSArIGRpcmVjdGlvbjtcbiAgICBpZiAobmV4dCA+PSBjb3VudCkge1xuICAgICAgaWYgKHRoaXMuc2h1ZmZsZSgpKSB7XG4gICAgICAgIHRoaXMucmVzaHVmZmxlKCk7XG4gICAgICB9XG4gICAgICB0aGlzLmluZGV4LnNldCgwKTtcbiAgICB9IGVsc2UgaWYgKG5leHQgPCAwKSB7XG4gICAgICB0aGlzLmluZGV4LnNldChjb3VudCAtIDEpO1xuICAgIH0gZWxzZSB7XG4gICAgICB0aGlzLmluZGV4LnNldChuZXh0KTtcbiAgICB9XG4gIH1cbiAgb25Qcm9ncmVzc0VuZCgpIHtcbiAgICBpZiAodGhpcy5jYW5BdXRvcGxheSgpICYmICF0aGlzLmlzUGF1c2VkKCkpIHtcbiAgICAgIHRoaXMubW92ZSgxKTtcbiAgICB9XG4gIH1cbiAgZm9jdXNPdXQoZXZlbnQ6IEZvY3VzRXZlbnQpIHtcbiAgICBpZiAoXG4gICAgICAhKGV2ZW50LnJlbGF0ZWRUYXJnZXQgaW5zdGFuY2VvZiBOb2RlKSB8fFxuICAgICAgIXRoaXMuZWxlbWVudC5uYXRpdmVFbGVtZW50LmNvbnRhaW5zKGV2ZW50LnJlbGF0ZWRUYXJnZXQpXG4gICAgKVxuICAgICAgdGhpcy5mb2N1c2VkLnNldChmYWxzZSk7XG4gIH1cbiAgdmlzaWJpbGl0eUNoYW5nZWQoKSB7XG4gICAgdGhpcy5oaWRkZW4uc2V0KGRvY3VtZW50LmhpZGRlbik7XG4gIH1cbiAgcHJpdmF0ZSBsYW5nU2VydmljZSA9IGluamVjdChMYW5ndWFnZVNlcnZpY2UpO1xuICB0ZXh0KGVzOiBzdHJpbmcsIGVuPzogc3RyaW5nKSB7XG4gICAgcmV0dXJuIHRoaXMubGFuZ1NlcnZpY2UudHJhbnNsYXRlVGV4dChlcywgZW4pO1xuICB9XG4gIGltYWdlRXJyb3IoZXZlbnQ6IEV2ZW50KSB7XG4gICAgY29uc3QgaW1hZ2UgPSBldmVudC50YXJnZXQgYXMgSFRNTEltYWdlRWxlbWVudDtcbiAgICBpZiAoIWltYWdlLnNyYy5lbmRzV2l0aCgnL2JyYW5kL2lzby5wbmcnKSkgaW1hZ2Uuc3JjID0gJy9icmFuZC9pc28ucG5nJztcbiAgfVxufVxuIiwiPGRpdlxuICBjbGFzcz1cInBob3RvLWNhcm91c2VsXCJcbiAgW2NsYXNzLmhlcm8tY2Fyb3VzZWxdPVwidmFyaWFudCgpID09PSAnaGVybydcIlxuICByb2xlPVwicmVnaW9uXCJcbiAgW2F0dHIuYXJpYS1yb2xlZGVzY3JpcHRpb25dPVwidGV4dCgnY2FycnVzZWwnLCAnY2Fyb3VzZWwnKVwiXG4gIFthdHRyLmFyaWEtbGFiZWxdPVwibGFiZWwoKVwiXG4+XG4gIEBpZiAoY3VycmVudCgpOyBhcyBwaG90bykge1xuICAgIDxpbWdcbiAgICAgIGNsYXNzPVwiY2Fyb3VzZWwtcGhvdG9cIlxuICAgICAgW3NyY109XCJwaG90by5zcmNcIlxuICAgICAgW2FsdF09XCJwaG90by5sb2NhdGlvbiB8fCBwaG90by50aXRsZSB8fCBsYWJlbCgpXCJcbiAgICAgIGZldGNocHJpb3JpdHk9XCJoaWdoXCJcbiAgICAgIGRlY29kaW5nPVwiYXN5bmNcIlxuICAgICAgKGVycm9yKT1cImltYWdlRXJyb3IoJGV2ZW50KVwiXG4gICAgLz5cbiAgICBAaWYgKHBob3RvLmxvY2F0aW9uKSB7XG4gICAgICA8c3BhbiBjbGFzcz1cImNhcm91c2VsLWxvY2F0aW9uXCI+PHRwLWljb24gbmFtZT1cInBpblwiIC8+e3sgcGhvdG8ubG9jYXRpb24gfX08L3NwYW4+XG4gICAgfVxuICAgIEBpZiAocGhvdG8udGl0bGUgfHwgcGhvdG8uZGVzY3JpcHRpb24gfHwgaGVhZGxpbmUoKSkge1xuICAgICAgPGRpdiBjbGFzcz1cImNhcm91c2VsLWNhcHRpb25cIj5cbiAgICAgICAgQGlmIChleWVicm93KCkpIHsgPHNwYW4gY2xhc3M9XCJjYXJvdXNlbC1leWVicm93XCI+e3sgZXllYnJvdygpIH19PC9zcGFuPiB9XG4gICAgICAgIEBpZiAocGhvdG8udGl0bGUgfHwgaGVhZGxpbmUoKSkge1xuICAgICAgICAgIDxoMj57eyBoZWFkbGluZSgpIHx8IHBob3RvLnRpdGxlIH19PC9oMj5cbiAgICAgICAgfVxuICAgICAgICBAaWYgKHBob3RvLmRlc2NyaXB0aW9uKSB7XG4gICAgICAgICAgPHA+e3sgcGhvdG8uZGVzY3JpcHRpb24gfX08L3A+XG4gICAgICAgIH1cbiAgICAgIDwvZGl2PlxuICAgIH1cbiAgICBAaWYgKG9yZGVyZWRQaG90b3MoKS5sZW5ndGggPiAxKSB7XG4gICAgICA8aW1nXG4gICAgICAgIGNsYXNzPVwiY2Fyb3VzZWwtcHJlbG9hZFwiXG4gICAgICAgIFtzcmNdPVwibmV4dFBob3RvKCk/LnNyY1wiXG4gICAgICAgIGFsdD1cIlwiXG4gICAgICAgIGFyaWEtaGlkZGVuPVwidHJ1ZVwiXG4gICAgICAgIGRlY29kaW5nPVwiYXN5bmNcIlxuICAgICAgICBmZXRjaHByaW9yaXR5PVwibG93XCJcbiAgICAgIC8+XG4gICAgICA8ZGl2IGNsYXNzPVwiY2Fyb3VzZWwtY29udHJvbHNcIj5cbiAgICAgICAgPGJ1dHRvblxuICAgICAgICAgIHRwQnV0dG9uXG4gICAgICAgICAgdmFyaWFudD1cImljb25cIlxuICAgICAgICAgIGljb249XCJsZWZ0XCJcbiAgICAgICAgICAoY2xpY2spPVwibW92ZSgtMSlcIlxuICAgICAgICAgIFthdHRyLmFyaWEtbGFiZWxdPVwidGV4dCgnRm90byBhbnRlcmlvcicsICdQcmV2aW91cyBwaG90bycpXCJcbiAgICAgICAgPjwvYnV0dG9uPlxuICAgICAgICA8c3BhblxuICAgICAgICAgIFthdHRyLmFyaWEtbGFiZWxdPVwiXG4gICAgICAgICAgICB0ZXh0KCdGb3RvICcsICdQaG90byAnKSArIChpbmRleCgpICsgMSkgKyB0ZXh0KCcgZGUgJywgJyBvZiAnKSArIG9yZGVyZWRQaG90b3MoKS5sZW5ndGhcbiAgICAgICAgICBcIlxuICAgICAgICAgID57eyBpbmRleCgpICsgMSB9fSAvIHt7IG9yZGVyZWRQaG90b3MoKS5sZW5ndGggfX08L3NwYW5cbiAgICAgICAgPlxuICAgICAgICA8YnV0dG9uXG4gICAgICAgICAgdHBCdXR0b25cbiAgICAgICAgICB2YXJpYW50PVwiaWNvblwiXG4gICAgICAgICAgKGNsaWNrKT1cInBhdXNlZC5zZXQoIXBhdXNlZCgpKVwiXG4gICAgICAgICAgW2F0dHIuYXJpYS1sYWJlbF09XCJcbiAgICAgICAgICAgIHBhdXNlZCgpXG4gICAgICAgICAgICAgID8gdGV4dCgnUmVwcm9kdWNpciBjYXJydXNlbCcsICdQbGF5IGNhcm91c2VsJylcbiAgICAgICAgICAgICAgOiB0ZXh0KCdQYXVzYXIgY2FycnVzZWwnLCAnUGF1c2UgY2Fyb3VzZWwnKVxuICAgICAgICAgIFwiXG4gICAgICAgICAgW2F0dHIuYXJpYS1wcmVzc2VkXT1cInBhdXNlZCgpXCJcbiAgICAgICAgPlxuICAgICAgICAgIEBpZiAocGF1c2VkKCkpIHtcbiAgICAgICAgICAgIDxzdmcgdmlld0JveD1cIjAgMCAyNCAyNFwiIGFyaWEtaGlkZGVuPVwidHJ1ZVwiPlxuICAgICAgICAgICAgICA8cGF0aCBkPVwibTggNSAxMSA3LTExIDdaXCIgZmlsbD1cImN1cnJlbnRDb2xvclwiIC8+XG4gICAgICAgICAgICA8L3N2Zz5cbiAgICAgICAgICB9IEBlbHNlIHtcbiAgICAgICAgICAgIDxzdmcgdmlld0JveD1cIjAgMCAyNCAyNFwiIGFyaWEtaGlkZGVuPVwidHJ1ZVwiPlxuICAgICAgICAgICAgICA8cGF0aCBkPVwiTTggNXYxNE0xNiA1djE0XCIgc3Ryb2tlPVwiY3VycmVudENvbG9yXCIgc3Ryb2tlLXdpZHRoPVwiM1wiIC8+XG4gICAgICAgICAgICA8L3N2Zz5cbiAgICAgICAgICB9XG4gICAgICAgIDwvYnV0dG9uPlxuICAgICAgICA8YnV0dG9uXG4gICAgICAgICAgdHBCdXR0b25cbiAgICAgICAgICB2YXJpYW50PVwiaWNvblwiXG4gICAgICAgICAgaWNvbj1cInJpZ2h0XCJcbiAgICAgICAgICAoY2xpY2spPVwibW92ZSgxKVwiXG4gICAgICAgICAgW2F0dHIuYXJpYS1sYWJlbF09XCJ0ZXh0KCdGb3RvIHNpZ3VpZW50ZScsICdOZXh0IHBob3RvJylcIlxuICAgICAgICA+PC9idXR0b24+XG4gICAgICA8L2Rpdj5cbiAgICAgIDwhLS0gQGlmIChjYW5BdXRvcGxheSgpKSB7XG4gICAgICAgIDxkaXYgY2xhc3M9XCJjYXJvdXNlbC1wcm9ncmVzcy10cmFja1wiIGFyaWEtaGlkZGVuPVwidHJ1ZVwiPlxuICAgICAgICAgIEBmb3IgKHAgb2YgW2luZGV4KCldOyB0cmFjayBwKSB7XG4gICAgICAgICAgICA8ZGl2XG4gICAgICAgICAgICAgIGNsYXNzPVwiY2Fyb3VzZWwtcHJvZ3Jlc3MtYmFyXCJcbiAgICAgICAgICAgICAgW2NsYXNzLmlzLXBhdXNlZF09XCJpc1BhdXNlZCgpXCJcbiAgICAgICAgICAgICAgW3N0eWxlLi0tY2Fyb3VzZWwtZHVyYXRpb25dPVwiaW50ZXJ2YWxNcygpICsgJ21zJ1wiXG4gICAgICAgICAgICAgIChhbmltYXRpb25lbmQpPVwib25Qcm9ncmVzc0VuZCgpXCJcbiAgICAgICAgICAgID48L2Rpdj5cbiAgICAgICAgICB9XG4gICAgICAgIDwvZGl2PlxuICAgICAgfSAtLT5cbiAgICB9XG4gIH0gQGVsc2Uge1xuICAgIDx0cC1pY29uIG5hbWU9XCJsYW5kc2NhcGVcIiAvPlxuICB9XG48L2Rpdj5cbiJdLCJtYXBwaW5ncyI6Ijs7Ozs7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QUEsRUFEeUIsWUFBQSxTQUFBLDBDQUFBLFFBQUE7QUFBQSxlQUFiLElBQUEsU0FBQSxNQUFBO01BQ2IsQ0FBQSxFQUQwQixvQkFBQSxTQUFBLG9EQUFBO0FBQUEsZUFBYixJQUFBLGtCQUFBO01BQ1YsR0FBQSw4QkFBQTs7OztBQ2xDSCxNQUFBLDRCQUFBLEdBQUEsT0FBQSxDQUFBO0FBT0UsTUFBQSxpQ0FBQSxHQUFBLHNDQUFBLEdBQUEsQ0FBQSxFQUEyQixHQUFBLHNDQUFBLEdBQUEsR0FBQSxXQUFBLENBQUE7QUEyRjdCLE1BQUEsMEJBQUE7Ozs7QUFoR0UsTUFBQSx5QkFBQSxpQkFBQSxJQUFBLFFBQUEsTUFBQSxNQUFBOztBQUtBLE1BQUEsdUJBQUE7QUFBQSxNQUFBLDRCQUFBLFVBQUEsSUFBQSxRQUFBLEtBQUEsSUFBQSxHQUFBLE9BQUE7O29CRGVVLFFBQVEsSUFBSSxHQUFBLFFBQUEsQ0FBQSxreklBQUEsRUFBQSxDQUFBOzs7K0VBV1gsZUFBYSxDQUFBO1VBYnpCO3VCQUNXLHFCQUFtQixTQUNwQixDQUFDLFFBQVEsSUFBSSxHQUFDLE1BR2pCO01BQ0osZ0JBQWdCO01BQ2hCLGdCQUFnQjtNQUNoQixhQUFhO01BQ2IsY0FBYztNQUNkLCtCQUErQjtPQUNoQyxVQUFBOzs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7R0FBQSxRQUFBLENBQUEseWpIQUFBLEVBQUEsQ0FBQTs7OztnRkFFVSxlQUFhLEVBQUEsV0FBQSxpQkFBQSxVQUFBLDhEQUFBLFlBQUEsR0FBQSxDQUFBO0FBQUEsR0FBQTs7Ozs7Ozs4REFBYixlQUFhLEVBQUEsU0FBQSxDQUFBLEVBQUEsR0FBQSxDQUFBLFFBQUEsTUFBQSxTQUFBLEdBQUEsYUFBQSxFQUFBLENBQUE7RUFBQTtBQUFBLEdBQUEsT0FBQSxjQUFBLGVBQUEsY0FBQSxzQkFBQSxLQUFBLElBQUEsQ0FBQTtBQUFBLEdBQUEsT0FBQSxjQUFBLGVBQUEsZUFBQSxZQUFBLE9BQUEsWUFBQSxJQUFBLEdBQUEsNEJBQUEsQ0FBQSxNQUFBLEVBQUEsT0FBQSxNQUFBLHNCQUFBLEVBQUEsU0FBQSxDQUFBO0FBQUEsR0FBQTsiLCJuYW1lcyI6W10sImRlYnVnSWQiOiJmOTg3ZDViNS1mZWU2LTU3OTAtYTAyZi00YWM3MDljNjQwMDUifQ==

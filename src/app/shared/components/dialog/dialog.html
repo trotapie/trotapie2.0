@@ -1,0 +1,32 @@
+<dialog
+  #dialog
+  class="dialog"
+  [class.dialog-contained]="!scrollBody()"
+  [class.dialog-fixed-chrome]="fixedChrome()"
+  [class.dialog-fullscreen-desktop]="fullscreenDesktop()"
+  [class.dialog-editor]="size() === 'editor'"
+  [class.dialog-wide]="size() === 'wide'"
+  [class.dialog-adaptive]="placement() === 'adaptive'"
+  [attr.aria-label]="title()"
+  (cancel)="cancel($event)"
+  (keydown)="keepFocus($event)"
+  (click)="backdrop($event)"
+>
+  <header>
+    <div>
+      <span class="eyebrow">{{ eyebrow() }}</span>
+      <h2>{{ title() }}</h2>
+    </div>
+    <button
+      tpButton
+      variant="icon"
+      icon="close"
+      type="button"
+      [attr.aria-label]="closeLabel()"
+      [disabled]="busy()"
+      (click)="closed.emit()"
+    ></button>
+  </header>
+  <div class="dialog-content"><ng-content /></div>
+  <div class="dialog-footer"><ng-content select=".dialog-actions" /></div>
+</dialog>

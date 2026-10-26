@@ -1,0 +1,105 @@
+<div
+  class="photo-carousel"
+  [class.hero-carousel]="variant() === 'hero'"
+  [class.lightbox-carousel]="variant() === 'lightbox'"
+  role="region"
+  [attr.aria-roledescription]="text('carrusel', 'carousel')"
+  [attr.aria-label]="label()"
+>
+  @if (current(); as photo) {
+    @if(variant()==='gallery'){
+      <tp-image-composer [previewOnly]="true" [image]="photo.style||{imagen_url:photo.src}" [title]="photo.title||''" [description]="photo.description||''"/>
+    }@else{<img
+      class="carousel-photo"
+      [src]="photo.src"
+      [alt]="photo.location || photo.title || label()"
+      fetchpriority="high"
+      decoding="async"
+      (error)="imageError($event)"
+    />
+    }
+    @if (photo.location) {
+      <span class="carousel-location"><tp-icon name="pin" />{{ photo.location }}</span>
+    }
+    @if (variant()==='hero' && (photo.title || photo.description || headline())) {
+      <div class="carousel-caption">
+        @if (eyebrow()) { <span class="carousel-eyebrow">{{ eyebrow() }}</span> }
+        @if (photo.title || headline()) {
+          <h2>{{ headline() || photo.title }}</h2>
+        }
+        @if (photo.description) {
+          <p>{{ photo.description }}</p>
+        }
+      </div>
+    }
+    @if (orderedPhotos().length > 1) {
+      <img
+        class="carousel-preload"
+        [src]="nextPhoto()?.src"
+        alt=""
+        aria-hidden="true"
+        decoding="async"
+        fetchpriority="low"
+      />
+      <div class="carousel-controls">
+        <button
+          tpButton
+          variant="icon"
+          icon="left"
+          (click)="moveManually(-1)"
+          [attr.aria-label]="text('Foto anterior', 'Previous photo')"
+        ></button>
+        <span
+          [attr.aria-label]="
+            text('Foto ', 'Photo ') + (index() + 1) + text(' de ', ' of ') + orderedPhotos().length
+          "
+          >{{ index() + 1 }} / {{ orderedPhotos().length }}</span
+        >
+        @if(autoplay()){
+        <button
+          tpButton
+          variant="icon"
+          (click)="paused.set(!paused())"
+          [attr.aria-label]="
+            paused()
+              ? text('Reproducir carrusel', 'Play carousel')
+              : text('Pausar carrusel', 'Pause carousel')
+          "
+          [attr.aria-pressed]="paused()"
+        >
+          @if (paused()) {
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="m8 5 11 7-11 7Z" fill="currentColor" />
+            </svg>
+          } @else {
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M8 5v14M16 5v14" stroke="currentColor" stroke-width="3" />
+            </svg>
+          }
+        </button>
+        }
+        <button
+          tpButton
+          variant="icon"
+          icon="right"
+          (click)="moveManually(1)"
+          [attr.aria-label]="text('Foto siguiente', 'Next photo')"
+        ></button>
+      </div>
+      <!-- @if (canAutoplay()) {
+        <div class="carousel-progress-track" aria-hidden="true">
+          @for (p of [index()]; track p) {
+            <div
+              class="carousel-progress-bar"
+              [class.is-paused]="isPaused()"
+              [style.--carousel-duration]="intervalMs() + 'ms'"
+              (animationend)="onProgressEnd()"
+            ></div>
+          }
+        </div>
+      } -->
+    }
+  } @else {
+    <tp-icon name="landscape" />
+  }
+</div>

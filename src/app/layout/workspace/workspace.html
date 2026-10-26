@@ -1,0 +1,19 @@
+<div class="workspace-shell">
+  <header class="workspace-topbar">
+    <a routerLink="/" class="workspace-brand" aria-label="Trotapie, página de inicio"><img src="/brand/iso.png" alt=""/><span>Trotapie<span class="brand-travel">Travel</span></span></a>
+    <nav class="workspace-nav" aria-label="Navegación administrativa" [tpNavIndicator]="currentUrl()"><span class="nav-indicator" aria-hidden="true"></span>
+      @for(item of nav;track item.path){@if(allowed(item.permission)){<a [routerLink]="base+'/'+item.path" [class.active]="sectionActive(item.path)" [attr.aria-current]="sectionActive(item.path)?'page':null">{{item.name}}</a>}}
+      <details tpDetailsMotion class="nav-more"><summary [class.active]="moreActive()">Más<tp-icon name="more"/></summary><div class="nav-dropdown">@for(item of more;track item.path){@if(allowed(item.permission)){<a [routerLink]="base+'/'+item.path" [class.active]="sectionActive(item.path)" [attr.aria-current]="sectionActive(item.path)?'page':null"><tp-icon [name]="item.icon"/>{{item.name}}</a>}}</div></details>
+    </nav>
+    <div class="workspace-tools">
+      <button tpButton icon="search" variant="icon" type="button" (click)="openSearch()" aria-label="Buscar sección o catálogo" title="Buscar sección o catálogo (Ctrl + K)" aria-haspopup="dialog" [attr.aria-expanded]="searchOpen()"></button>
+      <button tpButton [icon]="theme.dark() ? 'sun' : 'moon'" variant="icon" type="button" (click)="toggleTheme($event)" aria-label="Cambiar tema" title="Cambiar tema"></button>
+      <details tpDetailsMotion class="account-menu"><summary aria-label="Menú de usuario"><span class="account-avatar">{{(auth.identity()?.name||'T').slice(0,1)}}</span></summary><div class="nav-dropdown"><strong>{{auth.identity()?.name||(preview?'Vista de diseño':'Trotapie')}}</strong><small>{{auth.identity()?.email||'Sin datos de una sesión real'}}</small><a routerLink="/">Ver sitio público<tp-icon name="arrow"/></a>@if(!preview){<button tpButton icon="logout" variant="quiet" (click)="logout()">Cerrar sesión</button>}@else{<a tpButton icon="lock" routerLink="/acceso">Iniciar sesión</a>}</div></details>
+    </div>
+  </header>
+  <main id="main-content" class="workspace-content">
+    @if(preview){<div class="preview-notice"><span><strong>Vista previa de las pantallas nuevas.</strong> Las métricas privadas requieren iniciar sesión.</span><a routerLink="/acceso">Entrar a mi cuenta →</a></div>}
+    <router-outlet tpPageMotion/>
+  </main>
+</div>
+<tp-navigation-search [open]="searchOpen()" [entries]="searchEntries()" (closed)="searchOpen.set(false)" />

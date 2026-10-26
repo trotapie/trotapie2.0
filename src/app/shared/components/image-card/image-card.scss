@@ -1,0 +1,133 @@
+:host {
+  display: block;
+  min-width: 0;
+  height: 100%;
+}
+.image-card-country { display:flex; align-items:center; gap:6px; color:var(--brand); font-size:11px; line-height:1.5; margin:0 0 10px; overflow-wrap:anywhere; }
+.image-card-country tp-icon { width:14px; height:14px; flex-shrink:0; }
+
+.image-card {
+  display: flex;
+  flex-direction: column;
+  text-align: left;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  background: var(--card-surface, var(--surface));
+  border: 1px solid var(--card-border, var(--line));
+  border-radius: 18px;
+  overflow: hidden;
+  transition:
+    transform 200ms,
+    border-color 200ms;
+}
+
+.image-card:hover {
+  transform: translateY(-2px);
+  border-color: var(--muted);
+}
+
+.image-card-photo {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 100%;
+  height: 116px;
+  flex: 0 0 116px;
+  background: var(--brand-soft);
+  color: var(--brand);
+  overflow: hidden;
+}
+
+.image-card-photo > img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.image-card-photo-contain > img {
+  object-fit: contain;
+  padding: 4px;
+}
+.image-card-photo > tp-icon { width:90%; height:90%; max-width:108px; max-height:108px; }
+
+.card-arrow {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  color: white;
+  background: #202420;
+}
+
+.card-arrow tp-icon {
+  width: 14px;
+  height: 14px;
+}
+
+.image-card-body {
+  padding: 12px;
+  width: 100%;
+  min-width: 0;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.image-card-kicker {
+  font-size: 10px;
+  color: var(--muted);
+  overflow-wrap: anywhere;
+}
+
+.image-card h3 {
+  margin: 4px 0 10px;
+  font-size: 14px;
+  line-height: 1.4;
+  overflow-wrap: anywhere;
+}
+
+.image-card-bottom {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  margin-top: auto;
+  font-size: 10px;
+  color: var(--muted);
+}
+.image-card-bottom.has-actions { min-height:40px; padding-right:48px; }
+
+@media (max-width: 600px) {
+  .image-card {
+    flex-direction: row;
+    min-height: 112px;
+  }
+
+  .image-card-photo {
+    width: 96px;
+    height: auto;
+    align-self: stretch;
+    flex: 0 0 96px;
+  }
+
+  .image-card-photo-contain > img {
+    padding: 4px;
+  }
+
+  .card-arrow {
+    display: none;
+  }
+}
+
+.hotel-stars{display:flex;align-items:center;gap:3px;color:var(--warning);margin-top:0;margin-bottom:12px}.hotel-stars svg{width:14px;height:14px}.hotel-stars small{font-size:10px;margin-left:4px}
+
+.image-card h3.has-stars{margin-bottom:4px}
+
+.image-card-photo>.card-catalog-icon{width:72px;height:72px}

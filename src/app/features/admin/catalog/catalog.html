@@ -1,0 +1,257 @@
+<tp-page-header [customTitle]="kind==='catalogos'"
+  [title]="kind==='catalogos' ? catalogTitle() : hotelDestinationId ? 'Hoteles de '+destinationName : definition().title"
+  [backTo]="hotelDestinationId ? returnTo || base+'/destinos' : ''"
+  [description]="definition().description"
+  eyebrow="Trotapie / Espacio de trabajo"
+>
+  @if(kind==='catalogos'){<tp-catalog-picker pageTitle [label]="catalogTitle()" [value]="catalog()" [options]="catalogPickerOptions()" (changed)="switchCatalog($event)"/>}
+  <button
+    tpButton
+    icon="refresh"
+    (click)="data.invalidate(); load()"
+    [busy]="loading()"
+    aria-label="Actualizar datos"
+  >
+    Actualizar
+  </button>
+  @if (kind === 'cotizaciones') {
+    @if (preview || data.auth.hasPermission('cotizaciones.create')) {
+      <a tpButton icon="plus" variant="primary" [routerLink]="base + '/cotizaciones/nueva'"
+        >Nueva individual</a
+      ><a
+        tpButton
+        icon="quote"
+        [routerLink]="base + '/cotizaciones/nueva'"
+        [queryParams]="{ tipo: 'comparativa' }"
+        >Nueva comparativa</a
+      >
+    }
+  } @else if (preview || canEdit()) {
+    <button tpButton icon="plus" variant="primary" (click)="open(null)">
+      Crear {{ definition().singular }}
+    </button>
+  }
+</tp-page-header>
+
+<section class="catalog-summary">
+  <div>
+    <tp-icon [name]="definition().icon" /><span
+      ><small>{{
+        kind === 'catalogos'
+          ? catalogTitle()
+          : 'Registros disponibles'
+      }}</small
+      ><strong>{{
+        preview && kind !== 'destinos' && kind !== 'hoteles' && kind !== 'circuitos'
+          ? '—'
+          : (page().total | number:'1.0-0':'en-US')
+      }}</strong></span
+    >
+  </div>
+  <span>{{
+    preview
+      ? 'Consulta las pantallas. Inicia sesión para gestionar datos privados.'
+      : 'Selecciona un registro para consultar o editar su información.'
+  }}</span>
+</section>
+<section class="panel catalog-panel" tpCatalogScroll>
+  <tp-filter-bar [search]="search()" (searchChanged)="changeSearch($event)">
+    @if (kind === 'cotizaciones') {
+      <app-tp-select-search class="quote-type-select" label="Tipo de cotización" [options]="quoteTypeOptions" [ngModel]="multiple() ? 'comparativa' : 'individual'" (ngModelChange)="changeQuoteType($event==='comparativa')" [showClear]="false" [showSearch]="false"/>
+    }
+    @if (kind === 'destinos') {
+      <app-tp-select-search class="destination-type-select" label="Tipo de destino" [options]="destinationTypeOptions" [showClear]="false" [ngModel]="destinationType()" (ngModelChange)="changeDestinationType($event)" />
+      <button tpButton icon="filter" type="button" (click)="openDestinationFilters()">Filtros{{filterCount() ? ' ('+filterCount()+')' : ''}}</button>
+      @if(filterCount()){<button tpButton variant="quiet" icon="close" (click)="clearDestinationFilters()">Limpiar</button>}
+    }
+    <div class="view-options" role="group" aria-label="Vista de registros">
+      <button
+        tpButton
+        variant="icon"
+        icon="grid"
+        [class.active]="view() === 'cards'"
+        [attr.aria-pressed]="view() === 'cards'"
+        aria-label="Vista de tarjetas"
+        (click)="view.set('cards')"
+      ></button
+      ><button
+        tpButton
+        variant="icon"
+        icon="menu"
+        [class.active]="view() === 'table'"
+        [attr.aria-pressed]="view() === 'table'"
+        aria-label="Vista de tabla"
+        (click)="view.set('table')"
+      ></button>
+    </div>
+    <button
+      tpButton
+      variant="icon"
+      icon="download"
+      aria-label="Exportar registros de esta página"
+      title="Exportar esta página"
+      [disabled]="!page().items.length"
+      (click)="export()"
+    ></button>
+  </tp-filter-bar>
+  @if(kind === 'cotizaciones') {
+    <tp-quote-column-filters [value]="quoteFilters()" [status]="status()" [multiple]="multiple()" (changed)="changeQuoteFilters($event)" (statusChanged)="changeQuoteStatus($event)" (cleared)="clearQuoteFilters()" />
+  }
+  @if (loading()) {
+    <tp-state mode="loading" />
+  } @else if (error()) {
+    <tp-state mode="error" [message]="error()" (retry)="load()" />
+  } @else if (!page().items.length) {
+    <tp-state
+      [title]="preview ? 'Tu información tendrá su propio espacio' : 'Sin resultados por ahora'"
+      [message]="
+        preview
+          ? 'Estas pantallas usan los datos de tu cuenta al iniciar sesión.'
+          : 'Prueba otra búsqueda o agrega un registro para empezar.'
+      "
+    />
+  } @else {
+    @if (view() === 'cards') {
+      <div class="card-grid">
+        @for (record of page().items; track record.id) {
+          <div class="record-card">
+          <tp-image-card
+            [record]="record"
+            [hasActions]="kind==='destinos'"
+            [imageFit]="kind === 'destinos' ? 'contain' : 'cover'"
+            label="Consultar registro"
+            (selected)="open($event)"
+          />
+          @if(kind==='destinos'){<app-tp-actions-menu class="record-card-menu" [actions]="rowActions(record)" [ariaLabel]="'Acciones de '+record.title" (actionSelected)="destinationAction({id:$event,record})" />}
+          </div>
+        }
+      </div>
+    } @else {
+      <tp-data-table
+        [stickyHeader]="true"
+        [records]="page().items"
+        [columns]="tableColumns()"
+        [actions]="rowActions"
+        (actionSelected)="destinationAction($event)"
+        [title]="kind === 'cotizaciones' ? 'Cliente / pasajero' : 'Nombre'"
+        (selected)="open($event)"
+      />
+    }
+    <div class="pagination">
+      <span
+        >{{ page().page * pageSize() + 1 | number:'1.0-0':'en-US' }}–{{ page().page * pageSize() + page().items.length | number:'1.0-0':'en-US' }} de
+        {{ page().total | number:'1.0-0':'en-US' }}</span
+      >
+      <div class="pagination-actions">
+        <button
+          tpButton
+          icon="left"
+          [disabled]="page().page === 0 || loading()"
+          (click)="load(page().page - 1)"
+        >
+          Anterior</button
+        ><button
+          tpButton
+          icon="right"
+          [disabled]="(page().page + 1) * pageSize() >= page().total || loading()"
+          (click)="load(page().page + 1)"
+        >
+          Siguiente
+        </button>
+      </div>
+    </div>
+  }
+</section>
+<tp-dialog [open]="filtersOpen()" title="Filtrar destinos" eyebrow="Encuentra tu próximo destino" placement="adaptive" (closed)="filtersOpen.set(false)">
+  @if(filterLoading()){<tp-state mode="loading" />}
+  @else if(filterError()){<tp-state mode="error" [message]="filterError()" (retry)="openDestinationFilters()" />}
+  @else {<tp-resource-form submitLabel="Aplicar filtros" [fields]="filterFields()" [value]="destinationFilters()" (saved)="applyDestinationFilters($event)" (cancelled)="filtersOpen.set(false)" />}
+</tp-dialog>
+<tp-dialog
+  [open]="editorOpen()"
+  [title]="(selected() ? 'Editar ' : 'Crear ') + definition().singular"
+  [busy]="saving()"
+  (closed)="editorOpen.set(false)"
+>
+  @if (preview) {
+    <div class="preview-notice">Inicia sesión para guardar cambios en la agencia.</div>
+  }
+  @if (editorError()) {
+    <div class="error-banner" role="alert">{{ editorError() }}</div>
+  }
+  @if (editorLoading()) {
+    <tp-state mode="loading" />
+  } @else {
+    @if (selected() && kind === 'destinos') {
+      <div class="editor-specific-actions">
+        <a tpButton icon="edit" [routerLink]="['/admin/destinos', selected()!.id, 'contenido']"
+          >Editar contenido y galería</a
+        ><a tpButton icon="arrow" [routerLink]="['/destinos', selected()!.id]"
+          >Ver página pública</a
+        >
+      </div>
+    }
+    @if (selected() && kind === 'empleados') {
+      <div class="editor-specific-actions">
+        <a tpButton icon="lock" [routerLink]="['/admin/empleados', selected()!.id, 'acceso']"
+          >Gestionar acceso y firma</a
+        >
+      </div>
+    }
+    @if (selected() && kind === 'circuitos') {
+      <div class="editor-specific-actions">
+        <a tpButton icon="edit" [routerLink]="['/admin/circuitos', selected()!.id, 'flyer']"
+          >Diseñar flyer del circuito</a
+        >
+      </div>
+    }
+    @if (selected() && kind === 'configuracion') {
+      <div class="editor-specific-actions">
+        <a tpButton icon="settings" [routerLink]="['/admin/roles', selected()!.id]"
+          >Editar permisos del rol</a
+        >
+      </div>
+    }
+    <tp-resource-form
+      [fields]="fields()"
+      [value]="value()"
+      [editing]="!!selected()"
+      [busy]="saving()"
+      [disabled]="preview || !canEdit()"
+      (saved)="save($event)"
+      (cancelled)="editorOpen.set(false)"
+    />
+    @if (selected() && canEdit() && kind !== 'clientes') {
+      <div class="delete-area">
+        <button tpButton icon="trash" variant="danger" (click)="removeOpen.set(true)">
+          {{ kind === 'destinos' ? 'Desactivar destino' : 'Eliminar registro' }}
+        </button>
+      </div>
+    }
+  }
+</tp-dialog>
+<tp-dialog
+  [open]="removeOpen()"
+  [title]="kind === 'destinos' ? 'Desactivar destino' : 'Eliminar este registro'"
+  [busy]="removing()"
+  (closed)="removeOpen.set(false)"
+  ><p>
+    {{
+      kind === 'destinos'
+        ? 'El destino dejará de mostrarse en el catálogo público. Puedes volver a activarlo desde su edición.'
+        : 'Esta acción elimina el registro. Los datos relacionados pueden impedir su eliminación para conservar el historial.'
+    }}
+  </p>
+  @if (editorError()) {
+    <div class="error-banner">{{ editorError() }}</div>
+  }
+  <div class="dialog-actions">
+    <button tpButton icon="close" [disabled]="removing()" (click)="removeOpen.set(false)">
+      Cancelar</button
+    ><button tpButton icon="trash" variant="danger" [busy]="removing()" (click)="remove()">
+      Confirmar {{ kind === 'destinos' ? 'desactivación' : 'eliminación' }}
+    </button>
+  </div></tp-dialog
+>
+
+

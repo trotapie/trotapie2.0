@@ -1,0 +1,20 @@
+<!-- <section class="statistics" aria-labelledby="statistics-title">
+  <div class="statistics-heading"><div><span class="eyebrow">Tu agencia en números</span><h2 id="statistics-title">Estadísticas de la operación</h2></div><span class="scope">Resumen actual</span></div>
+  <div class="statistics-grid">
+    <article class="stat-panel" tpMotion="card">
+      <h3>Estado de las solicitudes</h3><p>Distribución del total registrado.</p>
+      @if(snapshot().total!==null) {
+        <div [attr.aria-label]="summary()"><tp-donut-chart [data]="distribution()" title="Solicitudes" [height]="250" /></div>
+        @if(snapshot().total===0){<p class="empty-note">Todavía no hay solicitudes registradas.</p>}
+      } @else {<div class="empty-chart"><span class="empty-ring"></span><strong>Estadísticas privadas</strong><p>Los totales se muestran cuando tu cuenta tiene acceso al resumen de la agencia.</p></div>}
+    </article>
+    <article class="stat-panel" tpMotion="card">
+      <h3>Hoteles en solicitudes recientes</h3><p>Basado en las últimas {{snapshot().recent.length}} solicitudes disponibles.</p>
+      @if(hotels().length) {
+        <tp-bar-chart [data]="hotelBars()" [height]="220" />
+        <ul class="hotel-legend">@for(hotel of hotels();track hotel.label){<li><span>{{$index+1}} · {{hotel.label}}</span><strong>{{hotel.value}}</strong></li>}</ul>
+      } @else {<div class="empty-chart"><span class="empty-bars" aria-hidden="true"><i></i><i></i><i></i></span><strong>Tu actividad aparecerá aquí</strong><p>Las solicitudes recientes permitirán comparar los hoteles consultados.</p></div>}
+      <p class="footnote">Cada solicitud cuenta una vez. Esta gráfica representa actividad reciente, no ventas.</p>
+    </article>
+  </div>
+</section> -->

@@ -1,0 +1,34 @@
+<tp-page-header title="Componentes compartidos" description="Prueba los controles adaptados. Esta vista utiliza ejemplos y no guarda cambios en tus datos." backTo="/vista-previa/dashboard" />
+<p>Ejemplo de estadísticas con datos ficticios para revisar el diseño.</p><tp-dashboard-statistics [snapshot]="statisticsExample" />
+<section class="panel"><h2>Formularios</h2><div class="form-grid">
+  <app-tp-input label="Nombre" [(ngModel)]="name" />
+  <app-tp-input label="Personas" type="number" [min]="1" [max]="8" [(ngModel)]="count" />
+  <app-tp-select-search label="Experiencia" [options]="options" [(ngModel)]="selected" />
+  <app-tp-multiselect label="Experiencias múltiples" [options]="options" [(ngModel)]="multiple" />
+  <app-phone-input label="Teléfono" [(ngModel)]="phone" [(dialCode)]="dialCode" />
+  <app-time-picker label="Check-in" [allowEmpty]="true" [(ngModel)]="time" />
+  <app-date-range-filter label="Fechas del viaje" [mostrarEstadia]="true" [(ngModel)]="range" />
+  <app-color-picker label="Color de la propuesta" [(ngModel)]="color" />
+  <label class="field">Importe MXN<input type="text" importeMxnBlur [(ngModel)]="amount" /></label>
+  <label class="field">Porcentaje<input type="text" porcentajeBlur [(ngModel)]="percent" /></label>
+  <app-custom-switch label="Habilitado" [(ngModel)]="enabled" />
+  <app-tp-textarea class="form-full" label="Notas" [(ngModel)]="notes" />
+  <app-tp-search-input class="form-full" label="Buscar en los ejemplos" [(ngModel)]="search" [searchDelay]="300" (search)="action.set('Búsqueda: '+$event)" />
+</div><div class="demo-values" aria-live="polite"><span>Personas: {{ count }}</span><span>Seleccionadas: {{ multiple.length }}</span><span>Hora: {{ time||'Sin hora' }}</span><span>Teléfono: +{{ dialCode }} {{ phone }}</span><span>Color: {{ color }}</span></div></section>
+<section class="panel"><h2>Acciones y mensajes</h2><div class="demo-actions"><app-tp-actions-menu [actions]="actions" (actionSelected)="action.set($event)" /><button tpButton type="button" (click)="showToast()">Probar notificación</button><button tpButton type="button" (click)="previewLoader()">Probar loader</button><button tpButton type="button" (click)="formOpen.set(true)">Formulario en modal</button><button tpButton icon="calendar" type="button" (click)="quoteControlsOpen.set(true)">Controles de cotización en modal</button></div><p role="status">{{ action() }}</p></section>
+<div class="charts"><section class="panel"><h2>Distribución</h2><tp-donut-chart [data]="chart" [height]="230" title="Solicitudes" (segmentClick)="action.set($event.label)" /></section><section class="panel"><h2>Operación</h2><tp-bar-chart [data]="chart" [height]="230" (barClick)="action.set($event.label)" /></section><section class="panel"><h2>Actividad</h2><tp-area-chart [data]="activity" [height]="230" (pointClick)="action.set($event.label)" /></section></div>
+<section class="panel"><app-folder-image-manager [folders]="folders" [selectedImageId]="selectedImage" [activeImageIds]="activeImages" (imageSelected)="selectedImage=$event.id" (createFolder)="createFolder($event)" (renameFolder)="renameFolder($event)" (toggleImageActive)="toggleImage($event)" (editImage)="action.set('Editar '+$event.name)" (addImage)="action.set('Agregar imagen')" /></section>
+<section class="panel"><h2>Galería ampliada</h2><app-imagenes-carrusel [imagenesCargadas]="['/brand/trotapie.png','/brand/iso.png','/flags/MX.svg']" /></section>
+<app-banner [empleado]="{nombre:'Asesor de ejemplo',cargo:'Equipo Trotapie',email:null,telefono:null}" />
+<tp-dialog [open]="formOpen()" title="Formulario de ejemplo" (closed)="formOpen.set(false)"><tp-resource-form [fields]="fields" [value]="{nombre:'',tipo:null,activo:true}" (saved)="action.set('Formulario válido');formOpen.set(false)" (cancelled)="formOpen.set(false)" /></tp-dialog>
+<app-blocking-loader [open]="loader()" title="Preparando tu viaje" message="El loader se cerrará automáticamente al terminar." />
+<tp-dialog [open]="quoteControlsOpen()" title="Controles de cotización" (closed)="quoteControlsOpen.set(false)">
+ <form #quoteControlsForm="ngForm" (ngSubmit)="quoteControlsForm.valid && quoteControlsOpen.set(false)">
+  <div class="form-grid">
+   <app-tp-select-search label="Estado" name="example-status" [options]="statusOptions" [(ngModel)]="quoteControls.status" [showSearch]="false" [showClear]="false" [required]="true"/>
+   <app-date-range-filter [single]="true" label="Fecha límite del seguro" name="example-insurance" [(ngModel)]="quoteControls.insuranceDeadline"/>
+   <app-date-range-filter [single]="true" label="Fecha límite a meses" name="example-months" [(ngModel)]="quoteControls.monthsDeadline"/>
+  </div>
+  <div class="dialog-actions"><button tpButton icon="close" type="button" (click)="quoteControlsOpen.set(false)">Cancelar</button><button tpButton icon="check" variant="primary" type="submit" [disabled]="quoteControlsForm.invalid">Terminar prueba</button></div>
+ </form>
+</tp-dialog>

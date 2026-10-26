@@ -1,0 +1,31 @@
+<div class="tariff-switch" aria-label="Tipo de tarifa">
+  @for(tariff of tariffs;track tariff.type){
+    <button type="button" [class.active]="active()===tariff.type" [attr.aria-pressed]="active()===tariff.type" [disabled]="disabled()" (click)="active.set(tariff.type)">{{tariff.label}}<small>{{total(tariff.priceKey)===null?'Sin precio':(total(tariff.priceKey)|currency:'MXN':'symbol-narrow':'1.2-2')}}</small></button>
+  }
+</div>
+@for(tariff of tariffs;track tariff.type){
+  <section [hidden]="active()!==tariff.type" [attr.aria-label]="'Precios de '+tariff.label">
+    <div class="rate-heading"><div><h3>{{tariff.label}}</h3><p>Captura el precio de cada habitación en MXN.</p></div><div class="rate-total"><small>Total de la tarifa</small><strong>{{total(tariff.priceKey)===null?'Por confirmar':(total(tariff.priceKey)|currency:'MXN':'symbol-narrow':'1.2-2')}}</strong></div></div>
+    <div class="rate-table-wrap"><table class="rate-table"><thead><tr><th scope="col">Personas</th><th scope="col">Origen</th><th scope="col">Tipo de habitación</th><th scope="col">Precio (MXN)</th>@if(tariff.percentKey){<th scope="col">% apartado</th>}</tr></thead><tbody>
+      @for(room of rooms();track $index;let i=$index){
+        <tr>
+          <th scope="row"><span>Habitación {{i+1}}</span><small>{{room.detalle||'Personas según solicitud'}}</small></th>
+          <td><app-tp-select-search label="Origen" [name]="tariff.type+'-origin-'+i" [options]="originOptions(room,tariff)" [(ngModel)]="room[tariff.originKey]" [ngModelOptions]="standalone" [disabled]="disabled()" placeholder="Seleccionar origen"/></td>
+          <td><app-tp-select-search label="Tipo de habitación" [name]="tariff.type+'-room-'+i" [options]="roomOptions(room,tariff)" [ngModel]="room[tariff.roomKey]?.id" (ngModelChange)="setRoomType(room,tariff.roomKey,$event)" [ngModelOptions]="standalone" [disabled]="disabled()" placeholder="Seleccionar habitación"/></td>
+          <td><label [for]="tariff.type+'-price-'+i">Precio (MXN)</label><input [id]="tariff.type+'-price-'+i" [name]="tariff.type+'-price-'+i" type="number" min="0" step="0.01" inputmode="decimal" [(ngModel)]="room[tariff.priceKey]" [ngModelOptions]="standalone" [disabled]="disabled()" placeholder="0.00"/></td>
+          @if(tariff.percentKey){<td><label [for]="tariff.type+'-percent-'+i">% apartado</label><input [id]="tariff.type+'-percent-'+i" [name]="tariff.type+'-percent-'+i" type="number" min="0" max="100" step="0.01" inputmode="decimal" [(ngModel)]="room[tariff.percentKey]" [ngModelOptions]="standalone" [disabled]="disabled()"/></td>}
+        </tr>
+      }
+    </tbody></table></div>
+    <div class="policy-list">
+      @for(room of rooms();track $index;let i=$index){
+        @if(tariff.type!=='sin_seguro'||i===0){
+          <section><h4>{{tariff.type==='sin_seguro'?'Políticas para todas las habitaciones':'Políticas · Habitación '+(i+1)}}</h4>
+            <app-tp-multiselect label="Políticas de reservación" [name]="tariff.type+'-policies-'+i" [options]="options(room,tariff.policyKey)" [ngModel]="selected(room,tariff.policyKey)" (ngModelChange)="select(room,tariff.policyKey,$event)" [ngModelOptions]="standalone" [disabled]="disabled()" placeholder="Seleccionar políticas del catálogo" searchPlaceholder="Buscar política"/>
+            @if(room[tariff.policyKey]?.length){<ul>@for(policy of room[tariff.policyKey];track $index){<li>{{policyText(policy)}}</li>}</ul>}
+          </section>
+        }
+      }
+    </div>
+  </section>
+}

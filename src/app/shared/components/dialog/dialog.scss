@@ -1,0 +1,70 @@
+.dialog.dialog-wide {
+  width: min(920px, calc(100vw - 48px));
+}
+.dialog.dialog-adaptive > header {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  background: var(--surface);
+}
+.dialog > header > div {
+  min-width: 0;
+}
+.dialog h2 {
+  overflow-wrap: anywhere;
+}
+.dialog > header > button {
+  flex: 0 0 auto;
+}
+@media (max-width: 600px) {
+  .dialog.dialog-adaptive {
+    position: fixed;
+    inset: auto 0 0;
+    margin: 0;
+    width: 100%;
+    max-width: none;
+    max-height: calc(100dvh - 40px);
+    border-radius: 26px 26px 0 0;
+    border-bottom: 0;
+    padding: 12px 16px max(16px, env(safe-area-inset-bottom));
+  }
+  .dialog.dialog-adaptive::before {
+    content: '';
+    display: block;
+    width: 40px;
+    height: 4px;
+    margin: 0 auto 18px;
+    border-radius: 999px;
+    background: var(--line);
+  }
+  .dialog.dialog-adaptive > header {
+    margin-bottom: 18px;
+  }
+  .dialog.dialog-adaptive h2 {
+    font-size: 21px;
+  }
+}
+
+:host .dialog.dialog-editor{width:75vw;max-width:none;height:75dvh;max-height:calc(100dvh - 32px);padding:28px;}
+:host .dialog.dialog-editor>header{position:sticky;top:-28px;background:var(--surface);z-index:4;padding:12px 0;}
+@media(max-width:900px){:host .dialog.dialog-editor{width:calc(100vw - 32px);height:calc(100dvh - 32px);}}
+@media(max-width:600px){:host .dialog.dialog-editor{padding:18px;}:host .dialog.dialog-editor>header{top:-18px;}}
+
+.dialog-content,.dialog-footer{display:contents}
+.dialog.dialog-fixed-chrome { overflow:hidden; }
+.dialog.dialog-fixed-chrome[open] { display:flex; flex-direction:column; }
+.dialog.dialog-fixed-chrome > header { flex:none; }
+.dialog.dialog-fixed-chrome > .dialog-content { display:block; min-height:0; overflow:auto; overscroll-behavior:contain; scrollbar-gutter:stable; padding-right:8px; }
+.dialog.dialog-fixed-chrome > .dialog-footer { display:block; flex:none; background:var(--surface); }
+.dialog.dialog-fixed-chrome > .dialog-footer:empty { display:none; }
+:host .dialog.dialog-editor{overflow:hidden;}
+:host .dialog.dialog-editor[open]{display:flex;flex-direction:column;}
+:host .dialog.dialog-editor>header{position:relative;top:auto;flex:none;margin-bottom:18px;padding:0;}
+:host .dialog.dialog-editor>.dialog-content{display:block;min-height:0;flex:1;overflow:auto;overscroll-behavior:contain;padding:0 8px 12px 0;scrollbar-gutter:stable;}
+:host .dialog.dialog-editor>.dialog-footer{display:block;flex:none;background:var(--surface);padding-top:12px;}
+:host .dialog.dialog-editor>.dialog-footer:empty{display:none;}
+
+:host .dialog.dialog-editor.dialog-contained>.dialog-content{overflow:hidden;padding:0;scrollbar-gutter:auto;}
+@media(min-width:901px){
+  :host .dialog.dialog-fullscreen-desktop{position:fixed;inset:0;width:100vw;height:100dvh;max-width:none;max-height:none;margin:0;border:0;border-radius:0;box-sizing:border-box;}
+}

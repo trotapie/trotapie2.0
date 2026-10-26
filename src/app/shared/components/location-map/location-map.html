@@ -1,0 +1,32 @@
+<tp-dialog
+  [open]="open()"
+  [title]="name()"
+  [eyebrow]="text('Ubicación', 'Location')"
+  size="wide"
+  placement="adaptive"
+  [closeLabel]="text('Cerrar mapa', 'Close map')"
+  (closed)="closed.emit()"
+>
+  @if (open()) {
+    @defer (on immediate) {
+      <tp-location-map-viewer
+        [location]="location()"
+        [name]="name()"
+        [zoom]="zoom()"
+        [english]="english()"
+      />
+    } @placeholder {
+      <tp-state mode="loading" />
+    } @error {
+      <tp-state
+        mode="error"
+        [message]="
+          text(
+            'No pudimos cargar el mapa. Cierra esta ventana y vuelve a intentarlo.',
+            'We could not load the map. Close this window and try again.'
+          )
+        "
+      />
+    }
+  }
+</tp-dialog>

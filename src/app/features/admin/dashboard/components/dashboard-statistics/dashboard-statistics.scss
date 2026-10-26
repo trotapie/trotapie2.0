@@ -1,0 +1,21 @@
+:host { display:block; margin:28px 0; }
+.statistics-heading { display:flex; align-items:center; justify-content:space-between; gap:16px; margin-bottom:18px; }
+h2 { margin:8px 0 0; font-size:26px; letter-spacing:-.04em; }
+.scope { background:var(--muted-surface); padding:8px 14px; border-radius:999px; color:var(--muted); font-size:11px; white-space:nowrap; }
+.statistics-grid { display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1.3fr); gap:16px; }
+.stat-panel { background:var(--surface); border-radius:26px; padding:24px; min-width:0; }
+h3 { font-size:18px; font-weight:500; margin:0 0 8px; letter-spacing:-.02em; }
+p { color:var(--muted); font-size:12px; line-height:1.7; margin:0 0 16px; }
+.footnote { border-top:1px solid var(--line); padding-top:14px; margin:16px 0 0; font-size:11px; }
+.hotel-legend { list-style:none; margin:18px 0 0; padding:0; display:grid; gap:8px; }
+.hotel-legend li { display:flex; justify-content:space-between; gap:16px; font-size:12px; color:var(--muted); }
+.hotel-legend strong { color:var(--ink); }
+.empty-chart { min-height:240px; display:flex; flex-direction:column; justify-content:center; align-items:center; gap:14px; text-align:center; }
+.empty-chart strong { font-size:14px; font-weight:500; }
+.empty-chart p { max-width:290px; margin:0; }
+.empty-ring { width:86px; height:86px; border:12px solid var(--line); border-radius:50%; }
+.empty-bars { display:flex; align-items:flex-end; gap:12px; height:86px; }
+.empty-bars i { width:24px; height:44px; background:var(--line); border-radius:7px; }
+.empty-bars i:nth-child(2) { height:80px; }.empty-bars i:nth-child(3) { height:60px; }
+@media(max-width:900px){.statistics-grid{grid-template-columns:1fr;}}
+@media(max-width:600px){.stat-panel{padding:20px;border-radius:22px;}h2{font-size:22px;}.statistics-heading{align-items:flex-start;}.scope{display:none;}}

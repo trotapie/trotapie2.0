@@ -1,0 +1,295 @@
+<div class="public-shell">
+  <header class="public-header">
+    <a routerLink="/" aria-label="Trotapie, inicio" (click)="navigateHome($event)"
+      ><img src="/brand/trotapie.png" alt="Trotapie Travel"
+    /></a>
+    <nav aria-label="Sitio público" [tpNavIndicator]="activeSection()"><span class="nav-indicator" aria-hidden="true"></span>
+      <a routerLink="/" [class.active]="activeSection()==='home'" [attr.aria-current]="activeSection()==='home'?'page':null" (click)="navigateHome($event)">{{ text('Inicio', 'Home') }}</a
+      ><a href="/#destinos" [class.active]="activeSection()==='destinations'" [attr.aria-current]="activeSection()==='destinations'?'page':null" (click)="navigateDestinations($event)">{{ text('Destinos', 'Destinations') }}</a
+      ><a routerLink="/circuitos" [class.active]="activeSection()==='circuits'" [attr.aria-current]="activeSection()==='circuits'?'page':null">{{ text('Circuitos', 'Tours') }}</a>
+    </nav>
+    <div class="public-tools">
+      <tp-theme-toggle [english]="data.language.language() === 'en'" />
+      <tp-language-menu [english]="data.language.language() === 'en'" (changed)="load()" />
+    </div>
+  </header>
+  <main #scrollArea id="main-content" (scroll)="updateActiveSection()">
+    @if (mode !== 'home' && mode !== 'destino' && mode !== 'hotel') {
+      <tp-back-button [label]="text('Regresar', 'Back')" />
+    }
+    @if (mode === 'home') {
+      <section class="public-hero">
+        <div class="public-hero-copy">
+          <span class="eyebrow">{{
+            text('Viajar se siente diferente con Trotapie', 'Travel feels different with Trotapie')
+          }}</span>
+          <h1>{{ text('Hay lugares que se quedan contigo.', 'Some places stay with you.') }}</h1>
+          <p>
+            {{
+              text(
+                'Encuentra tu próxima escapada entre playas, ciudades y experiencias que merecen vivirse. Nosotros te ayudamos a llegar.',
+                'Find your next getaway among beaches, cities and experiences worth living. We help you get there.'
+              )
+            }}
+          </p>
+          <a tpButton variant="primary" icon="globe" href="/#destinos" (click)="navigateDestinations($event)">{{
+            text('Encuentra tu próximo viaje', 'Find your next trip')
+          }}</a>
+          <div class="hero-small-note">
+            <tp-icon name="heart" /><span>{{
+              text(
+                'Destinos para cada forma de viajar.',
+                'Destinations for every way of travelling.'
+              )
+            }}</span>
+          </div>
+        </div>
+        <div class="public-hero-photo">
+          <tp-photo-carousel
+            variant="hero"
+            [shuffle]="true"
+            [intervalMs]="3000"
+            [photos]="heroPhotos()"
+            [label]="text('Destinos que inspiran', 'Inspiring destinations')"
+            [eyebrow]="text('Tu próxima historia', 'Your next story')"
+            [headline]="text('Un destino. Mil recuerdos.', 'One destination. A thousand memories.')"
+            [english]="data.language.language() === 'en'"
+          />
+        </div>
+      </section>
+    }
+    @if (mode === 'destino' || mode === 'hotel') {
+      <a
+        tpButton
+        icon="left"
+        variant="back"
+        [routerLink]="mode === 'hotel' ? returnUrl : '/destinos'"
+        >{{ text('Volver al catálogo', 'Back to catalog') }}</a
+      >
+      @if (detail()) {
+        <section class="detail-hero">
+          <div class="detail-photo" [class.destination-composition]="mode==='destino'">
+            @if (mode === 'destino') {
+              <tp-photo-carousel
+                [photos]="destinationPhotos()"
+                [label]="detail().nombre"
+                [autoplay]="!mapOpen()"
+                [english]="data.language.language() === 'en'"
+              />
+            } @else if (cover()?.url_imagen) {
+              <img
+                [src]="cover().url_imagen"
+                [alt]="detail().nombre || detail().nombre_hotel"
+                (error)="imageError($event)"
+              />
+            }
+          </div>
+          <div class="detail-copy">
+            <span class="eyebrow">{{
+              text('Para vivirlo a tu manera', 'Experience it your way')
+            }}</span>
+            <h1>{{ detail().nombre || detail().nombre_hotel }}</h1>
+            @if (mode === 'destino') { <p>{{ detail().detalle?.descripcion_corta || detail().descripcion || '' }}</p> }
+            @else { <p>{{ text('Descubre los horarios, servicios y detalles para planear tu próxima estancia.', 'Explore times, services and details to plan your next stay.') }}</p> }
+            @if (mode === 'hotel') {
+              <a tpButton variant="primary" icon="quote" [routerLink]="['/solicitar', id]">{{
+                text('Solicitar cotización', 'Request a quote')
+              }}</a>
+            }
+            <div class="detail-location">
+              @if (detail().ubicacion) {
+                <button
+                  tpButton
+                  variant="quiet"
+                  icon="pin"
+                  type="button"
+                  (click)="mapOpen.set(true)"
+                >
+                  {{ text('Ver ubicación', 'View location') }}
+                </button>
+              } @else {
+                <tp-icon name="pin" /><span>{{
+                  text('Ubicación por consultar', 'Ask about location')
+                }}</span>
+              }
+            </div>
+          </div>
+        </section>
+        @if (mode === 'hotel') {
+          <tp-hotel-information [hotel]="detail()" [english]="data.language.language() === 'en'" (locationRequested)="mapOpen.set(true)" />
+        }
+        @if (mode === 'hotel' && detail().imagenes?.length) {
+          <section class="hotel-photo-gallery" aria-label="Galería del hotel">
+            <app-imagenes-carrusel [imagenesCargadas]="detail().imagenes" [hotel]="detail()" layout="grid"/>
+          </section>
+        }
+        @if (mode === 'destino' && detail().detalle?.descripcion_larga) {
+          <section class="detail-description">
+            <h2>
+              {{
+                detail().detalle.titulo_descripcion ||
+                  text('Descubre el destino', 'Discover the destination')
+              }}
+            </h2>
+            <p>{{ detail().detalle.descripcion_larga }}</p>
+          </section>
+        }
+      }
+    }
+    @if (mode === 'destino') {
+      @if (loading()) {
+        <tp-state mode="loading" />
+      } @else if (error()) {
+        <tp-state mode="error" [message]="error()" (retry)="load()" />
+      } @else {
+        <tp-destination-facts
+          [facts]="detail()?.datos_rapidos || []"
+          [english]="data.language.language() === 'en'"
+        />
+        <tp-hotel-suggestions
+          [page]="page()"
+          [destinationId]="id"
+          [english]="data.language.language() === 'en'"
+          (selected)="open($event)"
+        />
+      }
+    }
+    @if (mode !== 'hotel' && mode !== 'destino') {
+      <section #destinationSection id="destinos" class="public-catalog">
+        <div class="public-section-heading">
+          <div>
+            <span class="eyebrow">{{
+              text('Escapadas que inspiran', 'Getaways that inspire')
+            }}</span>
+            <h2>
+              {{
+                mode === 'destino' || (mode === 'hoteles' && id)
+                  ? text('Encuentra tu estancia', 'Find your stay')
+                  : mode === 'circuitos'
+                    ? text('Viajes para descubrir más', 'Journeys to discover more')
+                    : mode === 'hoteles'
+                      ? text('¿A dónde quieres ir?', 'Where would you like to go?')
+                      : text('Tu próximo destino', 'Your next destination')
+              }}
+            </h2>
+            <p>
+              {{
+                text(
+                  'Elige un lugar. Lo demás lo planeamos contigo.',
+                  'Choose a place. We will plan the rest with you.'
+                )
+              }}
+            </p>
+          </div>
+          <span class="result-count">{{ page().total }} {{ text('opciones', 'options') }}</span>
+        </div>
+        @if (mode !== 'destino' && mode !== 'circuitos' && !id) {
+          <tp-quick-filters
+            [title]="text('Selecciona experiencia', 'Choose an experience')"
+            [options]="experienceFilters()"
+            [selected]="experience()"
+            (changed)="changeExperience($event)"
+          />
+          @if(!comingSoon() || !experienceOptions().length){<tp-filter-bar
+            [search]="search()"
+            [placeholder]="text('Busca un destino…', 'Find a destination…')"
+            (searchChanged)="changeSearch($event)"
+            ><button
+              tpButton
+              [variant]="type() === 'NACIONAL' ? 'primary' : 'secondary'"
+              icon="pin"
+              (click)="changeType('NACIONAL')"
+            >
+              {{ text('México', 'Mexico') }}</button
+            ><button
+              tpButton
+              [variant]="type() === 'INTERNACIONAL' ? 'primary' : 'secondary'"
+              icon="globe"
+              (click)="changeType('INTERNACIONAL')"
+            >
+              {{ text('El mundo', 'The world') }}
+            </button></tp-filter-bar
+          >}
+          @if(type()==='INTERNACIONAL'&&!comingSoon()){
+            <tp-international-filters [countries]="countries()" [region]="region()" [country]="country()" [busy]="loading()" [english]="data.language.language()==='en'" (regionChanged)="changeRegion($event)" (countryChanged)="changeCountry($event)" (cleared)="clearGeography()" />
+          }
+        }
+        @if(mode==='hoteles'&&id){<div class="hotel-filter-toolbar"><button tpButton icon="filter" (click)="openHotelFilters()">{{text('Filtros','Filters')}}@if(hotelFilterCount()){<span class="filter-count">{{hotelFilterCount()}}</span>}</button>@if(hotelFilterCount()){<button tpButton icon="close" variant="quiet" (click)="clearHotelFilters()">{{text('Limpiar filtros','Clear filters')}}</button>}</div>}
+
+        @if (loading()) {
+          <tp-state mode="loading" />
+        } @else if (error()) {
+          <tp-state mode="error" [message]="error()" (retry)="load()" />
+        } @else if (!experienceConfigured() && !id && mode !== 'circuitos') {
+          <tp-state [title]="selectedExperience() + ' · ' + text('Próximamente', 'Coming soon')" [message]="text('Estamos preparando nuevas experiencias para tu próximo viaje.', 'We are preparing new experiences for your next trip.')" />
+        } @else if (!page().items.length) {
+          <tp-state
+            [title]="
+              mode==='hoteles'&&id ? text('No se encontraron resultados', 'No results found') : text('El próximo destino está por llegar', 'Your next destination is on its way')
+            "
+            [message]="
+              mode==='hoteles'&&id ? text('Intenta con otra búsqueda o ajusta los filtros.', 'Try another search or adjust the filters.') : text('Prueba otra búsqueda o explora otra categoría.', 'Try another search or category.')
+            "
+          />
+        } @else {
+          <div class="card-grid" tpGridColumns (columnsChanged)="hotelGridSize($event)">
+            @for (record of page().items; track record.id) {
+              <tp-image-card
+                [record]="record"
+                [stars]="mode==='hoteles'&&id ? record.raw['estrellas'] : 0"
+                [country]="type()==='INTERNACIONAL' ? record.raw['pais_nombre'] || '' : ''"
+                [showStatus]="false"
+                [imageFit]="
+                  mode === 'home' || mode === 'destinos' || (mode === 'hoteles' && !id)
+                    ? 'contain'
+                    : 'cover'
+                "
+                (selected)="open($event)"
+                [label]="
+                  mode === 'destino' || (mode === 'hoteles' && id)
+                    ? text('Ver hotel', 'View hotel')
+                    : text('Descubrir destino', 'Discover destination')
+                "
+              />
+            }
+          </div>
+          <div class="pagination">
+            <span>{{ page().total }} {{ text('registros', 'results') }}</span>
+            <div class="pagination-actions">
+              <button
+                tpButton
+                icon="left"
+                [disabled]="page().page === 0"
+                (click)="load(page().page - 1)"
+              >
+                {{ text('Anterior', 'Previous') }}</button
+              ><button
+                tpButton
+                icon="right"
+                [disabled]="(page().page + 1) * (mode==='hoteles'&&id ? hotelPageSize() : 24) >= page().total"
+                (click)="load(page().page + 1)"
+              >
+                {{ text('Siguiente', 'Next') }}
+              </button>
+            </div>
+          </div>
+        }
+      </section>
+    } @else if (mode === 'hotel' && loading()) {
+      <tp-state mode="loading" />
+    } @else if (mode === 'hotel' && error()) {
+      <tp-state mode="error" [message]="error()" (retry)="load()" />
+    }
+  </main>
+  <tp-public-footer [english]="data.language.language() === 'en'" />
+</div>
+<tp-location-map
+  [open]="mapOpen()"
+  [location]="detail()?.ubicacion || ''"
+  [name]="detail()?.nombre || detail()?.nombre_hotel || ''"
+  [zoom]="mode === 'hotel' ? 16 : 12"
+  [english]="data.language.language() === 'en'"
+  (closed)="mapOpen.set(false)"
+/>
+
+<tp-dialog [open]="hotelFiltersOpen()" [title]="text('Filtrar hoteles','Filter hotels')" placement="adaptive" (closed)="hotelFiltersOpen.set(false)"><div class="hotel-filters-dialog"><tp-input [label]="text('Buscar hotel','Find a hotel')" [placeholder]="text('Nombre del hotel…','Hotel name…')" [ngModel]="hotelFilterDraft().search" (ngModelChange)="changeHotelFilter('search',$event)"/><fieldset class="star-range"><legend>{{text('Rango de estrellas','Star range')}}</legend><div class="star-range-inputs"><tp-range-slider [min]="0.5" [max]="5" [step]="0.5" [label]="text('Rango de estrellas','Star range')" [lowerLabel]="text('Estrellas mínimas','Minimum stars')" [upperLabel]="text('Estrellas máximas','Maximum stars')" [lower]="hotelFilterDraft().starsMin" [upper]="hotelFilterDraft().starsMax" (changed)="changeHotelFilter('starsMin',$event.lower);changeHotelFilter('starsMax',$event.upper)"/></div>@if(!hotelStarRangeValid()){<p class="range-error" role="alert">{{text('El mínimo no puede ser mayor que el máximo.','The minimum cannot exceed the maximum.')}}</p>}</fieldset><tp-select-search [label]="text('Régimen de hospedaje','Stay plan')" [placeholder]="text('Todos los regímenes','All plans')" [options]="hotelRegimes()" [ngModel]="hotelFilterDraft().regime" (ngModelChange)="changeHotelFilter('regime',$event)"/></div><div class="dialog-actions"><button tpButton icon="refresh" (click)="resetHotelDraft()">{{text('Limpiar','Clear')}}</button><button tpButton (click)="hotelFiltersOpen.set(false)">{{text('Cancelar','Cancel')}}</button><button tpButton icon="check" variant="primary" [disabled]="!hotelStarRangeValid()" (click)="applyHotelFilters()">{{text('Aplicar filtros','Apply filters')}}</button></div></tp-dialog>

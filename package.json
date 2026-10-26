@@ -1,0 +1,36 @@
+{
+  "name": "trotapie",
+  "version": "0.0.0",
+  "scripts": {
+    "ng": "ng",
+    "start": "node scripts/generate-environment.mjs && node scripts/generate-translations.mjs && ng serve --host 127.0.0.1 --port 4307",
+    "build": "node scripts/generate-environment.mjs && node scripts/generate-translations.mjs && ng build",
+    "watch": "ng build --watch --configuration development",
+    "test": "ng test",
+    "test:core": "node --experimental-strip-types --test tests/*.test.mjs"
+  },
+  "private": true,
+  "packageManager": "npm@10.9.8",
+  "dependencies": {
+    "@angular/cdk": "22.0.0",
+    "@angular/common": "^22.0.0",
+    "@angular/compiler": "^22.0.0",
+    "@angular/core": "^22.0.0",
+    "@angular/forms": "^22.0.0",
+    "@angular/platform-browser": "^22.0.0",
+    "@angular/router": "^22.0.0",
+    "@supabase/supabase-js": "2.56.0",
+    "gsap": "^3.15.0",
+    "leaflet": "1.9.4",
+    "rxjs": "~7.8.0",
+    "tslib": "^2.3.0"
+  },
+  "devDependencies": {
+    "@angular/build": "^22.0.7",
+    "@angular/cli": "^22.0.7",
+    "@angular/compiler-cli": "^22.0.0",
+    "@types/leaflet": "1.9.21",
+    "prettier": "^3.8.1",
+    "typescript": "~6.0.2"
+  }
+}

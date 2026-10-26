@@ -1,0 +1,17 @@
+<div class="rooms">
+  @for(room of rooms();track $index;let i=$index){
+    <section class="room">
+      <header><h3>Habitación {{i+1}}</h3>@if(rooms().length>1){<button tpButton variant="icon" icon="trash" type="button" [attr.aria-label]="'Quitar habitación '+(i+1)" (click)="remove(i)"></button>}</header>
+      <div class="form-grid">
+        <app-tp-select-search label="Adultos" [name]="'adults-'+i" [options]="adultOptions" [ngModel]="room.adults" (ngModelChange)="update(i,'adults',$event)" [showClear]="false" [showSearch]="false"/>
+        <app-tp-select-search label="Menores" [name]="'children-'+i" [options]="childOptions" [ngModel]="room.children" (ngModelChange)="update(i,'children',$event)" [showClear]="false" [showSearch]="false"/>
+      </div>
+      @if(room.children){<div class="child-ages">
+        @for(value of room.childAges;track $index;let child=$index){
+          <app-tp-select-search [label]="'Edad del menor '+(child+1)" [name]="'age-'+i+'-'+child" [options]="ageOptions" [ngModel]="value" (ngModelChange)="age(i,child,$event)" [required]="true" [showClear]="false" [showSearch]="false"/>
+        }
+      </div>}
+    </section>
+  }
+  <button tpButton icon="plus" type="button" [disabled]="rooms().length>=maxRooms()" (click)="add()">Agregar habitación</button>
+</div>

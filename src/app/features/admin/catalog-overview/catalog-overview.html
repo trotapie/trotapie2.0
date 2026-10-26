@@ -1,0 +1,15 @@
+<tp-page-header title="Catálogos" description="Los detalles que hacen funcionar cada viaje. Mantén las opciones de tu agencia al día." eyebrow="Trotapie / Espacio de trabajo">
+</tp-page-header>
+<section class="catalog-hero" aria-label="Resumen de catálogos">
+  <div><span class="hero-icon"><tp-icon name="grid" /></span><div><small>Fuente única de configuración</small><h2>Todo lo que tu operación necesita</h2><p>Elige un catálogo para consultar, filtrar o actualizar sus registros.</p></div></div>
+  <strong>{{ cards.length }}<small>catálogos disponibles</small></strong>
+</section>
+<section class="catalog-grid" aria-label="Catálogos disponibles">
+ @for (card of cards; track card.key) {
+  <a tpMotion="card" class="catalog-card" [class]="card.accent" [routerLink]="[card.key]">
+   <span class="card-icon"><tp-icon [name]="card.icon" /></span>
+   <div class="card-copy"><h3>{{ card.title }}</h3><p>{{ card.description }}</p></div>
+   <span class="card-action" aria-hidden="true"><tp-icon name="arrow" /></span>
+  </a>
+ }
+</section>

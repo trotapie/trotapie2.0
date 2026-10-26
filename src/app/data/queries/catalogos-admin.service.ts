@@ -1,0 +1,1734 @@
+// Query contracts reused from Trotapie; all screens are newly implemented.
+import { inject, Injectable } from '@angular/core';
+import { SupabaseService } from './supabase.service';
+
+const ES_ID = 1;
+
+export type CatalogoAdminKey =
+  | 'actividades'
+  | 'conceptos'
+  | 'continentes'
+  | 'descuentos'
+  | 'estatus_empleado'
+  | 'estatus_cotizacion'
+  | 'idiomas'
+  | 'politicas'
+  | 'origen_reservacion'
+  | 'roles_empresa'
+  | 'regimen_hotel'
+  | 'tarifas'
+  | 'tipo_imagen'
+  | 'tipos_habitacion'
+  | 'atracciones'
+  | 'tratamientos'
+  | 'meses_disponibles'
+  | 'codigos_pais'
+  | 'tipos_turisticos';
+
+export interface IPoliticaTarifaAdmin {
+  id: number;
+  codigo: string;
+  titulo: string;
+  descripcion: string;
+  activo: boolean;
+}
+
+@Injectable({ providedIn: 'root' })
+export class CatalogosAdminService {
+  private readonly supabase = inject(SupabaseService);
+
+  private get client() {
+    return this.supabase.getClient();
+  }
+
+  async obtenerDetalleCatalogoAtraccionesAdmin(catalogoAtraccionId: number) {
+    const { data: catalogo, error: catalogoError } = await this.client
+      .from('catalogo_atracciones')
+        .select(`
+            id,
+            clave,
+            icono,
+            orden,
+            activo,
+            created_at,
+            traducciones:catalogo_atracciones_traducciones (
+              idioma:idiomas(codigo),
+              nombre,
+              descripcion
+            )
+          `)
+      .eq('id', catalogoAtraccionId)
+      .maybeSingle();
+
+    if (catalogoError) throw catalogoError;
+    if (!catalogo) throw new Error('No se encontro el catalogo de atracciones solicitado.');
+
+    const traduccionCatalogoEs = catalogo?.traducciones?.find(
+      (x: any) => String(x?.idioma?.codigo ?? '').toLowerCase() === 'es'
+    );
+
+    return {
+      catalogo: {
+        id: catalogo.id,
+        clave: catalogo.clave ?? '',
+        icono: catalogo.icono ?? '',
+        orden: catalogo.orden ?? null,
+        activo: Boolean(catalogo.activo),
+        created_at: catalogo.created_at ?? null,
+        nombre: traduccionCatalogoEs?.nombre ?? '',
+        descripcion: traduccionCatalogoEs?.descripcion ?? ''
+      }
+    };
+  }
+
+  async obtenerTraduccionesCatalogoAtraccionAdmin(catalogoAtraccionId: number) {
+    const { data, error } = await this.client
+      .from('catalogo_atracciones')
+      .select(`
+        traducciones:catalogo_atracciones_traducciones (
+          idioma:idiomas(codigo),
+          nombre,
+          descripcion
+        )
+      `)
+      .eq('id', catalogoAtraccionId)
+      .maybeSingle();
+
+    if (error) throw error;
+
+    return (data?.traducciones ?? []).reduce((acc: Record<string, { nombre: string; descripcion: string }>, traduccion: any) => {
+      const codigo = String(traduccion?.idioma?.codigo ?? '').toLowerCase();
+      if (codigo) {
+        acc[codigo] = {
+          nombre: traduccion?.nombre ?? '',
+          descripcion: traduccion?.descripcion ?? ''
+        };
+      }
+      return acc;
+    }, {});
+  }
+
+  async obtenerTraduccionesTipoTuristicoAdmin(tipoTuristicoId: number) {
+    const { data, error } = await this.client
+      .from('catalogo_tipos_turisticos_traducciones')
+      .select('nombre, idioma:idiomas(codigo)')
+      .eq('tipo_turistico_id', tipoTuristicoId);
+
+    if (error) throw error;
+
+    return (data ?? []).reduce((acc: Record<string, { nombre: string }>, traduccion: any) => {
+      const codigo = String(traduccion?.idioma?.codigo ?? '').toLowerCase();
+      if (codigo) acc[codigo] = { nombre: String(traduccion?.nombre ?? '') };
+      return acc;
+    }, {});
+  }
+
+  async obtenerCatalogoAdmin(catalogo: CatalogoAdminKey): Promise<any[]> {
+    switch (catalogo) {
+      case 'actividades': {
+        const pageSize = 1000;
+        const select = `
+            id,
+            descripcion,
+            clave,
+            icono,
+            activo,
+            orden,
+            traducciones:actividades_traducciones (
+              idioma:idiomas(codigo),
+              descripcion
+            )
+          `;
+
+        const resultados: any[] = [];
+        let from = 0;
+
+        while (true) {
+          const { data, error } = await this.client
+            .from('actividades')
+            .select(select)
+            .order('orden', { ascending: true })
+            .order('id', { ascending: true })
+            .range(from, from + pageSize - 1);
+
+          if (error) throw error;
+
+          const bloque = data ?? [];
+          resultados.push(...bloque);
+
+          if (bloque.length < pageSize) {
+            break;
+          }
+
+          from += pageSize;
+        }
+
+        return resultados.map((item: any) => ({
+          ...item,
+          traducciones_preview: (item.traducciones ?? []).reduce((acc: any, t: any) => {
+            const code = t.idioma?.codigo;
+            if (code) {
+              acc[code] = { descripcion: t.descripcion };
+            }
+            return acc;
+          }, {})
+        }));
+      }
+      case 'conceptos': {
+        const { data, error } = await this.client
+          .from('conceptos')
+          .select('id, descripcion, icono')
+          .order('id', { ascending: true });
+        if (error) throw error;
+        return data ?? [];
+      }
+      case 'continentes': {
+        const { data, error } = await this.client
+          .from('continentes')
+          .select('id, nombre')
+          .order('id', { ascending: true });
+        if (error) throw error;
+        return data ?? [];
+      }
+      case 'descuentos': {
+        const { data, error } = await this.client
+          .from('descuentos')
+          .select(`
+            id,
+            tipo_descuento,
+            icono,
+            traducciones:descuentos_traducciones (
+              idioma:idiomas(codigo),
+              descripcion
+            )
+          `)
+          .order('id', { ascending: true });
+        if (error) throw error;
+        return (data ?? []).map((item: any) => ({
+          ...item,
+          traducciones_preview: (item?.traducciones ?? []).reduce((acc: Record<string, any>, traduccion: any) => {
+            const code = String(traduccion?.idioma?.codigo ?? '').toLowerCase();
+            if (!code) {
+              return acc;
+            }
+
+            acc[code] = {
+              descripcion: traduccion?.descripcion ?? ''
+            };
+
+            return acc;
+          }, {})
+        }));
+      }
+      case 'estatus_empleado': {
+        const { data, error } = await this.client
+          .from('estatus_empleado')
+          .select('id, clave, nombre, activo, orden')
+          .order('orden', { ascending: true })
+          .order('id', { ascending: true });
+        if (error) throw error;
+        return data ?? [];
+      }
+      case 'estatus_cotizacion': {
+        const { data, error } = await this.client
+          .from('estatus_cotizacion')
+          .select('id, clave, nombre, activo, orden')
+          .order('orden', { ascending: true })
+          .order('id', { ascending: true });
+        if (error) throw error;
+        return data ?? [];
+      }
+      case 'tipos_turisticos': {
+        const { data, error } = await this.client
+          .from('catalogo_tipos_turisticos')
+          .select('id, slug, nombre, activo, orden')
+          .order('orden', { ascending: true })
+          .order('id', { ascending: true });
+        if (error) throw error;
+        return (data ?? []).map((item: any) => ({ ...item, clave: item.slug }));
+      }
+      case 'idiomas': {
+        const { data, error } = await this.client
+          .from('idiomas')
+          .select('id, codigo, nombre, activo, orden')
+          .order('orden', { ascending: true })
+          .order('id', { ascending: true });
+        if (error) throw error;
+        return data ?? [];
+      }
+      case 'politicas': {
+        const { data, error } = await this.client
+          .from('politicas')
+          .select(`
+            id,
+            codigo,
+            categoria,
+            activo,
+            created_at,
+            traducciones:politicas_traducciones (
+              idioma,
+              titulo,
+              descripcion
+            )
+          `)
+          .order('id', { ascending: true });
+        if (error) throw error;
+        return (data ?? []).map((item: any) => {
+          const traduccionEs = item?.traducciones?.find((x: any) => String(x.idioma ?? '').toLowerCase() === 'es');
+          const traduccionesPreview = (item?.traducciones ?? []).reduce((acc: Record<string, any>, traduccion: any) => {
+            const idioma = String(traduccion?.idioma ?? '').toLowerCase();
+            if (!idioma) {
+              return acc;
+            }
+
+            acc[idioma] = {
+              titulo: traduccion?.titulo ?? '',
+              descripcion: traduccion?.descripcion ?? ''
+            };
+
+            return acc;
+          }, {});
+
+          return {
+            id: item.id,
+            codigo: item.codigo,
+            categoria: item.categoria,
+            activo: item.activo,
+            created_at: item.created_at,
+            titulo_es: traduccionEs?.titulo ?? traduccionEs?.nombre ?? traduccionEs?.title ?? '',
+            descripcion_es: traduccionEs?.descripcion ?? '',
+            traducciones_preview: traduccionesPreview
+          };
+        });
+      }
+      case 'origen_reservacion': {
+        const { data, error } = await this.client
+          .from('origen_reservacion')
+          .select('id, clave, nombre_cotizador, estatus, orden')
+          .order('orden', { ascending: true })
+          .order('id', { ascending: true });
+        if (error) throw error;
+        return data ?? [];
+      }
+      case 'roles_empresa': {
+        const { data, error } = await this.client
+          .from('roles_empresa')
+          .select('id, rol, descripcion_rol, estatus')
+          .order('rol', { ascending: true })
+          .order('id', { ascending: true });
+        if (error) throw error;
+        return data ?? [];
+      }
+      case 'regimen_hotel': {
+        const { data, error } = await this.client
+          .from('regimen')
+          .select(`
+            id,
+            traducciones:regimen_traducciones (
+              idioma_id,
+              descripcion
+            )
+          `)
+          .order('id', { ascending: true });
+
+        if (error) throw error;
+
+        return (data ?? []).map((item: any) => {
+          const traduccionEs = item?.traducciones?.find((x: any) => x.idioma_id === ES_ID);
+          return {
+            id: item.id,
+            descripcion: traduccionEs?.descripcion ?? `Regimen ${item.id}`
+          };
+        });
+      }
+      case 'tarifas': {
+        const { data, error } = await this.client
+          .from('tarifas')
+          .select(`
+            id,
+            clave,
+            nombre,
+            activo,
+            created_at,
+            politicas:tarifas_politicas (
+              id,
+              orden,
+              politica:politicas (
+                id,
+                codigo,
+                categoria,
+                activo,
+                traducciones:politicas_traducciones (
+                  idioma,
+                  titulo,
+                  descripcion
+                )
+              )
+            )
+          `)
+          .order('id', { ascending: true });
+        if (error) throw error;
+        return (data ?? []).map((item: any) => ({
+          id: item.id,
+          clave: item.clave,
+          nombre: item.nombre,
+          activo: item.activo,
+          created_at: item.created_at,
+          politicas: (item?.politicas ?? [])
+            .map((relacion: any) => {
+              const politica = relacion?.politica;
+              const traduccionEs = politica?.traducciones?.find(
+                (traduccion: any) => String(traduccion?.idioma ?? '').toLowerCase() === 'es'
+              );
+
+              return {
+                id: politica?.id,
+                relacion_id: relacion?.id,
+                orden: relacion?.orden ?? null,
+                codigo: politica?.codigo ?? '',
+                categoria: politica?.categoria ?? '',
+                activo: Boolean(politica?.activo),
+                titulo: traduccionEs?.titulo ?? '',
+                descripcion: traduccionEs?.descripcion ?? ''
+              };
+            })
+            .filter((politica: any) => Number.isFinite(Number(politica.id)))
+            .sort((a: any, b: any) => Number(a.orden ?? 0) - Number(b.orden ?? 0))
+        }));
+      }
+      case 'tipo_imagen': {
+        const { data, error } = await this.client
+          .from('tipos_imagen')
+          .select(`
+            id,
+            clave,
+            orden,
+            traducciones:tipos_imagen_traducciones!fk_tipo_imagen (
+              lang,
+              descripcion
+            )
+          `)
+          .order('orden', { ascending: true })
+          .order('id', { ascending: true });
+        if (error) throw error;
+        return (data ?? []).map((item: any) => {
+          const traduccionEs = (item?.traducciones ?? []).find(
+            (traduccion: any) => String(traduccion?.lang ?? '').toLowerCase() === 'es'
+          );
+
+          const traduccionesPreview = (item?.traducciones ?? []).reduce((acc: Record<string, any>, traduccion: any) => {
+            const lang = String(traduccion?.lang ?? '').toLowerCase();
+            if (!lang) {
+              return acc;
+            }
+
+            acc[lang] = {
+              descripcion: traduccion?.descripcion ?? ''
+            };
+
+            return acc;
+          }, {});
+
+          return {
+            id: item.id,
+            clave: item.clave ?? '',
+            descripcion: traduccionEs?.descripcion ?? item.clave ?? `Tipo ${item.id}`,
+            orden: item.orden ?? null,
+            traducciones_preview: traduccionesPreview
+          };
+        });
+      }
+      case 'tipos_habitacion': {
+        const { data, error } = await this.client
+          .from('tipos_habitacion')
+          .select('id, nombre_habitacion, capacidad_maxima, descripcion')
+          .order('id', { ascending: true });
+        if (error) throw error;
+        return data ?? [];
+      }
+      case 'atracciones': {
+        const { data, error } = await this.client
+          .from('catalogo_atracciones')
+          .select(`
+            id,
+            clave,
+            icono,
+            orden,
+            activo,
+            created_at,
+            traducciones:catalogo_atracciones_traducciones (
+              idioma_id,
+              idioma:idiomas(codigo),
+              nombre,
+              descripcion
+            )
+          `)
+          .order('orden', { ascending: true })
+          .order('id', { ascending: true });
+        if (error) throw error;
+        return (data ?? []).map((item: any) => {
+          const traduccionEs = item?.traducciones?.find((x: any) => String(x?.idioma?.codigo ?? '').toLowerCase() === 'es');
+          return {
+            id: item.id,
+            clave: item.clave,
+            icono: item.icono,
+            orden: item.orden,
+            activo: item.activo,
+            created_at: item.created_at,
+            nombre: traduccionEs?.nombre ?? '',
+            descripcion: traduccionEs?.descripcion ?? '',
+            traducciones_preview: (item?.traducciones ?? []).reduce((acc: Record<string, any>, traduccion: any) => {
+              const code = String(traduccion?.idioma?.codigo ?? '').toLowerCase();
+              if (!code) {
+                return acc;
+              }
+
+              acc[code] = {
+                nombre: traduccion?.nombre ?? '',
+                descripcion: traduccion?.descripcion ?? ''
+              };
+
+              return acc;
+            }, {})
+          };
+        });
+      }
+      case 'tratamientos': {
+        const { data, error } = await this.client
+          .from('tratamientos')
+          .select('id, nombre, abreviacion, estatus')
+          .order('nombre', { ascending: true })
+          .order('id', { ascending: true });
+        if (error) throw error;
+        return data ?? [];
+      }
+      case 'meses_disponibles': {
+        const { data, error } = await this.client
+          .from('meses_disponibles')
+          .select('id, meses, activo, orden')
+          .order('orden', { ascending: true })
+          .order('meses', { ascending: true });
+        if (error) throw error;
+        return data ?? [];
+      }
+      case 'codigos_pais': {
+        const { data, error } = await this.client.from('codigos_pais').select('id, pais, prefijo, activo, orden').order('orden').order('pais');
+        if (error) throw error;
+        return data ?? [];
+      }
+      default:
+        return [];
+    }
+  }
+
+  async actualizarOrdenCatalogoAdmin(
+    catalogo: CatalogoAdminKey,
+    registros: Array<{ id: number; orden: number }>
+  ) {
+    if (!registros?.length) {
+      return [];
+    }
+
+    const tablaPorCatalogo: Record<CatalogoAdminKey, string | null> = {
+      actividades: 'actividades',
+      conceptos: null,
+      continentes: null,
+      descuentos: null,
+      estatus_empleado: 'estatus_empleado',
+      estatus_cotizacion: 'estatus_cotizacion',
+      idiomas: 'idiomas',
+      politicas: null,
+      origen_reservacion: 'origen_reservacion',
+      roles_empresa: null,
+      regimen_hotel: null,
+      tarifas: null,
+      tipo_imagen: 'tipos_imagen',
+      tipos_habitacion: null,
+      atracciones: 'catalogo_atracciones',
+      tratamientos: null,
+      meses_disponibles: 'meses_disponibles',
+      codigos_pais: 'codigos_pais',
+      tipos_turisticos: 'catalogo_tipos_turisticos'
+    };
+
+    const tabla = tablaPorCatalogo[catalogo];
+    if (!tabla) {
+      throw new Error('Este catalogo no admite orden manual.');
+    }
+
+    const resultados = await Promise.all(
+      registros.map(({ id, orden }) =>
+        this.client
+          .from(tabla)
+          .update({ orden })
+          .eq('id', id)
+          .select('id, orden')
+          .maybeSingle()
+      )
+    );
+
+    const error = resultados.find((r) => r.error)?.error;
+    if (error) throw error;
+
+    return resultados.map((r) => r.data).filter(Boolean);
+  }
+
+  async crearCatalogoAdmin(catalogo: CatalogoAdminKey, payload: Record<string, any>) {
+    switch (catalogo) {
+      case 'regimen_hotel': {
+        const descripcion = String(payload.descripcion ?? '').trim();
+        const traducciones = await this.prepararTraduccionesRegimen(descripcion);
+        const { data: regimen, error } = await this.client
+          .from('regimen')
+          .insert({ descripcion })
+          .select('id')
+          .single();
+        if (error) throw error;
+
+        const { error: traduccionError } = await this.client
+          .from('regimen_traducciones')
+          .insert(traducciones.map((item) => ({ ...item, regimen_id: regimen.id })));
+        if (traduccionError) {
+          await this.client.from('regimen').delete().eq('id', regimen.id);
+          throw traduccionError;
+        }
+        return { id: regimen.id, descripcion };
+      }
+      case 'actividades': {
+        const { data: ultimoRegistro, error: ultimoError } = await this.client
+          .from('actividades')
+          .select('orden')
+          .order('orden', { ascending: false })
+          .limit(1)
+          .maybeSingle();
+
+        if (ultimoError) throw ultimoError;
+
+        const ordenMaximo = Number((ultimoRegistro as any)?.orden);
+        const siguienteOrden = Number.isFinite(ordenMaximo) ? ordenMaximo + 1 : 1;
+
+        const { data, error } = await this.client
+          .from('actividades')
+          .insert({
+            descripcion: payload.descripcion ?? null,
+            clave: payload.clave ?? null,
+            icono: payload.icono ?? null,
+            activo: payload.activo ?? true,
+            orden: siguienteOrden
+          })
+          .select('id, descripcion, clave, icono, activo, orden')
+          .single();
+
+        if (error) throw error;
+        await this.guardarTraduccionesActividad(Number((data as any).id), payload.descripcion ?? '');
+        return data;
+      }
+      case 'continentes': {
+        const { data, error } = await this.client
+          .from('continentes')
+          .insert({
+            nombre: payload.nombre ?? null
+          })
+          .select('id, nombre')
+          .single();
+        if (error) throw error;
+        return data;
+      }
+      case 'conceptos': {
+        const { data, error } = await this.client
+          .from('conceptos')
+          .insert({
+            descripcion: payload.descripcion ?? null,
+            icono: payload.icono ?? null
+          })
+          .select('id, descripcion, icono')
+          .single();
+        if (error) throw error;
+        return data;
+      }
+      case 'tratamientos': {
+        const { data, error } = await this.client
+          .from('tratamientos')
+          .insert({
+            nombre: payload.nombre ?? null,
+            abreviacion: payload.abreviacion ?? null,
+            estatus: payload.estatus ?? true
+          })
+          .select('id, nombre, abreviacion, estatus')
+          .single();
+        if (error) throw error;
+        return data;
+      }
+      case 'meses_disponibles': {
+        const { data: ultimoRegistro, error: ultimoError } = await this.client
+          .from('meses_disponibles')
+          .select('orden')
+          .order('orden', { ascending: false })
+          .limit(1)
+          .maybeSingle();
+        if (ultimoError) throw ultimoError;
+
+        const orden = Number(ultimoRegistro?.orden ?? 0) + 1;
+        const { data, error } = await this.client
+          .from('meses_disponibles')
+          .insert({ meses: payload.meses, activo: payload.activo ?? true, orden })
+          .select('id, meses, activo, orden')
+          .single();
+        if (error) throw error;
+        return data;
+      }
+      case 'codigos_pais': {
+        const { data: ultimo, error: ultimoError } = await this.client.from('codigos_pais').select('orden').order('orden', { ascending: false }).limit(1).maybeSingle();
+        if (ultimoError) throw ultimoError;
+        const { data, error } = await this.client.from('codigos_pais').insert({ pais: payload.pais, prefijo: payload.prefijo, activo: payload.activo ?? true, orden: Number(ultimo?.orden ?? 0) + 1 }).select('id, pais, prefijo, activo, orden').single();
+        if (error) throw error;
+        return data;
+      }
+      case 'estatus_empleado':
+      case 'estatus_cotizacion':
+      case 'tipos_turisticos': {
+        const tabla = catalogo === 'tipos_turisticos' ? 'catalogo_tipos_turisticos' : catalogo;
+        const { data: ultimoRegistro, error: ultimoError } = await this.client
+          .from(tabla)
+          .select('orden')
+          .order('orden', { ascending: false })
+          .limit(1)
+          .maybeSingle();
+
+        if (ultimoError) throw ultimoError;
+
+        const ordenMaximo = Number((ultimoRegistro as any)?.orden);
+        const siguienteOrden = Number.isFinite(ordenMaximo) ? ordenMaximo + 1 : 1;
+        const insertPayload = catalogo === 'tipos_turisticos'
+          ? { slug: payload.clave ?? null, nombre: payload.nombre ?? null, activo: payload.activo ?? true, orden: siguienteOrden }
+          : { clave: payload.clave ?? null, nombre: payload.nombre ?? null, activo: payload.activo ?? true, orden: siguienteOrden };
+        const { data, error } = await this.client.from(tabla).insert(insertPayload).select('id, nombre, activo, orden').single();
+
+        if (error) throw error;
+        if (catalogo === 'tipos_turisticos') {
+          await this.guardarTraduccionesTipoTuristico(Number(data.id), String(payload.nombre ?? ''));
+        }
+        return data;
+      }
+      case 'origen_reservacion': {
+        const { data: ultimoRegistro, error: ultimoError } = await this.client
+          .from('origen_reservacion')
+          .select('orden')
+          .order('orden', { ascending: false })
+          .limit(1)
+          .maybeSingle();
+
+        if (ultimoError) throw ultimoError;
+
+        const ordenMaximo = Number((ultimoRegistro as any)?.orden);
+        const siguienteOrden = Number.isFinite(ordenMaximo) ? ordenMaximo + 1 : 1;
+        const { data, error } = await this.client
+          .from('origen_reservacion')
+          .insert({
+            clave: payload.clave ?? null,
+            nombre_cotizador: payload.nombre_cotizador ?? null,
+            estatus: payload.estatus ?? true,
+            orden: siguienteOrden
+          })
+           .select('id, clave, nombre_cotizador, estatus, orden')
+           .single();
+        if (error) throw error;
+        return data;
+      }
+      case 'roles_empresa': {
+        const { data, error } = await this.client
+          .from('roles_empresa')
+          .insert({
+            rol: payload.rol ?? null,
+            descripcion_rol: payload.descripcion_rol ?? null,
+            estatus: payload.estatus ?? true
+          })
+          .select('id, rol, descripcion_rol, estatus')
+          .single();
+        if (error) throw error;
+        return data;
+      }
+      case 'descuentos': {
+        const { data, error } = await this.client
+          .from('descuentos')
+          .insert({
+            tipo_descuento: payload.tipo_descuento ?? null,
+            icono: payload.icono ?? null
+          })
+          .select('id, tipo_descuento, icono')
+          .single();
+        if (error) throw error;
+        await this.guardarTraduccionesDescuento(Number((data as any).id), payload.tipo_descuento ?? '');
+        return data;
+      }
+      case 'idiomas': {
+        const { data: ultimoRegistro, error: ultimoError } = await this.client
+          .from('idiomas')
+          .select('orden')
+          .order('orden', { ascending: false })
+          .limit(1)
+          .maybeSingle();
+
+        if (ultimoError) throw ultimoError;
+
+        const ordenMaximo = Number(ultimoRegistro?.orden);
+        const siguienteOrden = Number.isFinite(ordenMaximo) ? ordenMaximo + 1 : 1;
+
+        const { data, error } = await this.client
+          .from('idiomas')
+          .insert({
+            codigo: payload.codigo ?? null,
+            nombre: payload.nombre ?? null,
+            activo: payload.activo ?? true,
+            orden: siguienteOrden
+          })
+          .select('id, codigo, nombre, activo, orden')
+          .single();
+
+        if (error) throw error;
+        return data;
+      }
+      case 'politicas': {
+        const { data, error } = await this.client
+          .from('politicas')
+          .insert({
+            codigo: payload.codigo ?? null,
+            categoria: payload.categoria ?? null,
+            activo: payload.activo ?? true
+          })
+          .select('id, codigo, categoria, activo, created_at')
+          .single();
+
+        if (error) throw error;
+        await this.guardarTraduccionesPolitica(Number(data.id), {
+          titulo: String(payload.titulo_es ?? '').trim(),
+          descripcion: String(payload.descripcion_es ?? '').trim()
+        });
+        return data;
+      }
+      case 'tarifas': {
+        const { data, error } = await this.client
+          .from('tarifas')
+          .insert({
+            clave: payload.clave ?? null,
+            nombre: payload.nombre ?? null,
+            activo: payload.activo ?? true
+          })
+          .select('id, clave, nombre, activo, created_at')
+          .single();
+
+        if (error) throw error;
+        await this.guardarRelacionesTarifaPoliticas(
+          Number(data.id),
+          Array.isArray(payload.politica_ids) ? payload.politica_ids : []
+        );
+        return data;
+      }
+      case 'tipos_habitacion': {
+        const { data, error } = await this.client
+          .from('tipos_habitacion')
+          .insert({
+            nombre_habitacion: payload.nombre_habitacion ?? null,
+            capacidad_maxima: payload.capacidad_maxima ?? null,
+            descripcion: payload.descripcion ?? null
+          })
+          .select('id, nombre_habitacion, capacidad_maxima, descripcion')
+          .single();
+
+        if (error) throw error;
+        return data;
+      }
+      case 'atracciones': {
+        const orden = Number(payload.orden);
+        const ordenFinal = Number.isFinite(orden) && orden > 0 ? orden : null;
+
+        const { data, error } = await this.client
+          .from('catalogo_atracciones')
+          .insert({
+            clave: payload.clave ?? null,
+            icono: payload.icono ?? null,
+            activo: payload.activo ?? true,
+            orden: ordenFinal
+          })
+          .select('id, clave, icono, activo, orden')
+          .single();
+
+        if (error) throw error;
+        await this.guardarTraduccionesCatalogoAtraccion(
+          Number((data as any).id),
+          String(payload.nombre ?? '').trim(),
+          String(payload.descripcion ?? '').trim()
+        );
+        return data;
+      }
+      case 'tipo_imagen': {
+        const { data: ultimoRegistro, error: ultimoError } = await this.client
+          .from('tipos_imagen')
+          .select('orden')
+          .order('orden', { ascending: false })
+          .limit(1)
+          .maybeSingle();
+
+        if (ultimoError) throw ultimoError;
+
+        const ordenMaximo = Number((ultimoRegistro as any)?.orden);
+        const siguienteOrden = Number.isFinite(ordenMaximo) ? ordenMaximo + 1 : 1;
+
+        const { data, error } = await this.client
+          .from('tipos_imagen')
+          .insert({
+            clave: payload.clave ?? null,
+            orden: siguienteOrden
+          })
+          .select('id, clave, orden')
+          .single();
+
+        if (error) throw error;
+        await this.guardarTraduccionesTipoImagen(Number((data as any).id), String(payload.descripcion_es ?? '').trim());
+        return data;
+      }
+      default:
+        throw new Error('Este catalogo no admite creacion desde esta pantalla.');
+    }
+  }
+
+  async obtenerPoliticasDisponiblesTarifa(): Promise<IPoliticaTarifaAdmin[]> {
+    const { data, error } = await this.client
+      .from('politicas')
+      .select(`
+        id,
+        codigo,
+        activo,
+        traducciones:politicas_traducciones (
+          idioma,
+          titulo,
+          descripcion
+        )
+      `)
+      .eq('activo', true)
+      .order('id', { ascending: true });
+
+    if (error) throw error;
+
+    return (data ?? []).map((item: any) => {
+      const traduccionEs = (item?.traducciones ?? []).find(
+        (traduccion: any) => String(traduccion?.idioma ?? '').toLowerCase() === 'es'
+      );
+
+      return {
+        id: Number(item.id),
+        codigo: item.codigo ?? '',
+        titulo: traduccionEs?.titulo ?? item.codigo ?? '',
+        descripcion: traduccionEs?.descripcion ?? '',
+        activo: Boolean(item.activo)
+      };
+    });
+  }
+
+  async eliminarCatalogoAdmin(catalogo: CatalogoAdminKey, id: number) {
+    switch (catalogo) {
+      case 'regimen_hotel': {
+        const { data, error } = await this.client.rpc('eliminar_regimen_hotel', { p_regimen_id: id });
+        if (error) throw error;
+        if (!data) throw new Error('No se pudo eliminar el régimen. Verifica tus permisos o si ya fue eliminado.');
+        return { deleted: 1 };
+      }
+      case 'actividades': {
+        const { error } = await this.client
+          .from('actividades')
+          .delete()
+          .eq('id', id);
+        if (error) throw error;
+        return { deleted: 1 };
+      }
+      case 'conceptos': {
+        const { error } = await this.client
+          .from('conceptos')
+          .delete()
+          .eq('id', id);
+        if (error) throw error;
+        return { deleted: 1 };
+      }
+      case 'continentes': {
+        const { error } = await this.client
+          .from('continentes')
+          .delete()
+          .eq('id', id);
+        if (error) throw error;
+        return { deleted: 1 };
+      }
+      case 'descuentos': {
+        const { error: deleteTraduccionesError } = await this.client
+          .from('descuentos_traducciones')
+          .delete()
+          .eq('descuento_id', id);
+        if (deleteTraduccionesError) throw deleteTraduccionesError;
+
+        const { error } = await this.client
+          .from('descuentos')
+          .delete()
+          .eq('id', id);
+        if (error) throw error;
+        return { deleted: 1 };
+      }
+      case 'estatus_empleado':
+      case 'estatus_cotizacion': {
+        const { error } = await this.client
+          .from(catalogo)
+          .delete()
+          .eq('id', id);
+        if (error) throw error;
+        return { deleted: 1 };
+      }
+      case 'tipos_turisticos': {
+        const { data, error } = await this.client
+          .from('catalogo_tipos_turisticos')
+          .delete()
+          .eq('id', id)
+          .select('id')
+          .maybeSingle();
+        if (error) throw error;
+        if (!data) throw new Error('No fue posible eliminar el tipo turístico. Verifica tus permisos o sus registros relacionados.');
+        return { deleted: 1 };
+      }
+      case 'tipo_imagen': {
+        const { error: deleteTraduccionesError } = await this.client
+          .from('tipos_imagen_traducciones')
+          .delete()
+          .eq('tipo_imagen_id', id);
+        if (deleteTraduccionesError) throw deleteTraduccionesError;
+
+        const { error } = await this.client
+          .from('tipos_imagen')
+          .delete()
+          .eq('id', id);
+        if (error) throw error;
+        return { deleted: 1 };
+      }
+      case 'idiomas': {
+        const { error } = await this.client
+          .from('idiomas')
+          .delete()
+          .eq('id', id);
+        if (error) throw error;
+        return { deleted: 1 };
+      }
+      case 'politicas': {
+        const { error } = await this.client
+          .from('politicas')
+          .delete()
+          .eq('id', id);
+        if (error) throw error;
+        return { deleted: 1 };
+      }
+      case 'tarifas': {
+        const { error: deleteRelacionError } = await this.client
+          .from('tarifas_politicas')
+          .delete()
+          .eq('tarifa_id', id);
+        if (deleteRelacionError) throw deleteRelacionError;
+
+        const { error } = await this.client
+          .from('tarifas')
+          .delete()
+          .eq('id', id);
+        if (error) throw error;
+        return { deleted: 1 };
+      }
+      case 'tipos_habitacion': {
+        const { error } = await this.client
+          .from('tipos_habitacion')
+          .delete()
+          .eq('id', id);
+        if (error) throw error;
+        return { deleted: 1 };
+      }
+      case 'tratamientos': {
+        const { error } = await this.client
+          .from('tratamientos')
+          .delete()
+          .eq('id', id);
+        if (error) throw error;
+        return { deleted: 1 };
+      }
+      case 'meses_disponibles': {
+        const { error } = await this.client
+          .from('meses_disponibles')
+          .delete()
+          .eq('id', id);
+        if (error) throw error;
+        return { deleted: 1 };
+      }
+      case 'codigos_pais': {
+        const { error } = await this.client.from('codigos_pais').delete().eq('id', id);
+        if (error) throw error;
+        return { deleted: 1 };
+      }
+      case 'origen_reservacion': {
+        const { error } = await this.client
+          .from('origen_reservacion')
+          .delete()
+          .eq('id', id);
+        if (error) throw error;
+        return { deleted: 1 };
+      }
+      case 'roles_empresa': {
+        const { error } = await this.client
+          .from('roles_empresa')
+          .delete()
+          .eq('id', id);
+        if (error) throw error;
+        return { deleted: 1 };
+      }
+      case 'atracciones': {
+        const { error: deleteTraduccionesError } = await this.client
+          .from('catalogo_atracciones_traducciones')
+          .delete()
+          .eq('catalogo_atraccion_id', id);
+        if (deleteTraduccionesError) throw deleteTraduccionesError;
+
+        const { error } = await this.client
+          .from('catalogo_atracciones')
+          .delete()
+          .eq('id', id);
+        if (error) throw error;
+        return { deleted: 1 };
+      }
+      default:
+        throw new Error('Este catalogo no admite eliminacion desde esta pantalla.');
+    }
+  }
+
+  async actualizarCatalogoAdmin(
+    catalogo: CatalogoAdminKey,
+    id: number,
+    payload: Record<string, any>
+  ) {
+    switch (catalogo) {
+      case 'actividades': {
+        const { data, error } = await this.client
+          .from('actividades')
+          .update({
+            descripcion: payload.descripcion ?? null,
+            clave: payload.clave ?? null,
+            icono: payload.icono ?? null,
+            activo: payload.activo ?? null
+          })
+          .eq('id', id)
+          .select('id, descripcion, clave, icono, activo, orden')
+          .maybeSingle();
+        if (error) throw error;
+        await this.guardarTraduccionesActividad(id, payload.descripcion ?? '');
+        return data;
+      }
+      case 'tipos_turisticos': {
+        const { data, error } = await this.client
+          .from('catalogo_tipos_turisticos')
+          .update({ slug: payload.clave ?? null, nombre: payload.nombre ?? null, activo: payload.activo ?? null })
+          .eq('id', id)
+          .select('id')
+          .maybeSingle();
+        if (error) throw error;
+        await this.guardarTraduccionesTipoTuristico(id, String(payload.nombre ?? ''));
+        return data;
+      }
+      case 'conceptos': {
+        const { data, error } = await this.client
+          .from('conceptos')
+          .update({
+            descripcion: payload.descripcion ?? null,
+            icono: payload.icono ?? null
+          })
+          .eq('id', id)
+          .select('id')
+          .maybeSingle();
+        if (error) throw error;
+        return data;
+      }
+      case 'continentes': {
+        const { data, error } = await this.client
+          .from('continentes')
+          .update({
+            nombre: payload.nombre ?? null
+          })
+          .eq('id', id)
+          .select('id')
+          .maybeSingle();
+        if (error) throw error;
+        return data;
+      }
+      case 'tratamientos': {
+        const { data, error } = await this.client
+          .from('tratamientos')
+          .update({
+            nombre: payload.nombre ?? null,
+            abreviacion: payload.abreviacion ?? null,
+            estatus: payload.estatus ?? null
+          })
+          .eq('id', id)
+          .select('id, nombre, abreviacion, estatus')
+          .maybeSingle();
+        if (error) throw error;
+        return data;
+      }
+      case 'meses_disponibles': {
+        const { data, error } = await this.client
+          .from('meses_disponibles')
+          .update({ meses: payload.meses, activo: payload.activo })
+          .eq('id', id)
+          .select('id, meses, activo, orden')
+          .maybeSingle();
+        if (error) throw error;
+        return data;
+      }
+      case 'codigos_pais': {
+        const { data, error } = await this.client.from('codigos_pais').update({ pais: payload.pais, prefijo: payload.prefijo, activo: payload.activo }).eq('id', id).select('id, pais, prefijo, activo, orden').maybeSingle();
+        if (error) throw error;
+        return data;
+      }
+      case 'descuentos': {
+        const { data, error } = await this.client
+          .from('descuentos')
+          .update({
+            tipo_descuento: payload.tipo_descuento ?? null,
+            icono: payload.icono ?? null
+          })
+          .eq('id', id)
+          .select('id')
+          .maybeSingle();
+        if (error) throw error;
+        await this.guardarTraduccionesDescuento(id, payload.tipo_descuento ?? '');
+        return data;
+      }
+      case 'estatus_empleado': {
+        const { data, error } = await this.client
+          .from('estatus_empleado')
+          .update({
+            clave: payload.clave ?? null,
+            nombre: payload.nombre ?? null,
+            activo: payload.activo ?? null
+          })
+          .eq('id', id)
+          .select('id')
+          .maybeSingle();
+        if (error) throw error;
+        return data;
+      }
+      case 'estatus_cotizacion': {
+        const { data, error } = await this.client
+          .from('estatus_cotizacion')
+          .update({
+            clave: payload.clave ?? null,
+            nombre: payload.nombre ?? null,
+            activo: payload.activo ?? null
+          })
+          .eq('id', id)
+          .select('id')
+          .maybeSingle();
+        if (error) throw error;
+        return data;
+      }
+      case 'idiomas': {
+        const { data, error } = await this.client
+          .from('idiomas')
+          .update({
+            codigo: payload.codigo ?? null,
+            nombre: payload.nombre ?? null,
+            activo: payload.activo ?? null
+          })
+          .eq('id', id)
+          .select('id')
+          .maybeSingle();
+        if (error) throw error;
+        return data;
+      }
+      case 'origen_reservacion': {
+        const { data, error } = await this.client
+          .from('origen_reservacion')
+          .update({
+            clave: payload.clave ?? null,
+            nombre_cotizador: payload.nombre_cotizador ?? null,
+            estatus: payload.estatus ?? null
+          })
+          .eq('id', id)
+          .select('id, clave, nombre_cotizador, estatus')
+          .maybeSingle();
+        if (error) throw error;
+        return data;
+      }
+      case 'roles_empresa': {
+        const { data, error } = await this.client
+          .from('roles_empresa')
+          .update({
+            rol: payload.rol ?? null,
+            descripcion_rol: payload.descripcion_rol ?? null,
+            estatus: payload.estatus ?? null
+          })
+          .eq('id', id)
+          .select('id, rol, descripcion_rol, estatus')
+          .maybeSingle();
+        if (error) throw error;
+        return data;
+      }
+      case 'politicas': {
+        const { data, error } = await this.client
+          .from('politicas')
+          .update({
+            codigo: payload.codigo ?? null,
+            categoria: payload.categoria ?? null,
+            activo: payload.activo ?? null
+          })
+          .eq('id', id)
+          .select('id')
+          .maybeSingle();
+        if (error) throw error;
+        await this.guardarTraduccionesPolitica(id, {
+          titulo: String(payload.titulo_es ?? '').trim(),
+          descripcion: String(payload.descripcion_es ?? '').trim()
+        });
+        return data;
+      }
+      case 'regimen_hotel': {
+        const descripcion = String(payload.descripcion ?? '').trim();
+        const traducciones = await this.prepararTraduccionesRegimen(descripcion);
+        const { error: regimenError } = await this.client
+          .from('regimen')
+          .update({ descripcion })
+          .eq('id', id);
+        if (regimenError) throw regimenError;
+        const { data, error } = await this.client
+          .from('regimen_traducciones')
+          .upsert(traducciones.map((item) => ({ ...item, regimen_id: id })), { onConflict: 'regimen_id,idioma_id' })
+          .select('regimen_id');
+        if (error) throw error;
+        return data;
+      }
+      case 'tarifas': {
+        const { data, error } = await this.client
+          .from('tarifas')
+          .update({
+            clave: payload.clave ?? null,
+            nombre: payload.nombre ?? null,
+            activo: payload.activo ?? null
+          })
+          .eq('id', id)
+          .select('id')
+          .maybeSingle();
+        if (error) throw error;
+        await this.guardarRelacionesTarifaPoliticas(
+          id,
+          Array.isArray(payload.politica_ids) ? payload.politica_ids : []
+        );
+        return data;
+      }
+      case 'tipo_imagen': {
+        const { data, error } = await this.client
+          .from('tipos_imagen')
+          .update({
+            clave: payload.clave ?? null
+          })
+          .eq('id', id)
+          .select('id')
+          .maybeSingle();
+        if (error) throw error;
+        await this.guardarTraduccionesTipoImagen(id, String(payload.descripcion_es ?? '').trim());
+        return data;
+      }
+      case 'tipos_habitacion': {
+        const { data, error } = await this.client
+          .from('tipos_habitacion')
+          .update({
+            nombre_habitacion: payload.nombre_habitacion ?? null,
+            capacidad_maxima: payload.capacidad_maxima ?? null,
+            descripcion: payload.descripcion ?? null
+          })
+          .eq('id', id)
+          .select('id')
+          .maybeSingle();
+        if (error) throw error;
+        return data;
+      }
+      case 'atracciones': {
+        const { data, error } = await this.client
+          .from('catalogo_atracciones')
+          .update({
+            clave: payload.clave ?? null,
+            icono: payload.icono ?? null,
+            activo: payload.activo ?? null,
+            orden: Number.isFinite(Number(payload.orden)) ? Number(payload.orden) : null
+          })
+          .eq('id', id)
+          .select('id')
+          .maybeSingle();
+        if (error) throw error;
+
+        await this.guardarTraduccionesCatalogoAtraccion(
+          id,
+          String(payload.nombre ?? '').trim(),
+          String(payload.descripcion ?? '').trim()
+        );
+        return data;
+      }
+      default:
+        return null;
+    }
+  }
+
+  private async guardarTraduccionesPolitica(
+    politicaId: number,
+    payload: { titulo: string; descripcion: string }
+  ) {
+    const titulo = String(payload.titulo ?? '').trim();
+    const descripcion = String(payload.descripcion ?? '').trim();
+
+    if (!titulo) {
+      return;
+    }
+
+    const traducciones = await this.supabase.traducirPoliticaDesdeEspanol({
+      title: titulo,
+      description: descripcion
+    });
+
+    const traduccionesPayload = Object.entries(traducciones ?? {})
+      .map(([idioma, valor]: [string, any]) => ({
+        politica_id: politicaId,
+        idioma: String(idioma).toLowerCase(),
+        titulo:
+          String(idioma).toLowerCase() === 'es'
+            ? titulo
+            : typeof valor?.title === 'string'
+              ? valor.title
+              : '',
+        descripcion:
+          String(idioma).toLowerCase() === 'es'
+            ? descripcion
+            : typeof valor?.description === 'string'
+              ? valor.description
+              : ''
+      }))
+      .filter((item) => item.idioma.length > 0);
+
+    if (!traduccionesPayload.some((item) => item.idioma === 'es')) {
+      traduccionesPayload.push({
+        politica_id: politicaId,
+        idioma: 'es',
+        titulo,
+        descripcion
+      });
+    }
+
+    if (!traduccionesPayload.length) {
+      traduccionesPayload.push({
+        politica_id: politicaId,
+        idioma: 'es',
+        titulo,
+        descripcion
+      });
+    }
+
+    const { error } = await this.client
+      .from('politicas_traducciones')
+      .upsert(traduccionesPayload, { onConflict: 'politica_id,idioma' });
+
+    if (error) throw error;
+  }
+
+  private async guardarRelacionesTarifaPoliticas(tarifaId: number, politicaIds: number[]) {
+    const ids = [...new Set(
+      (politicaIds ?? [])
+        .map((id) => Number(id))
+        .filter((id) => Number.isFinite(id) && id > 0)
+    )];
+
+    const { error: deleteError } = await this.client
+      .from('tarifas_politicas')
+      .delete()
+      .eq('tarifa_id', tarifaId);
+
+    if (deleteError) throw deleteError;
+
+    if (!ids.length) {
+      return;
+    }
+
+    const payload = ids.map((politicaId, index) => ({
+      tarifa_id: tarifaId,
+      politica_id: politicaId,
+      orden: index + 1
+    }));
+
+    const { error: insertError } = await this.client
+      .from('tarifas_politicas')
+      .insert(payload);
+
+    if (insertError) throw insertError;
+  }
+
+  private async prepararTraduccionesRegimen(descripcion: string): Promise<Array<{ idioma_id: number; descripcion: string }>> {
+    if (!descripcion) throw new Error('La descripción del régimen es obligatoria.');
+
+    const [traducciones, idiomas] = await Promise.all([
+      this.supabase.traducirDesdeEspanol({ title: '', description: descripcion }),
+      this.supabase.obtenerIdiomasPreviewAdmin()
+    ]);
+
+    return idiomas.map((idioma) => {
+      const texto = idioma.codigo === 'es'
+        ? descripcion
+        : String(traducciones?.[idioma.codigo]?.description ?? '').trim();
+      if (!texto) throw new Error(`No se pudo generar la traducción del régimen a ${idioma.nombre}.`);
+      return { idioma_id: idioma.id, descripcion: texto };
+    });
+  }
+
+  async obtenerTraduccionesRegimenHotel(regimenId: number): Promise<Array<{ codigo: string; nombre: string; descripcion: string }>> {
+    const [idiomas, respuesta] = await Promise.all([
+      this.supabase.obtenerIdiomasPreviewAdmin(),
+      this.client.from('regimen_traducciones').select('idioma_id, descripcion').eq('regimen_id', regimenId)
+    ]);
+    if (respuesta.error) throw respuesta.error;
+
+    return idiomas.map((idioma) => ({
+      codigo: idioma.codigo,
+      nombre: idioma.nombre,
+      descripcion: respuesta.data?.find((item) => item.idioma_id === idioma.id)?.descripcion ?? ''
+    }));
+  }
+
+  private async guardarTraduccionesActividad(actividadId: number, descripcion: string) {
+    const desc = String(descripcion ?? '').trim();
+    if (!desc) {
+      return;
+    }
+
+    const traducciones = await this.supabase.traducirDesdeEspanol({
+      title: '',
+      description: desc
+    });
+
+    const idiomasDisponibles = await this.supabase.obtenerIdiomasPreviewAdmin();
+    const mapaIdiomas = new Map(idiomasDisponibles.map((i) => [i.codigo.toLowerCase(), i.id]));
+
+    const traduccionesPayload = Object.entries(traducciones ?? {})
+      .map(([idioma, valor]: [string, any]) => {
+        const idiomaId = mapaIdiomas.get(idioma.toLowerCase());
+        if (!idiomaId) {
+          return null;
+        }
+
+        return {
+          actividad_id: actividadId,
+          idioma_id: idiomaId,
+          descripcion: typeof valor?.description === 'string' ? valor.description : ''
+        };
+      })
+      .filter((item) => item !== null);
+
+    // Asegurar que el espanol este presente
+    const esId = mapaIdiomas.get('es') || ES_ID;
+    if (!traduccionesPayload.some((item) => item!.idioma_id === esId)) {
+      traduccionesPayload.push({
+        actividad_id: actividadId,
+        idioma_id: esId,
+        descripcion: desc
+      });
+    }
+
+    const { error } = await this.client
+      .from('actividades_traducciones')
+      .upsert(traduccionesPayload, { onConflict: 'actividad_id,idioma_id' });
+
+    if (error) throw error;
+  }
+
+  private async guardarTraduccionesTipoTuristico(tipoTuristicoId: number, nombre: string) {
+    const nombreLimpio = String(nombre ?? '').trim();
+    if (!nombreLimpio) {
+      return;
+    }
+
+    const traducciones = await this.supabase.traducirDesdeEspanol({
+      title: nombreLimpio,
+      description: ''
+    });
+    const idiomasDisponibles = await this.supabase.obtenerIdiomasPreviewAdmin();
+    const mapaIdiomas = new Map(idiomasDisponibles.map((idioma) => [idioma.codigo.toLowerCase(), idioma.id]));
+    const idiomaEspanolId = mapaIdiomas.get('es') || ES_ID;
+    const traduccionesPayload = Object.entries(traducciones ?? {})
+      .map(([codigo, valor]: [string, any]) => {
+        const idiomaId = mapaIdiomas.get(codigo.toLowerCase());
+        if (!idiomaId) {
+          return null;
+        }
+
+        return {
+          tipo_turistico_id: tipoTuristicoId,
+          idioma_id: idiomaId,
+          nombre: idiomaId === idiomaEspanolId ? nombreLimpio : String(valor?.title ?? '').trim()
+        };
+      })
+      .filter((traduccion) => traduccion !== null);
+
+    if (!traduccionesPayload.some((traduccion) => traduccion!.idioma_id === idiomaEspanolId)) {
+      traduccionesPayload.push({
+        tipo_turistico_id: tipoTuristicoId,
+        idioma_id: idiomaEspanolId,
+        nombre: nombreLimpio
+      });
+    }
+
+    const { error } = await this.client
+      .from('catalogo_tipos_turisticos_traducciones')
+      .upsert(traduccionesPayload, { onConflict: 'tipo_turistico_id,idioma_id' });
+    if (error) throw error;
+  }
+
+  private async guardarTraduccionesDescuento(descuentoId: number, tipoDescuento: string) {
+    const texto = String(tipoDescuento ?? '').trim();
+    if (!texto) {
+      return;
+    }
+
+    const traducciones = await this.supabase.traducirDesdeEspanol({
+      title: '',
+      description: texto
+    });
+
+    const idiomasDisponibles = await this.supabase.obtenerIdiomasPreviewAdmin();
+    const mapaIdiomas = new Map(idiomasDisponibles.map((i) => [i.codigo.toLowerCase(), i.id]));
+
+    const traduccionesPayload = Object.entries(traducciones ?? {})
+      .map(([idioma, valor]: [string, any]) => {
+        const idiomaId = mapaIdiomas.get(idioma.toLowerCase());
+        if (!idiomaId) {
+          return null;
+        }
+
+        return {
+          descuento_id: descuentoId,
+          idioma_id: idiomaId,
+          descripcion: typeof valor?.description === 'string' ? valor.description : ''
+        };
+      })
+      .filter((item) => item !== null);
+
+    const esId = mapaIdiomas.get('es') || ES_ID;
+    if (!traduccionesPayload.some((item) => item!.idioma_id === esId)) {
+      traduccionesPayload.push({
+        descuento_id: descuentoId,
+        idioma_id: esId,
+        descripcion: texto
+      });
+    }
+
+    const { error } = await this.client
+      .from('descuentos_traducciones')
+      .upsert(traduccionesPayload, { onConflict: 'descuento_id,idioma_id' });
+
+    if (error) throw error;
+  }
+
+  private async guardarTraduccionesTipoImagen(tipoImagenId: number, descripcion: string) {
+    const texto = String(descripcion ?? '').trim();
+    if (!texto) {
+      return;
+    }
+
+    const traducciones = await this.supabase.traducirDesdeEspanol({
+      title: '',
+      description: texto
+    });
+
+    const traduccionesPayload = Object.entries(traducciones ?? {})
+      .map(([idioma, valor]: [string, any]) => {
+        const lang = String(idioma).toLowerCase();
+        if (!lang) {
+          return null;
+        }
+
+        return {
+          tipo_imagen_id: tipoImagenId,
+          lang,
+          descripcion: lang === 'es' ? texto : typeof valor?.description === 'string' ? valor.description : ''
+        };
+      })
+      .filter((item) => item !== null);
+
+    const esIdioma = 'es';
+    if (!traduccionesPayload.some((item) => item!.lang === esIdioma)) {
+      traduccionesPayload.push({
+        tipo_imagen_id: tipoImagenId,
+        lang: esIdioma,
+        descripcion: texto
+      });
+    }
+
+    const { error } = await this.client
+      .from('tipos_imagen_traducciones')
+      .upsert(traduccionesPayload, { onConflict: 'tipo_imagen_id,lang' });
+
+    if (error) throw error;
+  }
+
+  private async guardarTraduccionesCatalogoAtraccion(
+    catalogoAtraccionId: number,
+    nombre: string,
+    descripcion: string
+  ) {
+    const nombreLimpio = String(nombre ?? '').trim();
+    const descripcionLimpia = String(descripcion ?? '').trim();
+
+    if (!nombreLimpio && !descripcionLimpia) {
+      return;
+    }
+
+    const traducciones = await this.supabase.traducirDesdeEspanol({
+      title: nombreLimpio,
+      description: descripcionLimpia
+    });
+
+    const idiomasDisponibles = await this.supabase.obtenerIdiomasPreviewAdmin();
+    const mapaIdiomas = new Map(idiomasDisponibles.map((i) => [i.codigo.toLowerCase(), i.id]));
+
+    const traduccionesPayload = Object.entries(traducciones ?? {})
+      .map(([idioma, valor]: [string, any]) => {
+        const idiomaId = mapaIdiomas.get(String(idioma).toLowerCase());
+        if (!idiomaId) {
+          return null;
+        }
+
+        return {
+          catalogo_atraccion_id: catalogoAtraccionId,
+          idioma_id: idiomaId,
+          nombre: typeof valor?.title === 'string' ? valor.title : '',
+          descripcion: typeof valor?.description === 'string' ? valor.description : ''
+        };
+      })
+      .filter((item) => item !== null);
+
+    const esId = mapaIdiomas.get('es') || ES_ID;
+    if (!traduccionesPayload.some((item) => item!.idioma_id === esId)) {
+      traduccionesPayload.push({
+        catalogo_atraccion_id: catalogoAtraccionId,
+        idioma_id: esId,
+        nombre: nombreLimpio,
+        descripcion: descripcionLimpia
+      });
+    } else {
+      for (const item of traduccionesPayload) {
+        if (item!.idioma_id === esId) {
+          item!.nombre = nombreLimpio;
+          item!.descripcion = descripcionLimpia;
+        }
+      }
+    }
+
+    const { error } = await this.client
+      .from('catalogo_atracciones_traducciones')
+      .upsert(traduccionesPayload, { onConflict: 'catalogo_atraccion_id,idioma_id' });
+
+    if (error) throw error;
+  }
+
+}

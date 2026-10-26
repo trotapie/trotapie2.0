@@ -1,0 +1,23 @@
+:host{display:block}.catalog-summary{display:flex;align-items:center;justify-content:space-between;gap:24px;margin-bottom:20px;padding:20px 24px;border-radius:24px;background:var(--surface)}.catalog-summary>div{display:flex;align-items:center;gap:16px}.catalog-summary>div>tp-icon{box-sizing:content-box;padding:16px;background:var(--brand-soft);color:var(--brand);border-radius:18px}.catalog-summary small{display:block;font-size:11px;color:var(--muted)}.catalog-summary strong{display:block;font-size:28px;font-weight:500;letter-spacing:-.04em}.catalog-summary>span{font-size:11px;max-width:360px;color:var(--muted);text-align:right}.editor-specific-actions{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:20px}.delete-area{padding-top:24px;margin-top:20px;border-top:1px solid var(--line)}
+@media(max-width:700px){.catalog-summary{padding:18px}.catalog-summary>span{display:none}.catalog-panel{padding:16px}.editor-specific-actions .btn{width:100%}}
+:host .destination-type-select { width:210px; min-width:180px; }
+:host .quote-type-select { width:180px; min-width:160px; }
+@media(max-width:600px){:host .destination-type-select{width:100%;flex-basis:100%;}}
+.catalog-panel tp-filter-bar button.btn { min-height:48px; }
+.catalog-panel tp-filter-bar button.btn-icon { width:48px; }
+.catalog-panel .view-options { height:48px; box-sizing:border-box; align-items:center; }
+.catalog-panel .view-options button.btn-icon { width:42px; min-height:42px; }
+.catalog-panel tp-filter-bar { display:flow-root; position:sticky; top:0; z-index:3; background:var(--surface); padding-top:12px; }
+.catalog-panel tp-filter-bar::before { content:''; position:absolute; top:-24px; left:-24px; right:-24px; height:24px; border-radius:24px 24px 0 0; background:var(--surface); pointer-events:none; }
+.catalog-panel .card-grid { max-height:none; overflow:visible; align-content:start; }
+.catalog-panel tp-quote-column-filters { display:block; position:sticky; top:var(--catalog-toolbar-height,0px); z-index:3; background:var(--surface); margin:0; padding:12px 0 24px; }
+.record-card { position:relative; min-width:0; height:100%; }
+.record-card-menu { position:absolute; right:12px; bottom:12px; z-index:1; }
+
+@media(max-width:600px){
+ .catalog-panel{min-width:0;padding:12px}
+ .catalog-panel tp-filter-bar{padding-top:8px}
+ .catalog-panel tp-filter-bar::before{left:-12px;right:-12px;top:-12px;height:12px;border-radius:18px 18px 0 0}
+ .catalog-panel .pagination{flex-wrap:wrap;gap:12px}
+ .catalog-panel .pagination-actions{margin-left:auto}
+}

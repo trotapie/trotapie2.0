@@ -1,0 +1,37 @@
+<section class="hotel-information" [attr.aria-label]="text('Información de tu estancia', 'Stay information')">
+  <div class="section-heading"><span class="eyebrow">{{ text('Todo para tu estancia', 'Everything for your stay') }}</span><h2>{{ text('Conoce tu hotel', 'Get to know your hotel') }}</h2></div>
+  <div class="hotel-tabs" role="tablist" [attr.aria-label]="text('Información del hotel', 'Hotel information')">
+    @for (tab of tabs(); track $index) {
+      <button type="button" role="tab" [id]="tabId($index)" [attr.aria-selected]="selected() === $index" [attr.aria-controls]="panelId()" [attr.tabindex]="selected() === $index ? 0 : -1" [class.selected]="selected() === $index" (click)="select($index)" (keydown)="navigateTabs($event, $index)"><tp-icon [name]="tab.icon" /><span>{{ tab.label }}</span></button>
+    }
+  </div>
+  <div #panel class="hotel-panel" role="tabpanel" [id]="panelId()" [attr.aria-labelledby]="tabId(selected())" tabindex="0">
+    @switch (selected()) {
+      @case (0) {
+        <h3>{{ text('Planea tu llegada', 'Plan your arrival') }}</h3>
+        <div class="schedule-grid">
+          @for (item of schedules(); track item.label) {
+            <article><span>{{ item.label }}</span><strong [class.missing]="!item.value">{{ item.value || text('Por confirmar', 'To be confirmed') }}</strong></article>
+          }
+        </div>
+        <p class="note">{{ text('Consulta con tu asesor la disponibilidad para llegadas anticipadas y salidas tardías.', 'Ask your adviser about early arrivals and late departures.') }}</p>
+      }
+      @case (1) { <h3>{{ text('Una estancia a tu manera', 'A stay your way') }}</h3><p class="description">{{ hotel().descripcion || text('La descripción de este hotel estará disponible próximamente.', 'This hotel description will be available soon.') }}</p> }
+      @case (2) {
+        <h3>{{ text('Detalles que hacen la diferencia', 'Details that make a difference') }}</h3>
+        @if (hotel().actividades?.length) {
+          <ul class="amenity-grid">@for (item of hotel().actividades; track $index) { <li><tp-icon name="check" /><span>{{ item.descripcion || item.nombre }}</span></li> }</ul>
+        } @else { <p class="note">{{ text('Consulta con tu asesor las amenidades disponibles en este hotel.', 'Ask your adviser about amenities available at this hotel.') }}</p> }
+      }
+      @case (3) { <h3>{{ regimen() }}</h3>
+        <ul class="plan-options"><li>{{ regimen() }}</li></ul>
+        <p class="description">{{ hotel().plan_todo_incluido?.descripcion || text('Consulta con tu asesor qué incluye este régimen y las condiciones de tu reserva.', 'Ask your adviser what this plan includes and about your booking conditions.') }}</p>
+      }
+    }
+  </div>
+  <div class="hotel-actions">
+    <button tpButton type="button" icon="pin" [disabled]="!hotel().ubicacion" (click)="locationRequested.emit()">{{ text('Ubicación', 'Location') }}</button>
+    <button tpButton type="button" icon="share" [disabled]="sharing()" (click)="share()">{{ text('Compartir hotel', 'Share hotel') }}</button>
+    <a tpButton variant="primary" icon="quote" [routerLink]="['/solicitar', hotel().id]">{{ text('Cotizar mi estancia', 'Request a quote') }}</a>
+  </div>
+</section>

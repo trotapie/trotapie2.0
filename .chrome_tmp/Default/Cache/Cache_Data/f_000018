@@ -1,0 +1,196 @@
+import { injectQuery as __vite__injectQuery } from "/@vite/client";import { createHotContext as __vite__createHotContext } from "/@vite/client";import.meta.hot = __vite__createHotContext("/chunk-G4SW3N62.js");import {
+  Badge
+} from "/chunk-LASGCAPN.js";
+import {
+  MotionDirective,
+  motion_directive_exports
+} from "/chunk-4C25L5N4.js";
+import {
+  Icon
+} from "/chunk-DHOAVJG5.js";
+
+// src/app/shared/components/image-card/image-card.ts
+import { Component, input, output } from "/@fs/D:/Users/Alex_Saenz/Documents/Proyectos/Rediseño trotapie/Trotapie nuevo/.angular/cache/22.2.2/trotapie/vite/deps/@angular_core.js?v=e11bbf10";
+import * as i0 from "/@fs/D:/Users/Alex_Saenz/Documents/Proyectos/Rediseño trotapie/Trotapie nuevo/.angular/cache/22.2.2/trotapie/vite/deps/@angular_core.js?v=e11bbf10";
+function ImageCard_Conditional_2_Template(rf, ctx) {
+  if (rf & 1) {
+    const _r1 = i0.\u0275\u0275getCurrentView();
+    i0.\u0275\u0275elementStart(0, "img", 11);
+    i0.\u0275\u0275listener("error", function ImageCard_Conditional_2_Template_img_error_0_listener($event) {
+      i0.\u0275\u0275restoreView(_r1);
+      const ctx_r1 = i0.\u0275\u0275nextContext();
+      return i0.\u0275\u0275resetView(ctx_r1.imageError($event));
+    });
+    i0.\u0275\u0275elementEnd();
+  }
+  if (rf & 2) {
+    const ctx_r1 = i0.\u0275\u0275nextContext();
+    i0.\u0275\u0275property("src", ctx_r1.record().image)("alt", ctx_r1.record().title);
+  }
+}
+function ImageCard_Conditional_3_Template(rf, ctx) {
+  if (rf & 1) {
+    i0.\u0275\u0275element(0, "tp-icon", 3);
+  }
+}
+function ImageCard_Conditional_7_Template(rf, ctx) {
+  if (rf & 1) {
+    i0.\u0275\u0275elementStart(0, "span", 7);
+    i0.\u0275\u0275text(1);
+    i0.\u0275\u0275elementEnd();
+  }
+  if (rf & 2) {
+    const ctx_r1 = i0.\u0275\u0275nextContext();
+    i0.\u0275\u0275advance();
+    i0.\u0275\u0275textInterpolate(ctx_r1.record().subtitle);
+  }
+}
+function ImageCard_Conditional_11_Template(rf, ctx) {
+  if (rf & 1) {
+    i0.\u0275\u0275element(0, "tp-badge", 9);
+  }
+  if (rf & 2) {
+    const ctx_r1 = i0.\u0275\u0275nextContext();
+    i0.\u0275\u0275property("label", ctx_r1.record().status);
+  }
+}
+function ImageCard_Conditional_12_Template(rf, ctx) {
+  if (rf & 1) {
+    i0.\u0275\u0275elementStart(0, "span");
+    i0.\u0275\u0275text(1);
+    i0.\u0275\u0275elementEnd();
+  }
+  if (rf & 2) {
+    const ctx_r1 = i0.\u0275\u0275nextContext();
+    i0.\u0275\u0275advance();
+    i0.\u0275\u0275textInterpolate(ctx_r1.label());
+  }
+}
+var ImageCard = class _ImageCard {
+  record = input.required(
+    ...ngDevMode ? [{ debugName: "record" }] : (
+      /* istanbul ignore next */
+      []
+    )
+  );
+  label = input(
+    "Descubrir destino",
+    ...ngDevMode ? [{ debugName: "label" }] : (
+      /* istanbul ignore next */
+      []
+    )
+  );
+  imageFit = input(
+    "cover",
+    ...ngDevMode ? [{ debugName: "imageFit" }] : (
+      /* istanbul ignore next */
+      []
+    )
+  );
+  showStatus = input(
+    true,
+    ...ngDevMode ? [{ debugName: "showStatus" }] : (
+      /* istanbul ignore next */
+      []
+    )
+  );
+  selected = output();
+  imageError(e) {
+    e.target.src = "/brand/iso.png";
+  }
+  static \u0275fac = function ImageCard_Factory(__ngFactoryType__) {
+    return new (__ngFactoryType__ || _ImageCard)();
+  };
+  static \u0275cmp = /* @__PURE__ */ i0.\u0275\u0275defineComponent({ type: _ImageCard, selectors: [["tp-image-card"]], inputs: { record: [1, "record"], label: [1, "label"], imageFit: [1, "imageFit"], showStatus: [1, "showStatus"] }, outputs: { selected: "selected" }, features: [i0.\u0275\u0275HostDirectivesFeature([MotionDirective])], decls: 14, vars: 6, consts: [["type", "button", 1, "image-card", 3, "click"], [1, "image-card-photo"], ["loading", "lazy", "decoding", "async", 3, "src", "alt"], ["name", "landscape"], [1, "card-arrow"], ["name", "arrow"], [1, "image-card-body"], [1, "image-card-kicker"], [1, "image-card-bottom"], [3, "label"], ["name", "right"], ["loading", "lazy", "decoding", "async", 3, "error", "src", "alt"]], template: function ImageCard_Template(rf, ctx) {
+    if (rf & 1) {
+      i0.\u0275\u0275elementStart(0, "button", 0);
+      i0.\u0275\u0275listener("click", function ImageCard_Template_button_click_0_listener() {
+        return ctx.selected.emit(ctx.record());
+      });
+      i0.\u0275\u0275elementStart(1, "div", 1);
+      i0.\u0275\u0275conditionalCreate(2, ImageCard_Conditional_2_Template, 1, 2, "img", 2)(3, ImageCard_Conditional_3_Template, 1, 0, "tp-icon", 3);
+      i0.\u0275\u0275elementStart(4, "span", 4);
+      i0.\u0275\u0275element(5, "tp-icon", 5);
+      i0.\u0275\u0275elementEnd()();
+      i0.\u0275\u0275elementStart(6, "div", 6);
+      i0.\u0275\u0275conditionalCreate(7, ImageCard_Conditional_7_Template, 2, 1, "span", 7);
+      i0.\u0275\u0275elementStart(8, "h3");
+      i0.\u0275\u0275text(9);
+      i0.\u0275\u0275elementEnd();
+      i0.\u0275\u0275elementStart(10, "div", 8);
+      i0.\u0275\u0275conditionalCreate(11, ImageCard_Conditional_11_Template, 1, 1, "tp-badge", 9)(12, ImageCard_Conditional_12_Template, 2, 1, "span");
+      i0.\u0275\u0275element(13, "tp-icon", 10);
+      i0.\u0275\u0275elementEnd()()();
+    }
+    if (rf & 2) {
+      i0.\u0275\u0275advance();
+      i0.\u0275\u0275classProp("image-card-photo-contain", ctx.imageFit() === "contain");
+      i0.\u0275\u0275advance();
+      i0.\u0275\u0275conditional(ctx.record().image ? 2 : 3);
+      i0.\u0275\u0275advance(5);
+      i0.\u0275\u0275conditional(ctx.record().subtitle ? 7 : -1);
+      i0.\u0275\u0275advance(2);
+      i0.\u0275\u0275textInterpolate(ctx.record().title);
+      i0.\u0275\u0275advance(2);
+      i0.\u0275\u0275conditional(ctx.showStatus() && ctx.record().status ? 11 : 12);
+    }
+  }, dependencies: [Icon, Badge], styles: ["\n[_nghost-%COMP%] {\n  display: block;\n  min-width: 0;\n  height: 100%;\n}\n.image-card[_ngcontent-%COMP%] {\n  display: flex;\n  flex-direction: column;\n  text-align: left;\n  padding: 0;\n  width: 100%;\n  height: 100%;\n  background: var(--%NS%card-surface, var(--%NS%surface));\n  border: 1px solid var(--%NS%card-border, var(--%NS%line));\n  border-radius: 18px;\n  overflow: hidden;\n  transition: transform 200ms, border-color 200ms;\n}\n.image-card[_ngcontent-%COMP%]:hover {\n  transform: translateY(-2px);\n  border-color: var(--%NS%muted);\n}\n.image-card-photo[_ngcontent-%COMP%] {\n  position: relative;\n  display: grid;\n  place-items: center;\n  width: 100%;\n  height: 116px;\n  flex: 0 0 116px;\n  background: var(--%NS%brand-soft);\n  color: var(--%NS%brand);\n  overflow: hidden;\n}\n.image-card-photo[_ngcontent-%COMP%]    > img[_ngcontent-%COMP%] {\n  position: absolute;\n  inset: 0;\n  width: 100%;\n  height: 100%;\n  object-fit: cover;\n}\n.image-card-photo-contain[_ngcontent-%COMP%]    > img[_ngcontent-%COMP%] {\n  object-fit: contain;\n  padding: 18px;\n}\n.card-arrow[_ngcontent-%COMP%] {\n  position: absolute;\n  top: 8px;\n  right: 8px;\n  display: grid;\n  place-items: center;\n  width: 28px;\n  height: 28px;\n  border-radius: 50%;\n  color: white;\n  background: #202420;\n}\n.card-arrow[_ngcontent-%COMP%]   tp-icon[_ngcontent-%COMP%] {\n  width: 14px;\n  height: 14px;\n}\n.image-card-body[_ngcontent-%COMP%] {\n  padding: 12px;\n  width: 100%;\n  min-width: 0;\n  flex: 1;\n  display: flex;\n  flex-direction: column;\n}\n.image-card-kicker[_ngcontent-%COMP%] {\n  font-size: 10px;\n  color: var(--%NS%muted);\n  overflow-wrap: anywhere;\n}\n.image-card[_ngcontent-%COMP%]   h3[_ngcontent-%COMP%] {\n  margin: 4px 0 10px;\n  font-size: 14px;\n  line-height: 1.4;\n  overflow-wrap: anywhere;\n}\n.image-card-bottom[_ngcontent-%COMP%] {\n  display: flex;\n  justify-content: space-between;\n  align-items: center;\n  gap: 8px;\n  margin-top: auto;\n  font-size: 10px;\n  color: var(--%NS%muted);\n}\n@media (max-width: 600px) {\n  .image-card[_ngcontent-%COMP%] {\n    flex-direction: row;\n    min-height: 112px;\n  }\n  .image-card-photo[_ngcontent-%COMP%] {\n    width: 96px;\n    height: auto;\n    align-self: stretch;\n    flex: 0 0 96px;\n  }\n  .image-card-photo-contain[_ngcontent-%COMP%]    > img[_ngcontent-%COMP%] {\n    padding: 12px;\n  }\n  .card-arrow[_ngcontent-%COMP%] {\n    display: none;\n  }\n}\n/*# sourceMappingURL=image-card.css.map */"] });
+};
+(() => {
+  (typeof ngDevMode === "undefined" || ngDevMode) && i0.\u0275setClassMetadata(ImageCard, [{
+    type: Component,
+    args: [{ selector: "tp-image-card", hostDirectives: [MotionDirective], imports: [Icon, Badge], template: `<button type="button" class="image-card" (click)="selected.emit(record())">
+  <div class="image-card-photo" [class.image-card-photo-contain]="imageFit() === 'contain'">
+    @if (record().image) {
+      <img
+        [src]="record().image"
+        [alt]="record().title"
+        loading="lazy"
+        decoding="async"
+        (error)="imageError($event)"
+      />
+    } @else {
+      <tp-icon name="landscape" />
+    }
+    <span class="card-arrow"><tp-icon name="arrow" /></span>
+  </div>
+  <div class="image-card-body">
+    @if (record().subtitle) {
+      <span class="image-card-kicker">{{ record().subtitle }}</span>
+    }
+    <h3>{{ record().title }}</h3>
+    <div class="image-card-bottom">
+      @if (showStatus() && record().status) {
+        <tp-badge [label]="record().status" />
+      } @else {
+        <span>{{ label() }}</span>
+      }
+      <tp-icon name="right" />
+    </div>
+  </div>
+</button>
+`, styles: ["/* src/app/shared/components/image-card/image-card.scss */\n:host {\n  display: block;\n  min-width: 0;\n  height: 100%;\n}\n.image-card {\n  display: flex;\n  flex-direction: column;\n  text-align: left;\n  padding: 0;\n  width: 100%;\n  height: 100%;\n  background: var(--card-surface, var(--surface));\n  border: 1px solid var(--card-border, var(--line));\n  border-radius: 18px;\n  overflow: hidden;\n  transition: transform 200ms, border-color 200ms;\n}\n.image-card:hover {\n  transform: translateY(-2px);\n  border-color: var(--muted);\n}\n.image-card-photo {\n  position: relative;\n  display: grid;\n  place-items: center;\n  width: 100%;\n  height: 116px;\n  flex: 0 0 116px;\n  background: var(--brand-soft);\n  color: var(--brand);\n  overflow: hidden;\n}\n.image-card-photo > img {\n  position: absolute;\n  inset: 0;\n  width: 100%;\n  height: 100%;\n  object-fit: cover;\n}\n.image-card-photo-contain > img {\n  object-fit: contain;\n  padding: 18px;\n}\n.card-arrow {\n  position: absolute;\n  top: 8px;\n  right: 8px;\n  display: grid;\n  place-items: center;\n  width: 28px;\n  height: 28px;\n  border-radius: 50%;\n  color: white;\n  background: #202420;\n}\n.card-arrow tp-icon {\n  width: 14px;\n  height: 14px;\n}\n.image-card-body {\n  padding: 12px;\n  width: 100%;\n  min-width: 0;\n  flex: 1;\n  display: flex;\n  flex-direction: column;\n}\n.image-card-kicker {\n  font-size: 10px;\n  color: var(--muted);\n  overflow-wrap: anywhere;\n}\n.image-card h3 {\n  margin: 4px 0 10px;\n  font-size: 14px;\n  line-height: 1.4;\n  overflow-wrap: anywhere;\n}\n.image-card-bottom {\n  display: flex;\n  justify-content: space-between;\n  align-items: center;\n  gap: 8px;\n  margin-top: auto;\n  font-size: 10px;\n  color: var(--muted);\n}\n@media (max-width: 600px) {\n  .image-card {\n    flex-direction: row;\n    min-height: 112px;\n  }\n  .image-card-photo {\n    width: 96px;\n    height: auto;\n    align-self: stretch;\n    flex: 0 0 96px;\n  }\n  .image-card-photo-contain > img {\n    padding: 12px;\n  }\n  .card-arrow {\n    display: none;\n  }\n}\n/*# sourceMappingURL=image-card.css.map */\n"] }]
+  }], null, { record: [{ type: i0.Input, args: [{ isSignal: true, alias: "record", required: true }] }], label: [{ type: i0.Input, args: [{ isSignal: true, alias: "label", required: false }] }], imageFit: [{ type: i0.Input, args: [{ isSignal: true, alias: "imageFit", required: false }] }], showStatus: [{ type: i0.Input, args: [{ isSignal: true, alias: "showStatus", required: false }] }], selected: [{ type: i0.Output, args: ["selected"] }] });
+})();
+(() => {
+  (typeof ngDevMode === "undefined" || ngDevMode) && i0.\u0275setClassDebugInfo(ImageCard, { className: "ImageCard", filePath: "src/app/shared/components/image-card/image-card.ts", lineNumber: 13 });
+})();
+(() => {
+  const id = "src%2Fapp%2Fshared%2Fcomponents%2Fimage-card%2Fimage-card.ts%40ImageCard";
+  function ImageCard_HmrLoad(t) {
+    import(
+      /* @vite-ignore */
+      __vite__injectQuery(i0.\u0275\u0275getReplaceMetadataURL(id, t, import.meta.url), 'import')
+    ).then((m) => m.default && i0.\u0275\u0275replaceMetadata(ImageCard, m.default, [i0, motion_directive_exports], [Icon, Badge, Component, MotionDirective], import.meta, id));
+  }
+  (typeof ngDevMode === "undefined" || ngDevMode) && ImageCard_HmrLoad(Date.now());
+  (typeof ngDevMode === "undefined" || ngDevMode) && (import.meta.hot && import.meta.hot.on("angular:component-update", (d) => d.id === id && ImageCard_HmrLoad(d.timestamp)));
+})();
+
+export {
+  ImageCard
+};
+//# debugId=e59a1186-4d00-5a17-8ff1-a0a825a58292
+
+
+//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbInNyYy9hcHAvc2hhcmVkL2NvbXBvbmVudHMvaW1hZ2UtY2FyZC9pbWFnZS1jYXJkLnRzIiwic3JjL2FwcC9zaGFyZWQvY29tcG9uZW50cy9pbWFnZS1jYXJkL2ltYWdlLWNhcmQuaHRtbCJdLCJzb3VyY2VzQ29udGVudCI6WyJpbXBvcnQgeyBDb21wb25lbnQsIGlucHV0LCBvdXRwdXQgfSBmcm9tICdAYW5ndWxhci9jb3JlJztcbmltcG9ydCB7IEljb24gfSBmcm9tICcuLi9pY29uL2ljb24nO1xuaW1wb3J0IHsgQmFkZ2UgfSBmcm9tICcuLi9iYWRnZS9iYWRnZSc7XG5pbXBvcnQgeyBNb3Rpb25EaXJlY3RpdmUgfSBmcm9tICcuLi8uLi9kaXJlY3RpdmVzL21vdGlvbi5kaXJlY3RpdmUnO1xuaW1wb3J0IHR5cGUgeyBUcmF2ZWxSZWNvcmQgfSBmcm9tICcuLi8uLi8uLi9kYXRhL2ZhY2FkZXMvdHJhdmVsLWRhdGEuc2VydmljZSc7XG5AQ29tcG9uZW50KHtcbiAgc2VsZWN0b3I6ICd0cC1pbWFnZS1jYXJkJyxcbiAgaG9zdERpcmVjdGl2ZXM6IFtNb3Rpb25EaXJlY3RpdmVdLFxuICBpbXBvcnRzOiBbSWNvbiwgQmFkZ2VdLFxuICB0ZW1wbGF0ZVVybDogJy4vaW1hZ2UtY2FyZC5odG1sJyxcbiAgc3R5bGVVcmw6ICcuL2ltYWdlLWNhcmQuc2NzcycsXG59KVxuZXhwb3J0IGNsYXNzIEltYWdlQ2FyZCB7XG4gIHJlY29yZCA9IGlucHV0LnJlcXVpcmVkPFRyYXZlbFJlY29yZD4oKTtcbiAgbGFiZWwgPSBpbnB1dCgnRGVzY3VicmlyIGRlc3Rpbm8nKTtcbiAgaW1hZ2VGaXQgPSBpbnB1dDwnY292ZXInIHwgJ2NvbnRhaW4nPignY292ZXInKTtcbiAgc2hvd1N0YXR1cyA9IGlucHV0KHRydWUpO1xuICBzZWxlY3RlZCA9IG91dHB1dDxUcmF2ZWxSZWNvcmQ+KCk7XG4gIGltYWdlRXJyb3IoZTogRXZlbnQpIHtcbiAgICAoZS50YXJnZXQgYXMgSFRNTEltYWdlRWxlbWVudCkuc3JjID0gJy9icmFuZC9pc28ucG5nJztcbiAgfVxufVxuIiwiPGJ1dHRvbiB0eXBlPVwiYnV0dG9uXCIgY2xhc3M9XCJpbWFnZS1jYXJkXCIgKGNsaWNrKT1cInNlbGVjdGVkLmVtaXQocmVjb3JkKCkpXCI+XG4gIDxkaXYgY2xhc3M9XCJpbWFnZS1jYXJkLXBob3RvXCIgW2NsYXNzLmltYWdlLWNhcmQtcGhvdG8tY29udGFpbl09XCJpbWFnZUZpdCgpID09PSAnY29udGFpbidcIj5cbiAgICBAaWYgKHJlY29yZCgpLmltYWdlKSB7XG4gICAgICA8aW1nXG4gICAgICAgIFtzcmNdPVwicmVjb3JkKCkuaW1hZ2VcIlxuICAgICAgICBbYWx0XT1cInJlY29yZCgpLnRpdGxlXCJcbiAgICAgICAgbG9hZGluZz1cImxhenlcIlxuICAgICAgICBkZWNvZGluZz1cImFzeW5jXCJcbiAgICAgICAgKGVycm9yKT1cImltYWdlRXJyb3IoJGV2ZW50KVwiXG4gICAgICAvPlxuICAgIH0gQGVsc2Uge1xuICAgICAgPHRwLWljb24gbmFtZT1cImxhbmRzY2FwZVwiIC8+XG4gICAgfVxuICAgIDxzcGFuIGNsYXNzPVwiY2FyZC1hcnJvd1wiPjx0cC1pY29uIG5hbWU9XCJhcnJvd1wiIC8+PC9zcGFuPlxuICA8L2Rpdj5cbiAgPGRpdiBjbGFzcz1cImltYWdlLWNhcmQtYm9keVwiPlxuICAgIEBpZiAocmVjb3JkKCkuc3VidGl0bGUpIHtcbiAgICAgIDxzcGFuIGNsYXNzPVwiaW1hZ2UtY2FyZC1raWNrZXJcIj57eyByZWNvcmQoKS5zdWJ0aXRsZSB9fTwvc3Bhbj5cbiAgICB9XG4gICAgPGgzPnt7IHJlY29yZCgpLnRpdGxlIH19PC9oMz5cbiAgICA8ZGl2IGNsYXNzPVwiaW1hZ2UtY2FyZC1ib3R0b21cIj5cbiAgICAgIEBpZiAoc2hvd1N0YXR1cygpICYmIHJlY29yZCgpLnN0YXR1cykge1xuICAgICAgICA8dHAtYmFkZ2UgW2xhYmVsXT1cInJlY29yZCgpLnN0YXR1c1wiIC8+XG4gICAgICB9IEBlbHNlIHtcbiAgICAgICAgPHNwYW4+e3sgbGFiZWwoKSB9fTwvc3Bhbj5cbiAgICAgIH1cbiAgICAgIDx0cC1pY29uIG5hbWU9XCJyaWdodFwiIC8+XG4gICAgPC9kaXY+XG4gIDwvZGl2PlxuPC9idXR0b24+XG4iXSwibWFwcGluZ3MiOiI7Ozs7Ozs7Ozs7OztBQUFBLFNBQVMsV0FBVyxPQUFPLGNBQWM7QTs7OztBQ0duQyxJQUFBLDRCQUFBLEdBQUEsT0FBQSxFQUFBO0FBS0UsSUFBQSx3QkFBQSxTQUFBLFNBQUEsc0RBQUEsUUFBQTtBQUFBLE1BQUEsMkJBQUEsR0FBQTtBQUFBLFlBQUEsU0FBQSwyQkFBQTtBQUFBLGFBQUEseUJBQVMsT0FBQSxXQUFBLE1BQUEsQ0FBa0I7SUFBQSxDQUFBO0FBTDdCLElBQUEsMEJBQUE7Ozs7QUFDRSxJQUFBLHdCQUFBLE9BQUEsT0FBQSxPQUFBLEVBQUEsS0FBQSxFQUFzQixPQUFBLE9BQUEsT0FBQSxFQUFBLEtBQUE7Ozs7O0FBT3hCLElBQUEsdUJBQUEsR0FBQSxXQUFBLENBQUE7Ozs7O0FBTUEsSUFBQSw0QkFBQSxHQUFBLFFBQUEsQ0FBQTtBQUFnQyxJQUFBLG9CQUFBLENBQUE7QUFBdUIsSUFBQSwwQkFBQTs7OztBQUF2QixJQUFBLHVCQUFBO0FBQUEsSUFBQSwrQkFBQSxPQUFBLE9BQUEsRUFBQSxRQUFBOzs7OztBQUs5QixJQUFBLHVCQUFBLEdBQUEsWUFBQSxDQUFBOzs7O0FBQVUsSUFBQSx3QkFBQSxTQUFBLE9BQUEsT0FBQSxFQUFBLE1BQUE7Ozs7O0FBRVYsSUFBQSw0QkFBQSxHQUFBLE1BQUE7QUFBTSxJQUFBLG9CQUFBLENBQUE7QUFBYSxJQUFBLDBCQUFBOzs7O0FBQWIsSUFBQSx1QkFBQTtBQUFBLElBQUEsK0JBQUEsT0FBQSxNQUFBLENBQUE7OztBRFpSLElBQU8sWUFBUCxNQUFPLFdBQVM7RUFDcEIsU0FBUyxNQUFNOzs7Ozs7RUFDZixRQUFRO0lBQU07Ozs7OztFQUNkLFdBQVc7SUFBMkI7Ozs7OztFQUN0QyxhQUFhO0lBQU07Ozs7OztFQUNuQixXQUFXLE9BQW1CO0VBQzlCLFdBQVcsR0FBUTtBQUNqQixJQUFDLEVBQUUsT0FBNEIsTUFBTTtFQUN2Qzs7cUNBUlcsWUFBUztFQUFBOzRFQUFULFlBQVMsV0FBQSxDQUFBLENBQUEsZUFBQSxDQUFBLEdBQUEsUUFBQSxFQUFBLFFBQUEsQ0FBQSxHQUFBLFFBQUEsR0FBQSxPQUFBLENBQUEsR0FBQSxPQUFBLEdBQUEsVUFBQSxDQUFBLEdBQUEsVUFBQSxHQUFBLFlBQUEsQ0FBQSxHQUFBLFlBQUEsRUFBQSxHQUFBLFNBQUEsRUFBQSxVQUFBLFdBQUEsR0FBQSxVQUFBLENBQUEscUNBQUEsQ0FBQSxlQUFBLENBQUEsQ0FBQSxHQUFBLE9BQUEsSUFBQSxNQUFBLEdBQUEsUUFBQSxDQUFBLENBQUEsUUFBQSxVQUFBLEdBQUEsY0FBQSxHQUFBLE9BQUEsR0FBQSxDQUFBLEdBQUEsa0JBQUEsR0FBQSxDQUFBLFdBQUEsUUFBQSxZQUFBLFNBQUEsR0FBQSxPQUFBLEtBQUEsR0FBQSxDQUFBLFFBQUEsV0FBQSxHQUFBLENBQUEsR0FBQSxZQUFBLEdBQUEsQ0FBQSxRQUFBLE9BQUEsR0FBQSxDQUFBLEdBQUEsaUJBQUEsR0FBQSxDQUFBLEdBQUEsbUJBQUEsR0FBQSxDQUFBLEdBQUEsbUJBQUEsR0FBQSxDQUFBLEdBQUEsT0FBQSxHQUFBLENBQUEsUUFBQSxPQUFBLEdBQUEsQ0FBQSxXQUFBLFFBQUEsWUFBQSxTQUFBLEdBQUEsU0FBQSxPQUFBLEtBQUEsQ0FBQSxHQUFBLFVBQUEsU0FBQSxtQkFBQSxJQUFBLEtBQUE7QUFBQSxRQUFBLEtBQUEsR0FBQTtBQ1p0QixNQUFBLDRCQUFBLEdBQUEsVUFBQSxDQUFBO0FBQXlDLE1BQUEsd0JBQUEsU0FBQSxTQUFBLDZDQUFBO0FBQUEsZUFBUyxJQUFBLFNBQUEsS0FBYyxJQUFBLE9BQUEsQ0FBUTtNQUFDLENBQUE7QUFDdkUsTUFBQSw0QkFBQSxHQUFBLE9BQUEsQ0FBQTtBQUNFLE1BQUEsaUNBQUEsR0FBQSxrQ0FBQSxHQUFBLEdBQUEsT0FBQSxDQUFBLEVBQXNCLEdBQUEsa0NBQUEsR0FBQSxHQUFBLFdBQUEsQ0FBQTtBQVd0QixNQUFBLDRCQUFBLEdBQUEsUUFBQSxDQUFBO0FBQXlCLE1BQUEsdUJBQUEsR0FBQSxXQUFBLENBQUE7QUFBd0IsTUFBQSwwQkFBQSxFQUFPO0FBRTFELE1BQUEsNEJBQUEsR0FBQSxPQUFBLENBQUE7QUFDRSxNQUFBLGlDQUFBLEdBQUEsa0NBQUEsR0FBQSxHQUFBLFFBQUEsQ0FBQTtBQUdBLE1BQUEsNEJBQUEsR0FBQSxJQUFBO0FBQUksTUFBQSxvQkFBQSxDQUFBO0FBQW9CLE1BQUEsMEJBQUE7QUFDeEIsTUFBQSw0QkFBQSxJQUFBLE9BQUEsQ0FBQTtBQUNFLE1BQUEsaUNBQUEsSUFBQSxtQ0FBQSxHQUFBLEdBQUEsWUFBQSxDQUFBLEVBQXVDLElBQUEsbUNBQUEsR0FBQSxHQUFBLE1BQUE7QUFLdkMsTUFBQSx1QkFBQSxJQUFBLFdBQUEsRUFBQTtBQUNGLE1BQUEsMEJBQUEsRUFBTSxFQUNGOzs7QUEzQndCLE1BQUEsdUJBQUE7QUFBQSxNQUFBLHlCQUFBLDRCQUFBLElBQUEsU0FBQSxNQUFBLFNBQUE7QUFDNUIsTUFBQSx1QkFBQTtBQUFBLE1BQUEsMkJBQUEsSUFBQSxPQUFBLEVBQUEsUUFBQSxJQUFBLENBQUE7QUFjQSxNQUFBLHVCQUFBLENBQUE7QUFBQSxNQUFBLDJCQUFBLElBQUEsT0FBQSxFQUFBLFdBQUEsSUFBQSxFQUFBO0FBR0ksTUFBQSx1QkFBQSxDQUFBO0FBQUEsTUFBQSwrQkFBQSxJQUFBLE9BQUEsRUFBQSxLQUFBO0FBRUYsTUFBQSx1QkFBQSxDQUFBO0FBQUEsTUFBQSwyQkFBQSxJQUFBLFdBQUEsS0FBQSxJQUFBLE9BQUEsRUFBQSxTQUFBLEtBQUEsRUFBQTs7b0JEYk0sTUFBTSxLQUFLLEdBQUEsUUFBQSxDQUFBLHc4RUFBQSxFQUFBLENBQUE7OzsrRUFJVixXQUFTLENBQUE7VUFQckI7dUJBQ1csaUJBQWUsZ0JBQ1QsQ0FBQyxlQUFlLEdBQUMsU0FDeEIsQ0FBQyxNQUFNLEtBQUssR0FBQyxVQUFBOzs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7R0FBQSxRQUFBLENBQUEsNGtFQUFBLEVBQUEsQ0FBQTs7OztnRkFJWCxXQUFTLEVBQUEsV0FBQSxhQUFBLFVBQUEsc0RBQUEsWUFBQSxHQUFBLENBQUE7QUFBQSxHQUFBOzs7Ozs7OzhEQUFULFdBQVMsRUFBQSxTQUFBLENBQUEsSUFBQSx3QkFBQSxHQUFBLENBQUEsTUFBQSxPQUFBLFdBQUEsZUFBQSxHQUFBLGFBQUEsRUFBQSxDQUFBO0VBQUE7QUFBQSxHQUFBLE9BQUEsY0FBQSxlQUFBLGNBQUEsa0JBQUEsS0FBQSxJQUFBLENBQUE7QUFBQSxHQUFBLE9BQUEsY0FBQSxlQUFBLGVBQUEsWUFBQSxPQUFBLFlBQUEsSUFBQSxHQUFBLDRCQUFBLENBQUEsTUFBQSxFQUFBLE9BQUEsTUFBQSxrQkFBQSxFQUFBLFNBQUEsQ0FBQTtBQUFBLEdBQUE7IiwibmFtZXMiOltdLCJkZWJ1Z0lkIjoiZTU5YTExODYtNGQwMC01YTE3LThmZjEtYTBhODI1YTU4MjkyIn0=

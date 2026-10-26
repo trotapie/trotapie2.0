@@ -1,0 +1,22 @@
+<form #form="ngForm" (ngSubmit)="form.valid&&!busy()&&!disabled()&&saved.emit(model())">
+  <div class="form-grid">@for(field of fields();track field.key){@if(!field.only||field.only==='edit'&&editing()||field.only==='create'&&!editing()){
+    <div [class.form-full]="field.type==='textarea'">
+      @if(field.type==='checkbox'){
+        <app-custom-switch [stacked]="true" [label]="field.label" [name]="field.key" [ngModel]="model()[field.key]" [disabled]="disabled()||busy()" (ngModelChange)="set(field.key,$event)" />
+      }@else if(field.type==='select'){
+        <app-tp-select-search [label]="field.label" [name]="field.key" [options]="$any(field.options||[])" [ngModel]="model()[field.key]" [required]="!!field.required" [disabled]="disabled()||busy()" (ngModelChange)="set(field.key,$event)" />
+      }@else if(field.type==='textarea'){
+        <app-tp-textarea [label]="field.label" [name]="field.key" [ngModel]="model()[field.key]" [required]="!!field.required" [disabled]="disabled()||busy()" (ngModelChange)="set(field.key,$event)" />
+      }@else{
+        <div [class.field-with-preview]="field.imagePreview">
+        <app-tp-input [label]="field.label" [inputId]="'field-'+field.key" [name]="field.key" [type]="field.type||'text'" [ngModel]="model()[field.key]" [required]="!!field.required" [min]="field.min??null" [email]="field.type==='email'" [disabled]="disabled()||busy()" (ngModelChange)="set(field.key,$event)" />
+        @if(field.imagePreview){<button tpButton variant="icon" icon="eye" type="button" [disabled]="!model()[field.key]" [attr.aria-label]="'Ver imagen: '+field.label" title="Ver imagen" (click)="preview.set({url:model()[field.key],title:field.label})"></button>}
+        </div>
+      }
+      @if(field.hint){<small>{{ field.hint }}</small>}
+    </div>
+  }}</div>
+  <div class="dialog-actions"><button tpButton icon="close" type="button" [disabled]="busy()" (click)="cancelled.emit()">Cancelar</button><button tpButton icon="check" variant="primary" type="submit" [busy]="busy()" [disabled]="form.invalid||busy()||disabled()">{{ busy()?'Guardando…':submitLabel() }}</button></div>
+</form>
+<tp-image-preview [open]="!!preview()" [src]="preview()?.url || ''" [title]="preview()?.title || 'Vista previa de la imagen'" (closed)="preview.set(null)" />
+

@@ -1,0 +1,170 @@
+import { injectQuery as __vite__injectQuery } from "/@vite/client";import { createHotContext as __vite__createHotContext } from "/@vite/client";import.meta.hot = __vite__createHotContext("/chunk-TGFBIEEB.js");import {
+  Icon
+} from "/chunk-DHOAVJG5.js";
+
+// src/app/shared/components/tp-search-input/tp-search-input.component.ts
+import { Component, EventEmitter, forwardRef, Input, Output } from "/@fs/D:/Users/Alex_Saenz/Documents/Proyectos/Rediseño trotapie/Trotapie nuevo/.angular/cache/22.2.2/trotapie/vite/deps/@angular_core.js?v=e11bbf10";
+import { NG_VALUE_ACCESSOR } from "/@fs/D:/Users/Alex_Saenz/Documents/Proyectos/Rediseño trotapie/Trotapie nuevo/.angular/cache/22.2.2/trotapie/vite/deps/@angular_forms.js?v=e11bbf10";
+import * as i0 from "/@fs/D:/Users/Alex_Saenz/Documents/Proyectos/Rediseño trotapie/Trotapie nuevo/.angular/cache/22.2.2/trotapie/vite/deps/@angular_core.js?v=e11bbf10";
+var TpSearchInputComponent = class _TpSearchInputComponent {
+  static nextId = 0;
+  inputId = "tp-search-" + _TpSearchInputComponent.nextId++;
+  label = "Buscar";
+  placeholder = "Buscar";
+  searchAriaLabel = "Buscar";
+  searchDelay = 0;
+  search = new EventEmitter();
+  valor = "";
+  disabled = false;
+  onChange = () => void 0;
+  onTouched = () => void 0;
+  searchTimer;
+  ngOnDestroy() {
+    this.cancelarBusquedaProgramada();
+  }
+  writeValue(value) {
+    this.valor = value ?? "";
+  }
+  registerOnChange(fn) {
+    this.onChange = fn;
+  }
+  registerOnTouched(fn) {
+    this.onTouched = fn;
+  }
+  setDisabledState(isDisabled) {
+    this.disabled = isDisabled;
+  }
+  actualizarValor(value) {
+    this.valor = value;
+    this.onChange(value);
+    this.programarBusqueda();
+  }
+  ejecutarBusqueda() {
+    this.cancelarBusquedaProgramada();
+    this.onTouched();
+    this.search.emit(this.valor.trim());
+  }
+  marcarTouched() {
+    this.onTouched();
+  }
+  limpiar() {
+    this.actualizarValor("");
+    this.ejecutarBusqueda();
+  }
+  programarBusqueda() {
+    if (!this.searchDelay || this.disabled)
+      return;
+    this.cancelarBusquedaProgramada();
+    this.searchTimer = setTimeout(() => this.ejecutarBusqueda(), this.searchDelay);
+  }
+  cancelarBusquedaProgramada() {
+    if (this.searchTimer)
+      clearTimeout(this.searchTimer);
+    this.searchTimer = void 0;
+  }
+  static \u0275fac = function TpSearchInputComponent_Factory(__ngFactoryType__) {
+    return new (__ngFactoryType__ || _TpSearchInputComponent)();
+  };
+  static \u0275cmp = /* @__PURE__ */ i0.\u0275\u0275defineComponent({ type: _TpSearchInputComponent, selectors: [["tp-search-input"], ["app-tp-search-input"]], inputs: { label: "label", placeholder: "placeholder", searchAriaLabel: "searchAriaLabel", searchDelay: "searchDelay" }, outputs: { search: "search" }, features: [i0.\u0275\u0275ProvidersFeature([{ provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => _TpSearchInputComponent), multi: true }])], decls: 8, vars: 13, consts: [[1, "tp-search-input"], [1, "tp-search-input__label", 3, "for"], [1, "tp-search-input__field"], [3, "name"], ["type", "text", 3, "input", "keydown.enter", "blur", "id", "value", "placeholder", "disabled"], ["type", "button", 3, "click", "disabled"]], template: function TpSearchInputComponent_Template(rf, ctx) {
+    if (rf & 1) {
+      i0.\u0275\u0275elementStart(0, "div", 0)(1, "label", 1);
+      i0.\u0275\u0275text(2);
+      i0.\u0275\u0275elementEnd();
+      i0.\u0275\u0275elementStart(3, "div", 2);
+      i0.\u0275\u0275element(4, "tp-icon", 3);
+      i0.\u0275\u0275elementStart(5, "input", 4);
+      i0.\u0275\u0275listener("input", function TpSearchInputComponent_Template_input_input_5_listener($event) {
+        return ctx.actualizarValor($event.target.value);
+      })("keydown.enter", function TpSearchInputComponent_Template_input_keydown_enter_5_listener() {
+        return ctx.ejecutarBusqueda();
+      })("blur", function TpSearchInputComponent_Template_input_blur_5_listener() {
+        return ctx.marcarTouched();
+      });
+      i0.\u0275\u0275elementEnd();
+      i0.\u0275\u0275elementStart(6, "button", 5);
+      i0.\u0275\u0275listener("click", function TpSearchInputComponent_Template_button_click_6_listener() {
+        return ctx.ejecutarBusqueda();
+      });
+      i0.\u0275\u0275element(7, "tp-icon", 3);
+      i0.\u0275\u0275elementEnd()()();
+    }
+    if (rf & 2) {
+      i0.\u0275\u0275advance();
+      i0.\u0275\u0275property("for", ctx.inputId);
+      i0.\u0275\u0275advance();
+      i0.\u0275\u0275textInterpolate(ctx.label);
+      i0.\u0275\u0275advance();
+      i0.\u0275\u0275classProp("tp-search-input__field--disabled", ctx.disabled);
+      i0.\u0275\u0275advance();
+      i0.\u0275\u0275property("name", "search");
+      i0.\u0275\u0275advance();
+      i0.\u0275\u0275property("id", ctx.inputId)("value", ctx.valor)("placeholder", ctx.placeholder)("disabled", ctx.disabled);
+      i0.\u0275\u0275attribute("aria-label", ctx.label);
+      i0.\u0275\u0275advance();
+      i0.\u0275\u0275property("disabled", ctx.disabled);
+      i0.\u0275\u0275attribute("aria-label", ctx.searchAriaLabel);
+      i0.\u0275\u0275advance();
+      i0.\u0275\u0275property("name", "right");
+    }
+  }, dependencies: [Icon], styles: ["\n[_nghost-%COMP%] {\n  display: block;\n  min-width: 0;\n}\n.tp-search-input[_ngcontent-%COMP%] {\n  min-width: 0;\n}\n.tp-search-input__label[_ngcontent-%COMP%] {\n  display: block;\n  margin: 0 0 0.45rem 0.2rem;\n  color: var(--%NS%muted);\n  font-size: 0.72rem;\n  font-weight: 500;\n  letter-spacing: 0.02em;\n}\n.tp-search-input__field[_ngcontent-%COMP%] {\n  display: flex;\n  align-items: center;\n  min-height: 3rem;\n  gap: 0.5rem;\n  padding: 0.35rem 0.45rem 0.35rem 0.9rem;\n  border: 1px solid var(--%NS%line);\n  border-radius: 1rem;\n  background: var(--%NS%surface);\n  transition: border-color 0.18s ease, box-shadow 0.18s ease;\n}\n.tp-search-input__field[_ngcontent-%COMP%]:focus-within, \n.tp-search-input__field[_ngcontent-%COMP%]:hover:not(.tp-search-input__field--disabled) {\n  border-color: var(--%NS%brand, #00a67c);\n  box-shadow: 0 0 0 1px color-mix(in srgb, var(--%NS%brand, #00a67c) 20%, transparent);\n}\n.tp-search-input__field[_ngcontent-%COMP%]    > tp-icon[_ngcontent-%COMP%] {\n  flex: 0 0 auto;\n  width: 1.15rem;\n  height: 1.15rem;\n  color: var(--%NS%muted);\n}\n.tp-search-input__field[_ngcontent-%COMP%]   input[_ngcontent-%COMP%] {\n  min-width: 0;\n  flex: 1;\n  height: 2.6rem;\n  color: var(--%NS%ink);\n  border: 0;\n  outline: 0;\n  background: transparent;\n  font-size: 0.875rem;\n}\n.tp-search-input__field[_ngcontent-%COMP%]   input[_ngcontent-%COMP%]::placeholder {\n  color: var(--%NS%muted);\n}\n.tp-search-input__field[_ngcontent-%COMP%]   button[_ngcontent-%COMP%] {\n  flex: 0 0 auto;\n  display: inline-flex;\n  align-items: center;\n  justify-content: center;\n  width: 2.2rem;\n  height: 2.2rem;\n  padding: 0;\n  border: 0;\n  background: transparent;\n  color: var(--%NS%brand, #137053);\n  cursor: pointer;\n  border-radius: 999px;\n  transition: opacity 0.18s ease, transform 0.18s ease;\n}\n.tp-search-input__field[_ngcontent-%COMP%]   button[_ngcontent-%COMP%]:hover:not(:disabled) {\n  opacity: 0.75;\n  transform: translateX(2px);\n}\n.tp-search-input__field[_ngcontent-%COMP%]   button[_ngcontent-%COMP%]   tp-icon[_ngcontent-%COMP%] {\n  width: 1.25rem;\n  height: 1.25rem;\n}\n.tp-search-input__field--disabled[_ngcontent-%COMP%] {\n  opacity: 0.58;\n}\n/*# sourceMappingURL=tp-search-input.component.css.map */"] });
+};
+(() => {
+  (typeof ngDevMode === "undefined" || ngDevMode) && i0.\u0275setClassMetadata(TpSearchInputComponent, [{
+    type: Component,
+    args: [{ selector: "tp-search-input, app-tp-search-input", standalone: true, imports: [Icon], providers: [{ provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => TpSearchInputComponent), multi: true }], template: `<div class="tp-search-input">
+  <label class="tp-search-input__label" [for]="inputId">{{ label }}</label>
+
+  <div class="tp-search-input__field" [class.tp-search-input__field--disabled]="disabled">
+    <tp-icon [name]="'search'"></tp-icon>
+    <input
+      [id]="inputId"
+      type="text"
+      [value]="valor"
+      [placeholder]="placeholder"
+      [disabled]="disabled"
+      [attr.aria-label]="label"
+      (input)="actualizarValor($any($event.target).value)"
+      (keydown.enter)="ejecutarBusqueda()"
+      (blur)="marcarTouched()" />
+
+    <button type="button" [disabled]="disabled" [attr.aria-label]="searchAriaLabel" (click)="ejecutarBusqueda()">
+      <tp-icon [name]="'right'"></tp-icon>
+    </button>
+  </div>
+</div>
+
+`, styles: ["/* src/app/shared/components/tp-search-input/tp-search-input.component.scss */\n:host {\n  display: block;\n  min-width: 0;\n}\n.tp-search-input {\n  min-width: 0;\n}\n.tp-search-input__label {\n  display: block;\n  margin: 0 0 0.45rem 0.2rem;\n  color: var(--muted);\n  font-size: 0.72rem;\n  font-weight: 500;\n  letter-spacing: 0.02em;\n}\n.tp-search-input__field {\n  display: flex;\n  align-items: center;\n  min-height: 3rem;\n  gap: 0.5rem;\n  padding: 0.35rem 0.45rem 0.35rem 0.9rem;\n  border: 1px solid var(--line);\n  border-radius: 1rem;\n  background: var(--surface);\n  transition: border-color 0.18s ease, box-shadow 0.18s ease;\n}\n.tp-search-input__field:focus-within,\n.tp-search-input__field:hover:not(.tp-search-input__field--disabled) {\n  border-color: var(--brand, #00a67c);\n  box-shadow: 0 0 0 1px color-mix(in srgb, var(--brand, #00a67c) 20%, transparent);\n}\n.tp-search-input__field > tp-icon {\n  flex: 0 0 auto;\n  width: 1.15rem;\n  height: 1.15rem;\n  color: var(--muted);\n}\n.tp-search-input__field input {\n  min-width: 0;\n  flex: 1;\n  height: 2.6rem;\n  color: var(--ink);\n  border: 0;\n  outline: 0;\n  background: transparent;\n  font-size: 0.875rem;\n}\n.tp-search-input__field input::placeholder {\n  color: var(--muted);\n}\n.tp-search-input__field button {\n  flex: 0 0 auto;\n  display: inline-flex;\n  align-items: center;\n  justify-content: center;\n  width: 2.2rem;\n  height: 2.2rem;\n  padding: 0;\n  border: 0;\n  background: transparent;\n  color: var(--brand, #137053);\n  cursor: pointer;\n  border-radius: 999px;\n  transition: opacity 0.18s ease, transform 0.18s ease;\n}\n.tp-search-input__field button:hover:not(:disabled) {\n  opacity: 0.75;\n  transform: translateX(2px);\n}\n.tp-search-input__field button tp-icon {\n  width: 1.25rem;\n  height: 1.25rem;\n}\n.tp-search-input__field--disabled {\n  opacity: 0.58;\n}\n/*# sourceMappingURL=tp-search-input.component.css.map */\n"] }]
+  }], null, { label: [{
+    type: Input
+  }], placeholder: [{
+    type: Input
+  }], searchAriaLabel: [{
+    type: Input
+  }], searchDelay: [{
+    type: Input
+  }], search: [{
+    type: Output
+  }] });
+})();
+(() => {
+  (typeof ngDevMode === "undefined" || ngDevMode) && i0.\u0275setClassDebugInfo(TpSearchInputComponent, { className: "TpSearchInputComponent", filePath: "src/app/shared/components/tp-search-input/tp-search-input.component.ts", lineNumber: 13 });
+})();
+(() => {
+  const id = "src%2Fapp%2Fshared%2Fcomponents%2Ftp-search-input%2Ftp-search-input.component.ts%40TpSearchInputComponent";
+  function TpSearchInputComponent_HmrLoad(t) {
+    import(
+      /* @vite-ignore */
+      __vite__injectQuery(i0.\u0275\u0275getReplaceMetadataURL(id, t, import.meta.url), 'import')
+    ).then((m) => m.default && i0.\u0275\u0275replaceMetadata(TpSearchInputComponent, m.default, [i0], [NG_VALUE_ACCESSOR, forwardRef, Icon, Component, Input, Output], import.meta, id));
+  }
+  (typeof ngDevMode === "undefined" || ngDevMode) && TpSearchInputComponent_HmrLoad(Date.now());
+  (typeof ngDevMode === "undefined" || ngDevMode) && (import.meta.hot && import.meta.hot.on("angular:component-update", (d) => d.id === id && TpSearchInputComponent_HmrLoad(d.timestamp)));
+})();
+
+export {
+  TpSearchInputComponent
+};
+//# debugId=d4ac26be-06ec-5540-9b14-c75515f459ac
+
+
+//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbInNyYy9hcHAvc2hhcmVkL2NvbXBvbmVudHMvdHAtc2VhcmNoLWlucHV0L3RwLXNlYXJjaC1pbnB1dC5jb21wb25lbnQudHMiLCJzcmMvYXBwL3NoYXJlZC9jb21wb25lbnRzL3RwLXNlYXJjaC1pbnB1dC90cC1zZWFyY2gtaW5wdXQuY29tcG9uZW50Lmh0bWwiXSwic291cmNlc0NvbnRlbnQiOlsiaW1wb3J0IHtJY29ufSBmcm9tICcuLi9pY29uL2ljb24nO1xuaW1wb3J0IHsgQ29tcG9uZW50LCBFdmVudEVtaXR0ZXIsIGZvcndhcmRSZWYsIElucHV0LCBPbkRlc3Ryb3ksIE91dHB1dCB9IGZyb20gJ0Bhbmd1bGFyL2NvcmUnO1xuaW1wb3J0IHsgQ29udHJvbFZhbHVlQWNjZXNzb3IsIE5HX1ZBTFVFX0FDQ0VTU09SIH0gZnJvbSAnQGFuZ3VsYXIvZm9ybXMnO1xuXG5AQ29tcG9uZW50KHtcbiAgc2VsZWN0b3I6ICd0cC1zZWFyY2gtaW5wdXQsIGFwcC10cC1zZWFyY2gtaW5wdXQnLFxuICBzdGFuZGFsb25lOiB0cnVlLFxuICBpbXBvcnRzOiBbIEljb25dLFxuICB0ZW1wbGF0ZVVybDogJy4vdHAtc2VhcmNoLWlucHV0LmNvbXBvbmVudC5odG1sJyxcbiAgc3R5bGVVcmw6ICcuL3RwLXNlYXJjaC1pbnB1dC5jb21wb25lbnQuc2NzcycsXG4gIHByb3ZpZGVyczogW3sgcHJvdmlkZTogTkdfVkFMVUVfQUNDRVNTT1IsIHVzZUV4aXN0aW5nOiBmb3J3YXJkUmVmKCgpID0+IFRwU2VhcmNoSW5wdXRDb21wb25lbnQpLCBtdWx0aTogdHJ1ZSB9XVxufSlcbmV4cG9ydCBjbGFzcyBUcFNlYXJjaElucHV0Q29tcG9uZW50IGltcGxlbWVudHMgQ29udHJvbFZhbHVlQWNjZXNzb3IsIE9uRGVzdHJveSB7XG4gIHByaXZhdGUgc3RhdGljIG5leHRJZD0wO1xuICByZWFkb25seSBpbnB1dElkPSd0cC1zZWFyY2gtJytUcFNlYXJjaElucHV0Q29tcG9uZW50Lm5leHRJZCsrO1xuICBASW5wdXQoKSBsYWJlbCA9ICdCdXNjYXInO1xuICBASW5wdXQoKSBwbGFjZWhvbGRlciA9ICdCdXNjYXInO1xuICBASW5wdXQoKSBzZWFyY2hBcmlhTGFiZWwgPSAnQnVzY2FyJztcbiAgQElucHV0KCkgc2VhcmNoRGVsYXkgPSAwO1xuICBAT3V0cHV0KCkgc2VhcmNoID0gbmV3IEV2ZW50RW1pdHRlcjxzdHJpbmc+KCk7XG5cbiAgdmFsb3IgPSAnJztcbiAgZGlzYWJsZWQgPSBmYWxzZTtcblxuICBwcml2YXRlIG9uQ2hhbmdlOiAodmFsdWU6IHN0cmluZykgPT4gdm9pZCA9ICgpID0+IHVuZGVmaW5lZDtcbiAgcHJpdmF0ZSBvblRvdWNoZWQ6ICgpID0+IHZvaWQgPSAoKSA9PiB1bmRlZmluZWQ7XG4gIHByaXZhdGUgc2VhcmNoVGltZXI/OiBSZXR1cm5UeXBlPHR5cGVvZiBzZXRUaW1lb3V0PjtcblxuICBuZ09uRGVzdHJveSgpOiB2b2lkIHtcbiAgICB0aGlzLmNhbmNlbGFyQnVzcXVlZGFQcm9ncmFtYWRhKCk7XG4gIH1cblxuICB3cml0ZVZhbHVlKHZhbHVlOiBzdHJpbmcgfCBudWxsKTogdm9pZCB7XG4gICAgdGhpcy52YWxvciA9IHZhbHVlID8/ICcnO1xuICB9XG5cbiAgcmVnaXN0ZXJPbkNoYW5nZShmbjogKHZhbHVlOiBzdHJpbmcpID0+IHZvaWQpOiB2b2lkIHtcbiAgICB0aGlzLm9uQ2hhbmdlID0gZm47XG4gIH1cblxuICByZWdpc3Rlck9uVG91Y2hlZChmbjogKCkgPT4gdm9pZCk6IHZvaWQge1xuICAgIHRoaXMub25Ub3VjaGVkID0gZm47XG4gIH1cblxuICBzZXREaXNhYmxlZFN0YXRlKGlzRGlzYWJsZWQ6IGJvb2xlYW4pOiB2b2lkIHtcbiAgICB0aGlzLmRpc2FibGVkID0gaXNEaXNhYmxlZDtcbiAgfVxuXG4gIGFjdHVhbGl6YXJWYWxvcih2YWx1ZTogc3RyaW5nKTogdm9pZCB7XG4gICAgdGhpcy52YWxvciA9IHZhbHVlO1xuICAgIHRoaXMub25DaGFuZ2UodmFsdWUpO1xuICAgIHRoaXMucHJvZ3JhbWFyQnVzcXVlZGEoKTtcbiAgfVxuXG4gIGVqZWN1dGFyQnVzcXVlZGEoKTogdm9pZCB7XG4gICAgdGhpcy5jYW5jZWxhckJ1c3F1ZWRhUHJvZ3JhbWFkYSgpO1xuICAgIHRoaXMub25Ub3VjaGVkKCk7XG4gICAgdGhpcy5zZWFyY2guZW1pdCh0aGlzLnZhbG9yLnRyaW0oKSk7XG4gIH1cblxuICBtYXJjYXJUb3VjaGVkKCk6IHZvaWQge1xuICAgIHRoaXMub25Ub3VjaGVkKCk7XG4gIH1cblxuICBsaW1waWFyKCk6IHZvaWQge1xuICAgIHRoaXMuYWN0dWFsaXphclZhbG9yKCcnKTtcbiAgICB0aGlzLmVqZWN1dGFyQnVzcXVlZGEoKTtcbiAgfVxuXG4gIHByaXZhdGUgcHJvZ3JhbWFyQnVzcXVlZGEoKTogdm9pZCB7XG4gICAgaWYgKCF0aGlzLnNlYXJjaERlbGF5IHx8IHRoaXMuZGlzYWJsZWQpIHJldHVybjtcbiAgICB0aGlzLmNhbmNlbGFyQnVzcXVlZGFQcm9ncmFtYWRhKCk7XG4gICAgdGhpcy5zZWFyY2hUaW1lciA9IHNldFRpbWVvdXQoKCkgPT4gdGhpcy5lamVjdXRhckJ1c3F1ZWRhKCksIHRoaXMuc2VhcmNoRGVsYXkpO1xuICB9XG5cbiAgcHJpdmF0ZSBjYW5jZWxhckJ1c3F1ZWRhUHJvZ3JhbWFkYSgpOiB2b2lkIHtcbiAgICBpZiAodGhpcy5zZWFyY2hUaW1lcikgY2xlYXJUaW1lb3V0KHRoaXMuc2VhcmNoVGltZXIpO1xuICAgIHRoaXMuc2VhcmNoVGltZXIgPSB1bmRlZmluZWQ7XG4gIH1cbn1cbiIsIjxkaXYgY2xhc3M9XCJ0cC1zZWFyY2gtaW5wdXRcIj5cbiAgPGxhYmVsIGNsYXNzPVwidHAtc2VhcmNoLWlucHV0X19sYWJlbFwiIFtmb3JdPVwiaW5wdXRJZFwiPnt7IGxhYmVsIH19PC9sYWJlbD5cblxuICA8ZGl2IGNsYXNzPVwidHAtc2VhcmNoLWlucHV0X19maWVsZFwiIFtjbGFzcy50cC1zZWFyY2gtaW5wdXRfX2ZpZWxkLS1kaXNhYmxlZF09XCJkaXNhYmxlZFwiPlxuICAgIDx0cC1pY29uIFtuYW1lXT1cIidzZWFyY2gnXCI+PC90cC1pY29uPlxuICAgIDxpbnB1dFxuICAgICAgW2lkXT1cImlucHV0SWRcIlxuICAgICAgdHlwZT1cInRleHRcIlxuICAgICAgW3ZhbHVlXT1cInZhbG9yXCJcbiAgICAgIFtwbGFjZWhvbGRlcl09XCJwbGFjZWhvbGRlclwiXG4gICAgICBbZGlzYWJsZWRdPVwiZGlzYWJsZWRcIlxuICAgICAgW2F0dHIuYXJpYS1sYWJlbF09XCJsYWJlbFwiXG4gICAgICAoaW5wdXQpPVwiYWN0dWFsaXphclZhbG9yKCRhbnkoJGV2ZW50LnRhcmdldCkudmFsdWUpXCJcbiAgICAgIChrZXlkb3duLmVudGVyKT1cImVqZWN1dGFyQnVzcXVlZGEoKVwiXG4gICAgICAoYmx1cik9XCJtYXJjYXJUb3VjaGVkKClcIiAvPlxuXG4gICAgPGJ1dHRvbiB0eXBlPVwiYnV0dG9uXCIgW2Rpc2FibGVkXT1cImRpc2FibGVkXCIgW2F0dHIuYXJpYS1sYWJlbF09XCJzZWFyY2hBcmlhTGFiZWxcIiAoY2xpY2spPVwiZWplY3V0YXJCdXNxdWVkYSgpXCI+XG4gICAgICA8dHAtaWNvbiBbbmFtZV09XCIncmlnaHQnXCI+PC90cC1pY29uPlxuICAgIDwvYnV0dG9uPlxuICA8L2Rpdj5cbjwvZGl2PlxuXG4iXSwibWFwcGluZ3MiOiI7Ozs7O0FBQ0EsU0FBUyxXQUFXLGNBQWMsWUFBWSxPQUFrQixjQUFjO0FBQzlFLFNBQStCLHlCQUF5Qjs7QUFVbEQsSUFBTyx5QkFBUCxNQUFPLHdCQUFpRTtFQUM1RSxPQUFlLFNBQU87RUFDYixVQUFRLGVBQWEsd0JBQXVCO0VBQzVDLFFBQVE7RUFDUixjQUFjO0VBQ2Qsa0JBQWtCO0VBQ2xCLGNBQWM7RUFDYixTQUFTLElBQUksYUFBbUI7RUFFMUMsUUFBUTtFQUNSLFdBQVc7RUFFSCxXQUFvQyxNQUFNO0VBQzFDLFlBQXdCLE1BQU07RUFDOUI7RUFFUixjQUFtQjtBQUNqQixTQUFLLDJCQUEw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

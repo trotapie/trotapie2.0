@@ -1,0 +1,31 @@
+<div class="attractions-heading"><div><h2>Atracciones del destino</h2><p>Organiza las experiencias y edita sus fotografías en un solo lugar.</p></div><button tpButton type="button" icon="plus" [disabled]="busy()" (click)="add()">Agregar atracción</button></div>
+@if(activities().length){
+  <div class="attractions-layout">
+    <aside class="attraction-list" aria-label="Listado de atracciones">
+      <div class="list-heading"><strong>{{activities().length}} atracciones</strong><small>Arrastra para ordenar</small></div>
+      <div class="attraction-list-items">
+      @for(item of activities();track item;let i=$index){
+        <div class="attraction-row" [class.selected]="selected()===item" [draggable]="!busy()" (dragstart)="startDrag($event,i)" (dragend)="endDrag()" (dragover)="$event.preventDefault()" (drop)="drop($event,i)">
+          <button type="button" [attr.aria-pressed]="selected()===item" (click)="select(i)"><span class="list-thumbnail">@if(thumbnail(item)){<img [src]="thumbnail(item)" alt="" loading="lazy" (error)="$any($event.target).style.visibility='hidden'"/>}@else{<tp-icon name="star"/>}</span><span class="list-copy"><strong>{{title(item,i)}}</strong><small>{{item.imagenes?.length||0}} fotografías · {{item.activo?'Activa':'Inactiva'}}</small></span><span class="list-order">{{i+1}}</span></button>
+        </div>
+      }
+      </div>
+      <p class="list-note">Las atracciones inactivas no aparecen en la página pública.</p>
+    </aside>
+    @if(selected();as a){
+      <section class="attraction-detail" tpMotion="card" aria-label="Editar atracción seleccionada">
+        <header class="detail-heading"><div><span class="eyebrow">Atracción {{index()+1}} de {{activities().length}}</span><h3>{{title(a)}}</h3></div><div class="detail-actions"><button tpButton variant="icon" type="button" icon="chevron-up" [disabled]="index()===0||busy()" aria-label="Mover atracción arriba" (click)="move(index(),index()-1)"></button><button tpButton variant="icon" type="button" icon="chevron-down" [disabled]="index()===activities().length-1||busy()" aria-label="Mover atracción abajo" (click)="move(index(),index()+1)"></button><app-custom-switch label="Activa" [ngModel]="a.activo" [disabled]="busy()" (ngModelChange)="toggled.emit({activity:a,active:$event})"/></div></header>
+        <div class="attraction-form">
+          <app-tp-select-search label="Tipo de atracción" [options]="typeOptions()" [(ngModel)]="a.catalogo_atraccion_id" [disabled]="busy()"/>
+          <tp-field label="Título de la atracción" forId="selected-attraction-title"><input id="selected-attraction-title" [(ngModel)]="text(a).nombre" [disabled]="busy()" placeholder="Un nombre que invite a descubrirla"/></tp-field>
+          <tp-field label="Descripción" forId="selected-attraction-description" class="form-full"><textarea id="selected-attraction-description" [(ngModel)]="text(a).descripcion" [disabled]="busy()" rows="4" placeholder="Cuenta qué hace especial esta experiencia."></textarea></tp-field>
+        </div>
+        <tp-attraction-photos [images]="a.imagenes||[]" [title]="title(a)" [active]="a.activo" [busy]="busy()" (edited)="imageEdited.emit({activity:a,image:$event})" />
+        <details class="media-tools"><summary><tp-icon name="plus"/>Agregar o importar fotografías<tp-icon name="chevron-down"/></summary><div class="media-fields"><tp-field label="Dirección pública de una imagen" forId="selected-attraction-image"><div class="inline-control"><input id="selected-attraction-image" type="url" [(ngModel)]="newImage" [disabled]="busy()" placeholder="https://…"/><button tpButton type="button" icon="plus" [disabled]="busy()||!newImage.trim()" (click)="addImage(a)">Agregar</button></div></tp-field><tp-field label="Carpeta de Google Drive" forId="selected-attraction-drive"><div class="inline-control"><input id="selected-attraction-drive" [(ngModel)]="driveFolder" [disabled]="busy()" placeholder="Enlace de la carpeta"/><button tpButton type="button" icon="download" [disabled]="busy()||!driveFolder.trim()" (click)="driveImported.emit({activity:a,url:driveFolder.trim()})">Importar</button></div></tp-field></div></details>
+      </section>
+    }
+  </div>
+}@else{<tp-state title="Este destino tiene historias por contar" message="Agrega la primera atracción y sus fotografías para empezar."/>}
+
+
+

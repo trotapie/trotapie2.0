@@ -1,0 +1,22 @@
+:host { display:block; min-width:0; }
+.table-scroll.sticky-header { max-height:none; overflow:visible; }
+.sticky-header th { position:sticky; top:var(--catalog-header-offset,0px); z-index:2; background:var(--surface); box-shadow:0 1px 0 var(--line); }
+
+.sticky-header table { border-collapse:separate; border-spacing:0; }
+
+@media(max-width:600px){
+ .table-scroll{overflow:visible;max-width:100%}
+ table,tbody{display:block;width:100%;white-space:normal}
+ thead{display:none}
+ .record-row{position:relative;display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px 12px;margin:12px 0;padding:16px;border:1px solid var(--line);border-radius:18px;background:var(--surface)}
+ .record-row td{display:block;border:0;padding:0;min-width:0;overflow-wrap:anywhere;font-size:12px}
+ .record-row td[data-label]{grid-column:1/-1;display:grid;grid-template-columns:90px minmax(0,1fr);gap:12px;line-height:1.6}
+ .record-row td[data-label]::before{content:attr(data-label);color:var(--muted);font-size:11px}
+ .record-row .record-name{grid-column:1/-1;margin-bottom:4px}
+ .record-name .table-identity{align-items:flex-start}
+ .record-name strong{white-space:normal;line-height:1.5}
+ .record-name small{white-space:normal;line-height:1.5}
+ .record-row td.record-status{grid-column:1;display:flex;align-items:center;padding-top:4px}
+ .record-status::before{display:none}
+ .record-row td.record-actions{grid-column:2;grid-row:auto;align-self:end;justify-self:end}
+}

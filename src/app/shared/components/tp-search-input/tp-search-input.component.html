@@ -1,0 +1,22 @@
+<div class="tp-search-input">
+  <label class="tp-search-input__label" [for]="inputId">{{ label }}</label>
+
+  <div class="tp-search-input__field" [class.tp-search-input__field--disabled]="disabled">
+    <tp-icon [name]="'search'"></tp-icon>
+    <input
+      [id]="inputId"
+      type="text"
+      [value]="valor"
+      [placeholder]="placeholder"
+      [disabled]="disabled"
+      [attr.aria-label]="label"
+      (input)="actualizarValor($any($event.target).value)"
+      (keydown.enter)="ejecutarBusqueda()"
+      (blur)="marcarTouched()" />
+
+    <button type="button" [disabled]="disabled" [attr.aria-label]="searchAriaLabel" (click)="ejecutarBusqueda()">
+      <tp-icon [name]="'right'"></tp-icon>
+    </button>
+  </div>
+</div>
+

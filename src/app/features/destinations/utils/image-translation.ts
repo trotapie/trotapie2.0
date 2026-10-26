@@ -1,0 +1,4 @@
+export interface TranslationLanguage {id:number;codigo:string}
+export function spanishImageText(image:Record<string,any>,languages:readonly TranslationLanguage[]){const id=languages.find(l=>l.codigo==='es')?.id;const text=id===undefined?null:image['traducciones']?.[id];return {title:String(text?.nombre||'').trim(),description:String(text?.descripcion||'').trim()};}
+export function imageTranslationKey(image:Record<string,any>,languages:readonly TranslationLanguage[]){return JSON.stringify(spanishImageText(image,languages));}
+export function needsImageTranslation(image:Record<string,any>,languages:readonly TranslationLanguage[],previousKey?:string){const es=spanishImageText(image,languages);if(!es.title&&!es.description)return false;return imageTranslationKey(image,languages)!==previousKey||languages.some(l=>l.codigo!=='es'&&((es.title&&!image['traducciones']?.[l.id]?.nombre?.trim())||(es.description&&!image['traducciones']?.[l.id]?.descripcion?.trim())));}

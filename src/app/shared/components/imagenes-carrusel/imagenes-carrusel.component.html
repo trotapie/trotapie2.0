@@ -1,0 +1,36 @@
+@if(!soloModal){
+  <div class="gallery-thumbs" [class.gallery-grid]="layout==='grid'">
+    @for(photo of previewPhotos();track $index){
+      <button type="button" (click)="open($index)" aria-haspopup="dialog" [attr.aria-label]="language.translateText('Ver imagen ','View image ')+($index+1)+': '+(photo.title||hotel?.nombre_hotel||'')">
+        <img [src]="photo.src" [alt]="photo.title||hotel?.nombre_hotel||'Imagen de la galería'" loading="lazy" (error)="imageError($event)"/>
+      </button>
+    }
+  </div>
+  @if(layout==='grid'&&allPhotos().length>previewPhotos().length){
+    <div class="gallery-more"><button tpButton icon="grid" type="button" (click)="open()" aria-haspopup="dialog">{{language.translateText('Ver más imágenes','View more photos')}} <span>({{allPhotos().length}})</span></button></div>
+  }
+}@else{
+  <button tpButton icon="grid" type="button" (click)="open()" aria-haspopup="dialog">{{triggerLabel}}</button>
+}
+<tp-dialog [open]="isOpen()" [title]="hotel?.nombre_hotel||language.translateText('Galería de imágenes','Photo gallery')" [size]="layout==='grid'?'editor':'wide'" [fullscreenDesktop]="layout==='grid'" [scrollBody]="layout!=='grid'" [fixedChrome]="true" (closed)="close()">
+  <div class="gallery-content" [class.expanded]="layout==='grid'">
+  @if(tiposImagen().length){
+    <div class="gallery-types" role="group" [attr.aria-label]="language.translateText('Tipo de imagen','Photo type')">
+      <button tpButton type="button" [variant]="selectedTipoId()===0?'primary':'secondary'" [attr.aria-pressed]="selectedTipoId()===0" (click)="onTipoChange(0)">{{language.translateText('Todas','All')}}</button>
+      @for(type of tiposImagen();track type.id){
+        <button tpButton type="button" [variant]="selectedTipoId()===type.id?'primary':'secondary'" [attr.aria-pressed]="selectedTipoId()===type.id" (click)="onTipoChange(type.id)">{{getTipoLabel(type)}}</button>
+      }
+    </div>
+  }
+  @if(isOpen()){
+    <div class="gallery-viewer"><tp-photo-carousel [photos]="photos()" [startIndex]="initialIndex()" [autoplay]="true" [intervalMs]="3000" variant="lightbox" [label]="hotel?.nombre_hotel||'Galería de imágenes'" [english]="language.language()==='en'"/></div>
+    <p class="gallery-count" role="status">{{language.translateText('Imagen ','Photo ')}}{{(viewer()?.index()??0)+1}} {{language.translateText('de ','of ')}}{{photos().length}} · {{allPhotos().length}} {{language.translateText('imágenes en total','photos in total')}}</p>
+    <div class="gallery-thumbs compact" [attr.aria-label]="language.translateText('Miniaturas de la galería','Gallery thumbnails')">
+      @for(photo of photos();track $index){
+        <button type="button" (click)="goTo($index)" [class.selected]="viewer()?.index()===$index" [attr.aria-pressed]="viewer()?.index()===$index" [attr.aria-label]="language.translateText('Seleccionar imagen ','Select image ')+($index+1)"><img [src]="photo.src" [alt]="photo.title||'Imagen'" loading="lazy" (error)="imageError($event)"/></button>
+      }
+    </div>
+  }
+  </div>
+  @if(hotel?.id){<div class="dialog-actions"><a tpButton variant="primary" icon="quote" [routerLink]="['/solicitar',hotel!.id]" (click)="close()">{{language.translateText('Solicitar cotización','Request a quote')}}</a></div>}
+</tp-dialog>

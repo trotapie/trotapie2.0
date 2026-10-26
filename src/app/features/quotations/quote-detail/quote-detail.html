@@ -1,0 +1,69 @@
+<div class="proposal-shell" [class.public-proposal]="publicView">
+ @if(publicView){
+   <header class="client-topbar"><a routerLink="/"><img src="/brand/trotapie.png" alt="Trotapie Travel"/></a></header>
+  @if(loading()){<tp-state mode="loading"/>}
+  @else if(error()){<tp-state mode="error" [message]="error()" (retry)="load()"/>}
+  @else if(record()){
+   <section class="client-intro">
+    <div class="client-recipient"><span class="eyebrow">Preparada para ti</span><p class="client-name"><tp-icon name="people"/>{{record().cliente_nombre || record().nombre_persona || 'Tu propuesta de viaje'}}</p><div class="client-adviser"><span>Asesor(a): <strong>{{contactAdviser().nombre}}</strong></span>@if(record().fecha_creacion || record().created_at){<small>{{(record().fecha_creacion || record().created_at) | date:'dd/MM/yyyy · HH:mm':'-0600':'es-MX'}}</small>}</div></div>
+    <div class="client-destination"><div><span class="eyebrow">Cotización</span>@if(folio()){<span class="quote-folio">{{folio()}}</span>}</div><h1>{{multiple ? 'Más opciones para tu viaje' : 'Tu estancia en '+(record().destino_nombre || 'tu próximo destino')}}</h1><p>Tu alojamiento, con los detalles que necesitas para planear.</p></div>
+   </section>
+   <div class="client-hotels">
+    @for(hotel of presentedHotels();track $index){
+     <article class="client-hotel">
+      <header><span class="eyebrow">{{multiple?'Opción '+($index+1):'Hotel seleccionado'}}</span><h2>{{hotel.title}}</h2>@if(hotel.estrellas){<span class="hotel-rating"><tp-icon name="star"/>{{hotel.estrellas}} estrellas</span>}</header>
+      <div class="client-hotel-layout">
+       <div class="client-hotel-media">
+        @if(hotel.photos.length){<img [src]="hotel.photos[0].url_imagen" [alt]="hotel.title" loading="lazy" (error)="photoError($event)"/><div class="client-gallery"><app-imagenes-carrusel [imagenesCargadas]="hotel.photos" [hotel]="{nombre_hotel:hotel.title}" [soloModal]="true" [triggerLabel]="'Ver '+hotel.photos.length+' fotos'"/></div>}
+        @else{<div class="photo-placeholder"><tp-icon name="hotel"/><span>{{hotel.title}}</span></div>}
+       </div>
+       <div class="client-hotel-details">
+        <div class="client-stay-fact"><tp-icon name="calendar"/><span><small>Tu estancia</small><strong>{{dateText(hotel.fecha_entrada || record().fecha_entrada)}} → {{dateText(hotel.fecha_salida || record().fecha_salida)}}</strong></span></div>
+        <div class="client-stay-fact"><tp-icon name="moon"/><span><small>Duración</small><strong>{{hotel.noches ?? record().noches ?? 'Por confirmar'}} {{(hotel.noches ?? record().noches)===1?'noche':'noches'}}</strong></span></div>
+        <div class="client-stay-fact"><tp-icon name="check"/><span><small>Régimen de alojamiento</small><strong>{{hotel.regimen || hotel.regimen_nombre || record().regimen || 'Por confirmar'}}</strong></span></div>
+        @if(hotel.roomText){<div class="client-room"><tp-icon name="people"/><div><small>¿Quiénes viajan?</small><p>{{hotel.roomText}}</p></div></div>}
+        @if(hotel.actividades?.length){<div class="client-amenities"><span class="eyebrow">Para tu estancia</span><div>@for(activity of hotel.actividades.slice(0,4);track $index){<span><tp-icon name="check"/>{{activity.descripcion || activity.nombre}}</span>}</div>@if(hotel.actividades.length>4){<details><summary>Ver {{hotel.actividades.length-4}} amenidades más</summary><ul>@for(activity of hotel.actividades.slice(4);track $index){<li>{{activity.descripcion || activity.nombre}}</li>}</ul></details>}</div>}
+        @if(!hotel.pricing.length){<p class="client-price-pending">Tu asesor confirmará la tarifa y disponibilidad de esta estancia.</p>}
+       </div>
+      </div>
+       <tp-quote-tariff-list [quote]="hotel"/>
+     </article>
+    }
+   </div>
+   @if(record().peticiones_especiales){<section class="panel proposal-notes"><h2>Peticiones especiales</h2><p>{{record().peticiones_especiales}}</p></section>}
+   <section class="client-observations"><tp-icon name="quote"/><div><h2>Observaciones</h2><p>Los precios son informativos y están sujetos a disponibilidad al momento de la contratación. Confirma con tu asesor las condiciones de la reserva.</p></div></section>
+   <section class="client-contact" aria-label="Tu asesor"><app-banner [empleado]="contactAdviser()"/></section>
+   <footer class="client-footer"><div><span class="eyebrow">Tu siguiente paso</span><p>{{presentedHotels()[0]?.title}}@if(record().regimen){ · {{record().regimen}}}</p></div><a tpButton icon="people" variant="primary" [href]="contactHref()" target="_blank" rel="noopener noreferrer">Contactar agente</a></footer>
+  }
+ }@else{
+<tp-page-header [title]="multiple?'Más opciones para tu próximo viaje':'Una propuesta a tu medida'" [description]="record()?.cliente_nombre||record()?.nombre_persona||'Tu propuesta de viaje con Trotapie'" eyebrow="Trotapie / Propuesta de viaje"><a tpButton variant="back" icon="left" [routerLink]="publicView ? '/' : (preview ? '/vista-previa/cotizaciones' : '/admin/cotizaciones')">Regresar</a><button tpButton icon="link" (click)="copy()">Copiar enlace</button><button tpButton icon="download" (click)="print()">Imprimir / PDF</button>@if(canEdit()&&!multiple){<button tpButton icon="edit" variant="primary" (click)="openPriceEditor()">Editar cotización</button>}</tp-page-header>
+@if(error()){<div class="error-banner" role="alert">{{error()}}</div>}
+@if(loading()){<tp-state mode="loading"/>}@else if(record()){
+<section class="proposal-facts panel"><div><tp-icon name="calendar"/><span><small>Estancia</small><strong>{{record().fecha_entrada|date:'dd MMM yyyy'}} → {{record().fecha_salida|date:'dd MMM yyyy'}}</strong></span></div><div><tp-icon name="hotel"/><span><small>Duración</small><strong>{{record().noches||'—'}} noches</strong></span></div><div><tp-icon name="people"/><span><small>Asesor</small><strong>{{record().empleado_nombre||'Equipo Trotapie'}}</strong></span></div><tp-badge [label]="record().estatus_nombre||record().estatus_clave||'Pendiente'"/></section>
+<div class="proposal-hotel-grid">@for(h of hotels();track $index){<article class="proposal-hotel panel">@if(image(h)){<img class="proposal-photo" [src]="image(h)" [alt]="h.hotel_nombre||h.nombre_hotel" loading="lazy"/>}<div class="proposal-hotel-body"><span class="eyebrow">{{h.destino_nombre||record().destino_nombre}}</span><h2>{{h.hotel_nombre||h.nombre_hotel||'Alojamiento por confirmar'}}</h2><p>{{h.regimen||h.regimen_nombre||'Régimen por confirmar'}}</p>@if(h.habitaciones?.es||record().habitaciones?.es){<p class="room-description">{{h.habitaciones?.es||record().habitaciones?.es}}</p>}
+<h3>Tarifas de la cotización</h3><tp-quote-tariff-list [quote]="h" [roomTypes]="roomTypes()" [origins]="origins()"/>
+@if(!publicView&&multiple){<button tpButton icon="edit" (click)="openAlternative(h)">Editar esta alternativa</button>}</div></article>}</div>
+@if(record().peticiones_especiales){<section class="panel proposal-notes"><h2>Peticiones especiales</h2><p>{{record().peticiones_especiales}}</p></section>}
+@if(!publicView){<div class="proposal-actions"><button tpButton icon="mail" [disabled]="!canEdit()" (click)="emailOpen.set(true)">Enviar propuesta por correo</button>@if(canEdit()){<button tpButton icon="refresh" [busy]="busy()" (click)="restore()">Marcar como pendiente</button><button tpButton icon="trash" variant="danger" (click)="deleteOpen.set(true)">Eliminar propuesta</button>}</div>}
+}
+
+
+ }
+</div>
+<tp-dialog [open]="editOpen()" title="Precio y condiciones" size="wide" [fixedChrome]="true" [busy]="busy()" (closed)="editOpen.set(false)">
+  <form id="quote-price-form" class="quote-price-form" #priceForm="ngForm" (ngSubmit)="priceForm.valid&&save()">
+    <div class="form-grid">
+      <app-tp-select-search label="Estado" name="status" [options]="statusOptions" [(ngModel)]="form.estatus" [showClear]="false" [showSearch]="false" [required]="true" [disabled]="busy()"/>
+      <app-tp-select-search label="Tipo de tarifa a meses" name="policyTariff" [options]="tariffOptions" [ngModel]="form.tipoTarifa" (ngModelChange)="changePolicyTariff($event)" [showClear]="false" [showSearch]="false" [disabled]="busy()"/>
+      <div class="form-full"><tp-quote-tariff-editor [(rooms)]="tariffRooms" [roomTypes]="roomTypes()" [origins]="origins()" [policies]="tariffPolicyOptions()" [disabled]="busy()||policyLoading()"/></div>
+      <app-date-range-filter [single]="true" label="Fecha límite de apartado" inputId="limit-insurance" name="limitInsurance" [disabled]="busy()" [(ngModel)]="form.fechaLimiteSeguro"/>
+      @if(form.tipoTarifa==='apartado'){<app-date-range-filter [single]="true" label="Fecha límite a meses" inputId="limit-months" name="limitMonths" [disabled]="busy()" [(ngModel)]="form.fechaLimiteMeses"/>}
+      @if(tariffValidation()){<p class="form-full error-banner" role="alert">{{tariffValidation()}}</p>}
+      @if(policyLoading()){<p class="form-full" role="status">Cargando catálogos de tarifas, políticas y habitaciones…</p>}
+      @if(policyError()){<div class="form-full error-banner" role="alert">{{policyError()}} <button tpButton icon="refresh" type="button" (click)="loadPolicyCatalog()">Reintentar</button></div>}
+    </div>
+  </form>
+  <div class="dialog-actions"><button tpButton icon="close" type="button" [disabled]="busy()" (click)="editOpen.set(false)">Cancelar</button><button tpButton icon="check" variant="primary" type="submit" form="quote-price-form" [busy]="busy()" [disabled]="priceForm.invalid||busy()||policyLoading()||!!tariffValidation()">Guardar cotización</button></div>
+</tp-dialog>
+<tp-dialog [open]="deleteOpen()" title="Eliminar propuesta" [busy]="busy()" (closed)="deleteOpen.set(false)"><p>La propuesta quedará marcada como eliminada. Podrás localizarla desde el filtro de eliminadas.</p><div class="dialog-actions"><button tpButton icon="close" (click)="deleteOpen.set(false)">Cancelar</button><button tpButton icon="trash" variant="danger" [busy]="busy()" (click)="delete()">Confirmar eliminación</button></div></tp-dialog>
+<tp-dialog [open]="emailOpen()" title="Enviar propuesta al cliente" [busy]="busy()" (closed)="emailOpen.set(false)"><form #emailForm="ngForm" (ngSubmit)="emailForm.valid&&sendEmail()"><div class="stack"><tp-field label="Correo del destinatario" forId="proposal-email" [required]="true"><input id="proposal-email" name="email" type="email" [(ngModel)]="emailTo" required email/></tp-field><tp-field label="Mensaje" forId="proposal-message"><textarea id="proposal-message" name="message" [(ngModel)]="emailMessage" placeholder="Agrega un mensaje para tu cliente."></textarea></tp-field></div><div class="dialog-actions"><button tpButton icon="close" type="button" (click)="emailOpen.set(false)">Cancelar</button><button tpButton icon="mail" variant="primary" [busy]="busy()" [disabled]="emailForm.invalid||busy()">Enviar correo</button></div></form></tp-dialog>

@@ -1,0 +1,16 @@
+<tp-page-header title="Imágenes del inicio" eyebrow="Trotapie / Contenido" backTo="/admin/dashboard" description="Gestiona las fotografías del inicio y de Lugares para inspirar. La portada se elige al azar entre las imágenes activas; las primeras tres activas aparecen en las tarjetas.">
+  <button tpButton icon="refresh" [busy]="loading()" (click)="load()">Actualizar</button>
+  @if(canEdit()){<button tpButton variant="primary" icon="plus" (click)="open(null)" [disabled]="loading() || !!error()">Agregar imagen</button>}
+</tp-page-header>
+@if(loading()){<tp-state mode="loading"/>}
+@else if(error()){<tp-state mode="error" [message]="error()" (retry)="load()"/>}
+@else {
+  <section class="home-images-grid" aria-label="Imágenes del inicio">
+    @for(record of records(); track record.id){<tp-image-card [record]="record" label="Editar imagen" (selected)="open($event)"/>}
+    @empty{<tp-state title="Agrega tu primera imagen" message="Las imágenes activas se mostrarán en el inicio."/>}
+  </section>
+}
+<tp-dialog [open]="editorOpen()" [title]="selected() ? 'Editar imagen del inicio' : 'Agregar imagen del inicio'" [busy]="saving()" (closed)="editorOpen.set(false)">
+  @if(editorError()){<div class="error-banner" role="alert">{{editorError()}}</div>}
+  <tp-resource-form [fields]="fields()" [value]="value()" [editing]="!!selected()" [busy]="saving()" [disabled]="!canEdit()" (saved)="save($event)" (cancelled)="editorOpen.set(false)"/>
+</tp-dialog>

@@ -1,0 +1,12 @@
+:host{position:relative;display:inline-flex;flex:0 0 auto;z-index:20}
+.language-trigger{display:flex;align-items:center;gap:8px;min-height:42px;padding:8px 12px;border:1px solid var(--line);border-radius:999px;background:var(--surface);color:var(--ink);font-size:12px}
+img{width:24px;height:18px;object-fit:cover;border-radius:4px;box-shadow:0 0 0 1px var(--line)}
+.language-trigger tp-icon{width:14px;height:14px;color:var(--muted)}
+.language-popover{position:absolute;top:calc(100% + 10px);right:0;width:224px;max-width:calc(100vw - 32px);padding:8px;background:var(--surface);border:1px solid var(--line);border-radius:20px;box-shadow:0 18px 40px #0003}
+.language-popover p{margin:4px 10px 8px;font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}
+.language-popover button{width:100%;display:flex;align-items:center;gap:12px;min-height:48px;padding:9px 12px;border:0;border-radius:12px;background:transparent;color:var(--ink);text-align:left;font-size:13px}
+.language-popover button:hover{background:var(--muted-surface)}
+.language-popover button.selected{background:var(--brand-soft);color:var(--brand)}
+.language-name{flex:1}.language-name small{display:block;color:var(--muted);font-size:9px;margin-top:2px}
+.language-popover tp-icon{width:16px;height:16px}
+@media(max-width:700px){.language-trigger{padding:8px;gap:6px}.language-trigger img{width:20px;height:15px}}

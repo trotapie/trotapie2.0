@@ -1,0 +1,10 @@
+<tp-dialog [open]="open()" title="¿A dónde quieres ir?" eyebrow="Navegación rápida" placement="adaptive" closeLabel="Cerrar buscador" (closed)="closed.emit()">
+  <div class="search-field"><tp-icon name="search"/><input #searchInput type="search" autofocus autocomplete="off" placeholder="Busca una sección o catálogo…" aria-label="Buscar sección o catálogo" role="combobox" aria-autocomplete="list" [attr.aria-expanded]="open()" [attr.aria-controls]="id+'-results'" [attr.aria-activedescendant]="results().length ? optionId(active()) : null" [ngModel]="query()" (ngModelChange)="search($event)" (keydown)="keydown($event)" /></div>
+  <div class="search-caption"><span>{{query() ? results().length+(results().length===1?' resultado':' resultados') : 'Secciones y catálogos disponibles'}}</span><span aria-hidden="true">↑ ↓ elegir · Enter abrir</span></div>
+  <div #resultsElement class="search-results" role="listbox" [id]="id+'-results'" aria-label="Secciones encontradas">
+    @for(entry of results();track entry.path){
+      <a [routerLink]="entry.path" role="option" [id]="optionId($index)" [attr.aria-selected]="active()===$index" [class.active]="active()===$index" (mouseenter)="active.set($index)" (click)="closed.emit()"><span class="result-icon"><tp-icon [name]="entry.icon"/></span><span class="result-copy"><strong>{{entry.title}}</strong><small>{{entry.description}}</small></span><span class="result-group">{{entry.group}}</span><tp-icon name="right"/></a>
+    } @empty {<div class="no-results"><tp-icon name="search"/><strong>No encontramos esa sección</strong><p>Prueba con “idiomas”, “destinos” o “cotizaciones”.</p></div>}
+  </div>
+  <p class="search-note">Busca sin salir de tu pantalla. Pulsa Esc o toca fuera para cerrar.</p>
+</tp-dialog>
