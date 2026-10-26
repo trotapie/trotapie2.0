@@ -9,6 +9,7 @@ import { Observable } from 'rxjs';
 import { ISolicitudCotizacionListado } from '../models/solicitudes-cotizacion.interface';
 import { construirNombreClienteVisible } from '../utils/cliente-nombre.util';
 import { queryHomeImagesDrive } from '../utils/home-images-drive';
+import { deleteHomeImage } from '../utils/delete-home-image';
 import type { HotelHorarios, HotelPlanTodoIncluido } from '../models/hotel-estancia.interface';
 
 const ES_ID = 1;
@@ -3737,11 +3738,7 @@ export class SupabaseService {
   }
 
   async eliminarImagenFondoAdmin(id: number) {
-    const { error } = await this.client
-      .from('imagenes_fondo')
-      .delete()
-      .eq('id', id);
-    if (error) throw error;
+    await deleteHomeImage(this.client, id);
   }
 
   async eliminarImagenesFondoAdmin(ids: number[]) {
