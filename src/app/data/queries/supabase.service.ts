@@ -3741,6 +3741,26 @@ export class SupabaseService {
     await deleteHomeImage(this.client, id);
   }
 
+  async completarTraduccionesImagenFondoAdmin(id: number, traducciones: Array<{idioma_id: number; nombre_destino: string}>) {
+    if (!Number.isSafeInteger(id) || id <= 0) throw new Error('La imagen no tiene un ID válido.');
+    const {data: existing, error: readError} = await this.client.from('imagenes_fondo_traducciones')
+      .select('idioma_id, nombre_destino').eq('imagen_fondo_id', id);
+    if (readError) throw readError;
+    for (const translation of traducciones) {
+      const current = existing?.find(row => row.idioma_id === translation.idioma_id);
+      if (current?.nombre_destino?.trim()) continue;
+      const payload = {imagen_fondo_id: id, idioma_id: translation.idioma_id, nombre_destino: translation.nombre_destino.trim()};
+      if (!payload.nombre_destino) throw new Error('La traducción está vacía.');
+      const query = current
+        ? this.client.from('imagenes_fondo_traducciones').update({nombre_destino: payload.nombre_destino})
+          .eq('imagen_fondo_id', id).eq('idioma_id', translation.idioma_id).eq('nombre_destino', current.nombre_destino)
+        : this.client.from('imagenes_fondo_traducciones').insert(payload);
+      const {data, error} = await query.select('idioma_id').maybeSingle();
+      if (error) throw error;
+      if (!data) throw new Error('No se pudo guardar la traducción. Reintenta para consultar los datos actuales.');
+    }
+  }
+
   async eliminarImagenesFondoAdmin(ids: number[]) {
     if (!ids.length) return;
 

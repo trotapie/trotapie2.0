@@ -2,6 +2,15 @@ import {test} from 'node:test';
 import assert from 'node:assert/strict';
 import {translateHomeImage} from '../src/app/features/admin/home-images/translate-home-image.ts';
 
+test('can translate only missing languages without replacing existing saved text', async () => {
+  const value = {nombre_destino: 'Ámsterdam, Países Bajos', translation_2: 'Existing English name'};
+  const prepared = await translateHomeImage(value, [{id: 3, codigo: 'fr', nombre: 'Francés'}],
+    async payload => { assert.equal(payload.title, value.nombre_destino); return {fr: {title: 'Amsterdam, Pays-Bas'}}; }, () => true);
+  assert.equal(prepared.translation_2, value.translation_2);
+  assert.equal(prepared.translation_3, 'Amsterdam, Pays-Bas');
+  assert.equal(value.translation_3, undefined);
+});
+
 const languages = [
   {id: 1, codigo: 'es', nombre: 'Español'},
   {id: 2, codigo: 'en', nombre: 'English'},

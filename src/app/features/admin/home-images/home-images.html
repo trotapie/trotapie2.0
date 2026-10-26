@@ -75,7 +75,7 @@
 }
 <tp-dialog [open]="editorOpen()" [title]="selected() ? 'Editar imagen del inicio' : 'Agregar imagen del inicio'" [busy]="saving() || translating()" (closed)="closeEditor()">
   @if(editorError()){<div class="error-banner" role="alert">{{editorError()}}</div>}
-  <tp-resource-form [fields]="fields()" [value]="value()" [editing]="!!selected()" [busy]="saving() || translating()" [busyLabel]="translating() ? 'Traduciendo…' : 'Guardando…'" [disabled]="!canEdit()" (saved)="save($event)" (cancelled)="closeEditor()" (previewRequested)="translationsOpen.set(true)"/>
+  <tp-resource-form [fields]="fields()" [value]="value()" [editing]="!!selected()" [busy]="saving() || translating()" [busyLabel]="translating() ? 'Traduciendo…' : 'Guardando…'" [disabled]="!canEdit()" (saved)="save($event)" (cancelled)="closeEditor()" (previewRequested)="previewTranslations()"/>
 </tp-dialog>
 <tp-dialog [open]="!!deleteTarget()" title="Eliminar imagen del inicio" [busy]="deleting()" (closed)="closeDelete()">
   @if(deleteTarget(); as record){
@@ -102,12 +102,15 @@
     <button tpButton type="button" variant="danger" [busy]="bulkBusy()" [disabled]="!canEdit() || !checkedRecords().length" (click)="runBulk('delete')">{{bulkBusy() ? 'Eliminando…' : 'Eliminar '+checkedRecords().length+' imágenes'}}</button>
   </div>
 </tp-dialog>
-<tp-dialog [open]="translationsOpen()" title="Traducciones del destino" (closed)="translationsOpen.set(false)">
-  <p class="translations-note">Estas son las traducciones guardadas. Al guardar cambios, se traducirá automáticamente el nombre en español.</p>
+<tp-dialog [open]="translationsOpen()" title="Traducciones del destino" [busy]="translating()" (closed)="translationsOpen.set(false)">
+  <p class="translations-note">Se muestran las traducciones del nombre guardado. Los idiomas faltantes se traducen y guardan automáticamente, sin guardar otros cambios del formulario.</p>
+  @if(!selected()){<p>Guarda primero la imagen para generar sus traducciones.</p>}
+  @if(translating()){<p role="status">Consultando y completando traducciones…</p>}
+  @if(translationsError()){<div class="error-banner" role="alert">{{translationsError()}}</div><button tpButton type="button" [disabled]="translating()" (click)="previewTranslations()">Reintentar</button>}
   <dl class="translations-list">
     @for(translation of savedTranslations(); track translation.id){
       <div><dt>{{translation.name}}</dt><dd [attr.lang]="translation.code">{{translation.text || 'Sin traducción guardada'}}</dd></div>
     } @empty {<p>No hay idiomas disponibles.</p>}
   </dl>
-  <div class="dialog-actions"><button tpButton type="button" (click)="translationsOpen.set(false)">Cerrar</button></div>
+  <div class="dialog-actions"><button tpButton type="button" [disabled]="translating()" (click)="translationsOpen.set(false)">Cerrar</button></div>
 </tp-dialog>

@@ -47,13 +47,14 @@ export class HomeImages implements OnInit {
   readonly bulkResult = signal<HomeImageBulkResult | null>(null);
   readonly actionsLocked = computed(() => this.loading() || this.importing() || this.saving() || this.translating() || this.deleting() || this.bulkBusy());
   readonly translationsOpen = signal(false);
+  readonly translationsError = signal('');
   readonly savedTranslations = computed(() => this.languages()
     .filter(language => language.codigo !== 'es')
     .map(language => ({
       id: language.id,
       code: language.codigo,
       name: language.nombre,
-      text: String(this.value()['translation_'+language.id] || '').trim(),
+      text: String(this.selected()?.raw['traducciones']?.find((translation: Row) => Number(translation['idioma_id']) === language.id)?.nombre_destino || '').trim(),
     })));
   private readonly editor = viewChild(ResourceForm);
   driveFolder = '';
@@ -73,6 +74,43 @@ export class HomeImages implements OnInit {
     {key: 'activo', label: 'Mostrar en el inicio', type: 'checkbox'},
   ]);
   canEdit() { return this.data.auth.hasPermission('destinos.edit'); }
+  async previewTranslations() {
+    if (this.actionsLocked() || !this.editorOpen()) return;
+    this.translationsError.set('');
+    this.translationsOpen.set(true);
+    const record = this.selected();
+    if (!record || !this.canEdit()) return;
+    this.translating.set(true);
+    this.pendingImport.sync();
+    try {
+      // Consult persisted values, not the editor draft. A previous attempt may have saved some languages.
+      const images = await this.data.legacy.obtenerImagenesFondoAdmin();
+      const image = images.find(image => String(image.id) === record.id);
+      if (!image) throw new Error('La imagen ya no existe o no tienes permisos para consultarla.');
+      const current = {...record, raw: image};
+      this.selected.set(current);
+      const missing = this.languages().filter(language => language.codigo !== 'es' &&
+        !image.traducciones?.some(translation => Number(translation.idioma_id) === language.id && translation.nombre_destino?.trim()));
+      if (!missing.length) return;
+      const prepared = await translateHomeImage({nombre_destino: image.nombre_destino}, missing,
+        payload => this.data.legacy.traducirDesdeEspanol(payload), () => true);
+      if (!prepared) return;
+      const translations = missing.map(language => ({idioma_id: language.id, nombre_destino: String(prepared['translation_'+language.id])}));
+      if (!this.canEdit()) throw new Error('No tienes permiso para guardar traducciones.');
+      await this.data.legacy.completarTraduccionesImagenFondoAdmin(Number(record.id), translations);
+      const refreshed = await this.data.legacy.obtenerImagenesFondoAdmin();
+      const saved = refreshed.find(image => String(image.id) === record.id);
+      if (!saved) throw new Error('No pudimos consultar las traducciones guardadas. Intenta nuevamente.');
+      this.selected.set({...record, raw: saved});
+      this.records.update(records => records.map(item => item.id === record.id ? {...item, raw: saved} : item));
+      this.data.invalidate();
+    } catch (error) {
+      this.translationsError.set(error && typeof error === 'object' && 'message' in error ? String(error.message) : 'No pudimos completar las traducciones. Intenta nuevamente.');
+    } finally {
+      this.translating.set(false);
+      this.pendingImport.sync();
+    }
+  }
   toggleSelectionMode() {
     if (!this.canEdit() || this.actionsLocked() || this.bulkDeletingOpen()) return;
     this.selectionMode.update(enabled => !enabled);
