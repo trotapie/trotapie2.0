@@ -1,6 +1,6 @@
 import {imageStylePayload} from '../../shared/models/image-style-payload';
 // Query contracts reused from Trotapie; all screens are newly implemented.
-import { inject, Injectable } from '@angular/core';
+import { inject, Injectable, isDevMode } from '@angular/core';
 import { ClientService } from '../../core/services/client.service';
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
 import { getDefaultLang } from '../../core/utils/lang.utils';
@@ -8,6 +8,7 @@ import { LanguageService as TranslocoService } from '../../core/services/languag
 import { Observable } from 'rxjs';
 import { ISolicitudCotizacionListado } from '../models/solicitudes-cotizacion.interface';
 import { construirNombreClienteVisible } from '../utils/cliente-nombre.util';
+import { queryHomeImagesDrive } from '../utils/home-images-drive';
 import type { HotelHorarios, HotelPlanTodoIncluido } from '../models/hotel-estancia.interface';
 
 const ES_ID = 1;
@@ -308,6 +309,8 @@ export class SupabaseService {
 
     return {
       publicImageUrl,
+      thumbnailUrl: typeof value === 'object' && value !== null && typeof value.thumbnailUrl === 'string'
+        ? value.thumbnailUrl.trim() || null : null,
       nombre,
       extension,
       mimeType,
@@ -440,6 +443,13 @@ export class SupabaseService {
     }
 
     return [];
+  }
+
+  async obtenerImagenesInicioDesdeDrive(folderUrlOrId: string): Promise<IDriveActividadImportFolder[]> {
+    const folderId = this.extraerIdCarpetaDrive(folderUrlOrId);
+    if (isDevMode()) console.log('[Drive inicio] Enlace e ID extraído', {enlaceCapturado: folderUrlOrId, folderId});
+    if (!folderId) throw new Error('La URL de Drive no es válida. Verifica que incluya una carpeta.');
+    return queryHomeImagesDrive(folderId, result => this.normalizarCarpetasDriveActividad(result), fetch, isDevMode());
   }
 
   async obtenerImagenesActividadDesdeDrive(folderUrlOrId: string): Promise<IDriveActividadImportFolder[]> {
@@ -3655,6 +3665,17 @@ export class SupabaseService {
 
     if (error) throw error;
     return data ?? [];
+  }
+
+  /** Import only the base record in one write; translations can be edited afterwards. */
+  async agregarImagenFondoDesdeDriveAdmin(payload: {url_imagen: string; nombre_destino: string; activo: boolean}) {
+    const {data, error} = await this.client
+      .from('imagenes_fondo')
+      .insert({url_imagen: payload.url_imagen, nombre_destino: payload.nombre_destino, activo: payload.activo})
+      .select('id')
+      .single();
+    if (error) throw error;
+    return Number(data.id);
   }
 
   async guardarImagenFondoAdmin(payload: {

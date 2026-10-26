@@ -1,7 +1,36 @@
 <tp-page-header title="Imágenes del inicio" eyebrow="Trotapie / Contenido" backTo="/admin/dashboard" description="Gestiona las fotografías del inicio y de Lugares para inspirar. La portada se elige al azar entre las imágenes activas; las primeras tres activas aparecen en las tarjetas.">
-  <button tpButton icon="refresh" [busy]="loading()" (click)="load()">Actualizar</button>
-  @if(canEdit()){<button tpButton variant="primary" icon="plus" (click)="open(null)" [disabled]="loading() || !!error()">Agregar imagen</button>}
+  <button tpButton icon="refresh" [busy]="loading()" [disabled]="importing() || saving()" (click)="load()">Actualizar</button>
+  @if(canEdit()){
+    <button tpButton icon="download" (click)="openDriveImport()" [disabled]="loading() || importing() || saving() || !!error()">Importar desde Drive</button>
+    <button tpButton variant="primary" icon="plus" (click)="open(null)" [disabled]="loading() || importing() || saving() || !!error()">Agregar imagen</button>
+  }
 </tp-page-header>
+@if(canEdit()){
+  <tp-dialog [open]="importOpen()" title="Importar desde Google Drive" size="wide" [busy]="importing()" (closed)="closeDriveImport()">
+    <div class="drive-import" [attr.aria-busy]="importing()">
+    <!-- <div class="drive-import-heading"><p>Agrega todas las fotografías de una carpeta sin reemplazar las actuales. Las imágenes repetidas se omiten. Si el servicio principal falla o no encuentra imágenes, se consulta automáticamente el de respaldo.</p></div> -->
+    <form class="drive-import-form" (ngSubmit)="importDrive()">
+      <tp-field label="Enlace o ID de la carpeta de Drive" forId="home-images-drive" hint="La carpeta debe ser accesible para el servicio de Drive. Se guardan los enlaces, no se copian los archivos.">
+        <input id="home-images-drive" name="driveFolder" [(ngModel)]="driveFolder" [disabled]="importing() || saving()" placeholder="https://drive.google.com/drive/folders/…" required aria-describedby="drive-import-note"/>
+      </tp-field>
+      <button tpButton type="submit" icon="download" variant="primary" [busy]="importing()" [disabled]="loading() || saving() || editorOpen() || !!error() || !driveFolder.trim()">Importar imágenes</button>
+    </form>
+    <p id="drive-import-note" class="drive-import-note">Las nuevas imágenes quedan activas. El nombre se toma del archivo; después puedes editarlo y agregar sus traducciones.</p>
+    <div aria-live="polite" role="status">
+      @if(importing()){
+        @if(importProgress(); as progress){<p class="drive-import-status">Procesadas {{progress.completed}} de {{progress.total}} imágenes. No cierres esta página.</p><progress [value]="progress.completed" [max]="progress.total" aria-label="Progreso de importación"></progress>}
+        @else{<p class="drive-import-status">Consultando las imágenes de Drive…</p>}
+      }
+      @if(importResult(); as result){<p class="drive-import-status">Resultado: {{result.added}} agregadas · {{result.skipped}} omitidas por duplicado · {{result.failed.length}} con error.</p>}
+    </div>
+    @if(importError()){<div class="error-banner" role="alert">{{importError()}}</div>}
+    @if(importResult(); as result){@if(result.failed.length){
+      <details class="drive-import-errors"><summary>Ver imágenes con error ({{result.failed.length}})</summary><p>Puedes volver a importar la carpeta: las imágenes ya agregadas se omitirán.</p><ul>@for(failure of result.failed; track $index){<li><strong>{{failure.name}}</strong>: {{failure.message}}</li>}</ul></details>
+    }}
+    <div class="dialog-actions"><button tpButton type="button" [disabled]="importing()" (click)="closeDriveImport()">Cerrar</button></div>
+    </div>
+  </tp-dialog>
+}
 @if(loading()){<tp-state mode="loading"/>}
 @else if(error()){<tp-state mode="error" [message]="error()" (retry)="load()"/>}
 @else {

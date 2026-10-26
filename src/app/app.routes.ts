@@ -9,7 +9,7 @@ const catalogRoutes=(preview=false):Routes=>[
  ...(preview?[{path:'componentes',loadComponent:()=>import('./features/common/shared-showcase/shared-showcase').then(m=>m.SharedShowcase),data:{preview:true}}]:[]),
  {path:'',pathMatch:'full',redirectTo:'dashboard'},
   {path:'dashboard',loadComponent:dashboard,data:{preview}},
-  {path:'imagenes-inicio',loadComponent:()=>import('./features/admin/home-images/home-images').then(m=>m.HomeImages),data:{permission:'destinos.edit'},canActivate:[authGuard]},
+  {path:'imagenes-inicio',loadComponent:()=>import('./features/admin/home-images/home-images').then(m=>m.HomeImages),data:{permission:'destinos.edit'},canActivate:[authGuard],canDeactivate:[unsavedChangesGuard]},
  {path:'empleados/:id/acceso',loadComponent:()=>import('./features/employees/access/employee-access').then(m=>m.EmployeeAccess),data:{permission:'empleados.manage'},canActivate:[authGuard]},
  {path:'circuitos/:id/flyer',loadComponent:()=>import('./features/circuits/flyer/flyer-editor').then(m=>m.FlyerEditor),data:{permission:'circuitos.edit'},canActivate:[authGuard]},
  {path:'roles/:id',loadComponent:()=>import('./features/configuration/role-editor/role-editor').then(m=>m.RoleEditor),data:{permission:'empleados.manage'},canActivate:[authGuard]},
