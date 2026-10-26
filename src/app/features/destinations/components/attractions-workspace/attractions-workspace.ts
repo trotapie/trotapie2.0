@@ -16,9 +16,11 @@ export class AttractionsWorkspace {
   activities=input<IActividadPreviewAdmin[]>([]);
   types=input<Array<{id:number;nombre:string}>>([]);
   language=input(1);busy=input(false);
+  importing=input(false);
   added=output<void>();reordered=output<{from:number;to:number}>();
   toggled=output<{activity:IActividadPreviewAdmin;active:boolean}>();
   imageEdited=output<{activity:IActividadPreviewAdmin;image:Record<string,any>}>();
+  imageToggled=output<{activity:IActividadPreviewAdmin;image:Record<string,any>;active:boolean}>();
   imageAdded=output<{activity:IActividadPreviewAdmin;url:string}>();
   driveImported=output<{activity:IActividadPreviewAdmin;url:string}>();
   index=signal(0);

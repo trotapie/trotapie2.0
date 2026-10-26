@@ -6,7 +6,11 @@ import { MotionDirective } from '../../../../../shared/directives/motion.directi
 
 export interface DashboardSnapshot { total:number|null; pending:number|null; quoted:number|null; recent:TravelRecord[]; }
 
-@Component({selector:'tp-dashboard-statistics',imports:[TpDonutChartComponent,TpBarChartComponent,MotionDirective],templateUrl:'./dashboard-statistics.html',styleUrl:'./dashboard-statistics.scss'})
+@Component({
+  selector:'tp-dashboard-statistics',
+  imports:[],
+  templateUrl:'./dashboard-statistics.html',
+  styleUrl:'./dashboard-statistics.scss'})
 export class DashboardStatistics {
   snapshot=input.required<DashboardSnapshot>();
   distribution=computed(()=>{

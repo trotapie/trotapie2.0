@@ -5,7 +5,7 @@ import { gsap } from 'gsap';
 
 @Component({
   selector: 'tp-theme-toggle',
-  imports: [Button],
+  // imports: [Button],
   templateUrl: './theme-toggle.html',
   styleUrl: './theme-toggle.scss',
 })

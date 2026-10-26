@@ -1,4 +1,5 @@
 import {imageStylePayload} from '../../shared/models/image-style-payload';
+import {driveImageThumbnailUrl} from '../utils/drive-image-url';
 // Query contracts reused from Trotapie; all screens are newly implemented.
 import {normalizarEstiloTextosImagen} from '../../shared/models/image-text-style';
 import { inject, Injectable } from '@angular/core';
@@ -969,7 +970,7 @@ export class DestinosService {
         const { error: updateActividadError } = await this.client
           .from('atracciones_principales')
           .update({
-            imagen_fondo: actividad.imagen_fondo,
+            imagen_fondo: actividad.imagen_fondo ? driveImageThumbnailUrl(actividad.imagen_fondo) : actividad.imagen_fondo,
             catalogo_atraccion_id: actividad.catalogo_atraccion_id ?? null
           })
           .eq('id', idActividad)
@@ -985,7 +986,7 @@ export class DestinosService {
         .from('atracciones_principales')
         .insert({
           detalles_destino_id: detallesDestinosId,
-          imagen_fondo: actividad.imagen_fondo,
+          imagen_fondo: actividad.imagen_fondo ? driveImageThumbnailUrl(actividad.imagen_fondo) : actividad.imagen_fondo,
           catalogo_atraccion_id: actividad.catalogo_atraccion_id ?? null
         })
         .select('id')
@@ -2708,8 +2709,7 @@ export class DestinosService {
       orden?: number | null;
       vigencia_desde?: string | null;
       vigencia_hasta?: string | null;
-    }>,
-    imagenActivaId?: number | null
+    }>
   ) {
     if (!Array.isArray(imagenes)) {
       return;
@@ -2720,7 +2720,7 @@ export class DestinosService {
         style:imageStylePayload(imagen as Record<string,any>),
         traducciones:(imagen as any).traducciones,
         id: Number.isFinite(Number(imagen?.id)) ? Number(imagen?.id) : null,
-        imagen_url: String(imagen?.imagen_url ?? '').trim(),
+        imagen_url: driveImageThumbnailUrl(String(imagen?.imagen_url ?? '')),
         carpeta_id: this.parseNumber(imagen?.carpeta_id),
         carpeta_nombre: this.normalizarNombreCarpeta(imagen?.carpeta_nombre ?? imagen?.carpeta),
         carpeta: this.normalizarNombreCarpeta(imagen?.carpeta_nombre ?? imagen?.carpeta),
@@ -2749,16 +2749,6 @@ export class DestinosService {
       return;
     }
 
-    const idActivaRecibida = this.parseNumber(imagenActivaId);
-    const indicePorId = idActivaRecibida !== null
-      ? limpias.findIndex((imagen) => imagen.id === idActivaRecibida)
-      : -1;
-    const primeraActiva = limpias.findIndex((imagen) => imagen.activa);
-    const indiceActivaFinal = indicePorId >= 0 ? indicePorId : primeraActiva >= 0 ? primeraActiva : 0;
-    limpias.forEach((imagen, index) => {
-      imagen.activa = index === indiceActivaFinal;
-    });
-
     const carpetasPorNombre = await this.asegurarCarpetasActividad(
       actividadId,
       limpias.map((imagen) => imagen.carpeta_nombre ?? imagen.carpeta)
@@ -2772,10 +2762,7 @@ export class DestinosService {
     if (existentesError) throw existentesError;
 
     const idsExistentes = new Set((existentes ?? []).map((item: any) => Number(item.id)));
-    const idImagenActivaActual =
-      (existentes ?? []).find((item: any) => Boolean(item.activa))?.id ?? null;
     const idsRecibidos = new Set<number>();
-    let idImagenActivaFinal: number | null = null;
 
     for (let index = 0; index < limpias.length; index += 1) {
       const imagen = limpias[index];
@@ -2816,6 +2803,7 @@ export class DestinosService {
             mime_type: imagen.mime_type,
             size: imagen.size,
             size_formatted: imagen.size_formatted,
+            activa: imagen.activa,
             oscurecer_fondo: Boolean(imagen.oscurecer_fondo),
             ...imagen.style,
             orden: imagen.orden,
@@ -2826,9 +2814,6 @@ export class DestinosService {
           .eq('atraccion_id', actividadId);
 
         if (updateError) throw updateError;
-        if (index === indiceActivaFinal) {
-          idImagenActivaFinal = imagen.id;
-        }
         continue;
       }
 
@@ -2844,7 +2829,7 @@ export class DestinosService {
           mime_type: imagen.mime_type,
           size: imagen.size,
           size_formatted: imagen.size_formatted,
-          activa: false,
+          activa: imagen.activa,
           oscurecer_fondo: Boolean(imagen.oscurecer_fondo),
             ...imagen.style,
           orden: imagen.orden,
@@ -2858,9 +2843,6 @@ export class DestinosService {
       if (nuevaImagen?.id) {
         idsRecibidos.add(Number(nuevaImagen.id));
         await this.saveImageTranslations(Number(nuevaImagen.id),imagen.traducciones);
-        if (index === indiceActivaFinal) {
-          idImagenActivaFinal = Number(nuevaImagen.id);
-        }
       }
     }
 
@@ -2873,50 +2855,6 @@ export class DestinosService {
         .in('id', idsParaEliminar);
 
       if (eliminarError) throw eliminarError;
-    }
-
-    const imagenActivaFinal = limpias[indiceActivaFinal] ?? null;
-    if (idImagenActivaFinal === null && imagenActivaFinal?.imagen_url) {
-      const { data: imagenesPorUrl, error: buscarPorUrlError } = await this.client
-        .from('atracciones_imagenes')
-        .select('id')
-        .eq('atraccion_id', actividadId)
-        .eq('imagen_url', imagenActivaFinal.imagen_url)
-        .limit(1);
-
-      if (buscarPorUrlError) throw buscarPorUrlError;
-
-      const idPorUrl = this.parseNumber(imagenesPorUrl?.[0]?.id);
-      if (idPorUrl === null) {
-        throw new Error('No se encontro la imagen seleccionada para marcarla como principal.');
-      }
-
-      idImagenActivaFinal = idPorUrl;
-    }
-
-    const idImagenActivaAnterior = this.parseNumber(idImagenActivaActual);
-    if (
-      idImagenActivaAnterior !== null &&
-      idImagenActivaAnterior !== idImagenActivaFinal &&
-      idsRecibidos.has(idImagenActivaAnterior)
-    ) {
-      const { error: desactivarAnteriorError } = await this.client
-        .from('atracciones_imagenes')
-        .update({ activa: false })
-        .eq('id', idImagenActivaAnterior)
-        .eq('atraccion_id', actividadId);
-
-      if (desactivarAnteriorError) throw desactivarAnteriorError;
-    }
-
-    if (idImagenActivaFinal !== null && idImagenActivaFinal !== idImagenActivaAnterior) {
-      const { error: activarFinalError } = await this.client
-        .from('atracciones_imagenes')
-        .update({ activa: true })
-        .eq('id', idImagenActivaFinal)
-        .eq('atraccion_id', actividadId);
-
-      if (activarFinalError) throw activarFinalError;
     }
 
   }

@@ -11,7 +11,7 @@ import {PageMotionDirective} from '../../shared/directives/page-motion.directive
 import {DetailsMotionDirective} from '../../shared/directives/details-motion.directive';
 import {AuthService} from '../../core/services/auth.service';import {Icon} from '../../shared/components/icon/icon';import {Button} from '../../shared/components/button/button';
 import {gsap} from 'gsap';
-@Component({selector:'tp-workspace',imports:[NavIndicatorDirective,NavigationSearch,RouterLink,RouterLinkActive,RouterOutlet,Icon,Button,PageMotionDirective,DetailsMotionDirective],templateUrl:'./workspace.html',styleUrl:'./workspace.scss'})
+@Component({selector:'tp-workspace',imports:[NavIndicatorDirective,NavigationSearch,RouterLink,RouterOutlet,Icon,Button,PageMotionDirective,DetailsMotionDirective],templateUrl:'./workspace.html',styleUrl:'./workspace.scss'})
 export class Workspace {
   theme=inject(ThemeService);
   auth=inject(AuthService);router=inject(Router);route=inject(ActivatedRoute);
