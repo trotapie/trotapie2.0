@@ -4,7 +4,7 @@ import {NavigationEntry} from '../../shared/models/navigation-entry';
 import {catalogLabels,catalogOverviewKeys} from '../../features/catalogs/models/catalog-definitions';
 
 export const workspaceNavigation=[{name:'Dashboard',path:'dashboard',icon:'grid',permission:''},{name:'Cotizaciones',path:'cotizaciones',icon:'quote',permission:'cotizaciones.view'},{name:'Destinos',path:'destinos',icon:'map',permission:'destinos.view'}];
-export const workspaceMoreNavigation=[{name:'Clientes',path:'clientes',icon:'people',permission:'cotizaciones.view'},{name:'Empleados',path:'empleados',icon:'people',permission:'empleados.manage'},{name:'Circuitos',path:'circuitos',icon:'suitcase',permission:'circuitos.view'},{name:'Catálogos',path:'catalogos',icon:'grid',permission:'destinos.edit'},{name:'Configuración',path:'configuracion',icon:'settings',permission:'empleados.manage'}];
+export const workspaceMoreNavigation=[{name:'Clientes',path:'clientes',icon:'people',permission:'cotizaciones.view'},{name:'Empleados',path:'empleados',icon:'people',permission:'empleados.manage'},{name:'Circuitos',path:'circuitos',icon:'suitcase',permission:'circuitos.view'},{name:'Catálogos',path:'catalogos',icon:'grid',permission:'destinos.edit'},{name:'Imágenes del inicio',path:'imagenes-inicio',icon:'home',permission:'destinos.edit'},{name:'Configuración',path:'configuracion',icon:'settings',permission:'empleados.manage'}];
 
 @Injectable({providedIn:'root'})
 export class NavigationSearchService {
