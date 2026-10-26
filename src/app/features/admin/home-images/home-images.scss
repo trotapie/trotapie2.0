@@ -4,6 +4,13 @@
   gap: 20px;
 }
 
+.translations-note { color: var(--muted); font-size: 13px; line-height: 1.7; margin: 0 0 20px; }
+.translations-list { margin: 0; }
+.translations-list > div { padding: 12px 0; }
+.translations-list dt { color: var(--muted); font-size: 13px; margin-bottom: 6px; }
+.translations-list dd { margin: 0; overflow-wrap: anywhere; }
+
+
 .drive-import-heading p, .drive-import-note { color: var(--muted); font-size: 13px; line-height: 1.7; }
 .drive-import-heading p { margin: 0 0 20px; }
 .drive-import-form { display: flex; align-items: center; gap: 16px; }

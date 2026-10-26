@@ -1,4 +1,4 @@
-import { Component, OnInit, computed, inject, signal, isDevMode } from '@angular/core';
+import { Component, OnInit, computed, inject, signal, isDevMode, viewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { TravelDataService, Row, TravelRecord } from '../../../data/facades/travel-data.service';
 import { FieldDefinition } from '../../../shared/models/resource-definition';
@@ -12,6 +12,7 @@ import { TpToastService } from '../../../shared/services/tp-toast.service';
 import { Field } from '../../../shared/components/field/field';
 import { protectUnsavedChanges } from '../../../core/guards/unsaved-changes.guard';
 import { importHomeImages, type DriveImportResult } from './drive-import';
+import { translateHomeImage } from './translate-home-image';
 
 @Component({
   imports: [PageHeader, Button, State, ImageCard, Dialog, ResourceForm, FormsModule, Field],
@@ -31,19 +32,32 @@ export class HomeImages implements OnInit {
   readonly value = signal<Row>({});
   readonly saving = signal(false);
   readonly editorError = signal('');
+  readonly translating = signal(false);
+  readonly translationsOpen = signal(false);
+  readonly savedTranslations = computed(() => this.languages()
+    .filter(language => language.codigo !== 'es')
+    .map(language => ({
+      id: language.id,
+      code: language.codigo,
+      name: language.nombre,
+      text: String(this.value()['translation_'+language.id] || '').trim(),
+    })));
+  private readonly editor = viewChild(ResourceForm);
   driveFolder = '';
   readonly importOpen = signal(false);
   readonly importing = signal(false);
   readonly importError = signal('');
   readonly importResult = signal<DriveImportResult | null>(null);
   readonly importProgress = signal<{completed: number; total: number} | null>(null);
-  private readonly pendingImport = protectUnsavedChanges(() => false, () => this.importing());
+  private readonly pendingImport = protectUnsavedChanges(
+    () => this.editorOpen() && !!this.editor()?.hasChanges(),
+    () => this.importing() || this.translating() || this.saving(),
+  );
   canDeactivate() { return this.pendingImport.confirm(); }
   readonly fields = computed<FieldDefinition[]>(() => [
-    {key: 'nombre_destino', label: 'Nombre del destino', required: true},
+    {key: 'nombre_destino', label: 'Nombre del destino', required: true, textPreview: true},
     {key: 'url_imagen', label: 'URL de la imagen', type: 'url', required: true, imagePreview: true, hint: 'Pega el enlace público de la fotografía.'},
     {key: 'activo', label: 'Mostrar en el inicio', type: 'checkbox'},
-    ...this.languages().filter(language => language.codigo !== 'es').map(language => ({key: 'translation_'+language.id, label: 'Nombre del destino · '+language.nombre}))
   ]);
   canEdit() { return this.data.auth.hasPermission('destinos.edit'); }
   openDriveImport() {
@@ -97,15 +111,20 @@ export class HomeImages implements OnInit {
     finally { this.loading.set(false); }
   }
   open(record: TravelRecord | null) {
-    if (!this.canEdit() || this.importing() || this.saving()) return;
+    if (!this.canEdit() || this.importing() || this.saving() || this.translating()) return;
     this.selected.set(record); this.editorError.set('');
+    this.translationsOpen.set(false);
     const value: Row = record ? {...record.raw} : {activo: true};
     for (const translation of record?.raw['traducciones'] || []) value['translation_'+translation.idioma_id] = translation.nombre_destino;
     this.value.set(value); this.editorOpen.set(true);
   }
+  closeEditor() {
+    if (this.pendingImport.confirm()) this.editorOpen.set(false);
+  }
   async save(value: Row) {
-    if (!this.canEdit() || this.saving() || this.importing()) return;
+    if (!this.canEdit() || this.saving() || this.importing() || this.translating()) return;
     this.saving.set(true); this.editorError.set('');
+    this.pendingImport.sync();
     try {
       const name = String(value['nombre_destino'] || '').trim();
       const url = String(value['url_imagen'] || '').trim();
@@ -113,14 +132,21 @@ export class HomeImages implements OnInit {
       let parsed: URL;
       try { parsed = new URL(url); } catch { throw new Error('Introduce una URL válida para la imagen.'); }
       if (!['https:', 'http:'].includes(parsed.protocol)) throw new Error('La imagen debe tener una URL HTTP o HTTPS.');
-      // Preserve translations for languages not exposed by the editor.
+      let prepared = value;
+      if (this.languages().some(language => language.codigo !== 'es')) {
+        this.translating.set(true);
+        prepared = await translateHomeImage(value, this.languages(),
+          payload => this.data.legacy.traducirDesdeEspanol(payload), () => true) || value;
+        this.translating.set(false);
+      }
+      // Preserve translations for languages outside the current catalog.
       const translations = new Map<number, string>((this.selected()?.raw['traducciones'] || []).map((translation: Row) => [Number(translation['idioma_id']), String(translation['nombre_destino'] || '')]));
-      for (const language of this.languages()) translations.set(language.id, language.codigo === 'es' ? name : String(value['translation_'+language.id] || '').trim());
+      for (const language of this.languages()) translations.set(language.id, language.codigo === 'es' ? name : String(prepared['translation_'+language.id] || '').trim());
       await this.data.legacy.guardarImagenFondoAdmin({id: this.selected() ? Number(this.selected()!.id) : null, nombre_destino: name, url_imagen: url, activo: !!value['activo'], traducciones: Array.from(translations, ([idioma_id, nombre_destino]) => ({idioma_id, nombre_destino}))});
       this.data.invalidate(); this.editorOpen.set(false);
       this.toast.success('La imagen del inicio se guardó correctamente.');
       await this.load();
     } catch (error) { this.editorError.set(error instanceof Error ? error.message : 'No pudimos guardar la imagen. Intenta nuevamente.'); }
-    finally { this.saving.set(false); }
+    finally { this.translating.set(false); this.saving.set(false); this.pendingImport.sync(); }
   }
 }

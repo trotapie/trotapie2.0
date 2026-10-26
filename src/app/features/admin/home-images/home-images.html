@@ -15,7 +15,7 @@
       </tp-field>
       <button tpButton type="submit" icon="download" variant="primary" [busy]="importing()" [disabled]="loading() || saving() || editorOpen() || !!error() || !driveFolder.trim()">Importar imágenes</button>
     </form>
-    <p id="drive-import-note" class="drive-import-note">Las nuevas imágenes quedan activas. El nombre se toma del archivo; después puedes editarlo y agregar sus traducciones.</p>
+    <p id="drive-import-note" class="drive-import-note">Las nuevas imágenes quedan activas. El nombre se toma del archivo; al editar y guardar la imagen, se traduce automáticamente.</p>
     <div aria-live="polite" role="status">
       @if(importing()){
         @if(importProgress(); as progress){<p class="drive-import-status">Procesadas {{progress.completed}} de {{progress.total}} imágenes. No cierres esta página.</p><progress [value]="progress.completed" [max]="progress.total" aria-label="Progreso de importación"></progress>}
@@ -39,7 +39,16 @@
     @empty{<tp-state title="Agrega tu primera imagen" message="Las imágenes activas se mostrarán en el inicio."/>}
   </section>
 }
-<tp-dialog [open]="editorOpen()" [title]="selected() ? 'Editar imagen del inicio' : 'Agregar imagen del inicio'" [busy]="saving()" (closed)="editorOpen.set(false)">
+<tp-dialog [open]="editorOpen()" [title]="selected() ? 'Editar imagen del inicio' : 'Agregar imagen del inicio'" [busy]="saving() || translating()" (closed)="closeEditor()">
   @if(editorError()){<div class="error-banner" role="alert">{{editorError()}}</div>}
-  <tp-resource-form [fields]="fields()" [value]="value()" [editing]="!!selected()" [busy]="saving()" [disabled]="!canEdit()" (saved)="save($event)" (cancelled)="editorOpen.set(false)"/>
+  <tp-resource-form [fields]="fields()" [value]="value()" [editing]="!!selected()" [busy]="saving() || translating()" [busyLabel]="translating() ? 'Traduciendo…' : 'Guardando…'" [disabled]="!canEdit()" (saved)="save($event)" (cancelled)="closeEditor()" (previewRequested)="translationsOpen.set(true)"/>
+</tp-dialog>
+<tp-dialog [open]="translationsOpen()" title="Traducciones del destino" (closed)="translationsOpen.set(false)">
+  <p class="translations-note">Estas son las traducciones guardadas. Al guardar cambios, se traducirá automáticamente el nombre en español.</p>
+  <dl class="translations-list">
+    @for(translation of savedTranslations(); track translation.id){
+      <div><dt>{{translation.name}}</dt><dd [attr.lang]="translation.code">{{translation.text || 'Sin traducción guardada'}}</dd></div>
+    } @empty {<p>No hay idiomas disponibles.</p>}
+  </dl>
+  <div class="dialog-actions"><button tpButton type="button" (click)="translationsOpen.set(false)">Cerrar</button></div>
 </tp-dialog>

@@ -8,15 +8,16 @@
       }@else if(field.type==='textarea'){
         <app-tp-textarea [label]="field.label" [name]="field.key" [ngModel]="model()[field.key]" [required]="!!field.required" [disabled]="disabled()||busy()" (ngModelChange)="set(field.key,$event)" />
       }@else{
-        <div [class.field-with-preview]="field.imagePreview">
+        <div [class.field-with-preview]="field.imagePreview || field.textPreview">
         <app-tp-input [label]="field.label" [inputId]="'field-'+field.key" [name]="field.key" [type]="field.type||'text'" [ngModel]="model()[field.key]" [required]="!!field.required" [min]="field.min??null" [email]="field.type==='email'" [disabled]="disabled()||busy()" (ngModelChange)="set(field.key,$event)" />
         @if(field.imagePreview){<button tpButton variant="icon" icon="eye" type="button" [disabled]="!model()[field.key]" [attr.aria-label]="'Ver imagen: '+field.label" title="Ver imagen" (click)="preview.set({url:model()[field.key],title:field.label})"></button>}
+        @if(field.textPreview){<button tpButton variant="icon" icon="eye" type="button" [disabled]="busy()" [attr.aria-label]="'Ver traducciones: '+field.label" title="Ver traducciones" (click)="previewRequested.emit(field.key)"></button>}
         </div>
       }
       @if(field.hint){<small>{{ field.hint }}</small>}
     </div>
   }}</div>
-  <div class="dialog-actions"><button tpButton icon="close" type="button" [disabled]="busy()" (click)="cancelled.emit()">Cancelar</button><button tpButton icon="check" variant="primary" type="submit" [busy]="busy()" [disabled]="form.invalid||busy()||disabled()">{{ busy()?'Guardando…':submitLabel() }}</button></div>
+  <div class="dialog-actions"><button tpButton icon="close" type="button" [disabled]="busy()" (click)="cancelled.emit()">Cancelar</button><button tpButton icon="check" variant="primary" type="submit" [busy]="busy()" [disabled]="form.invalid||busy()||disabled()">{{ busy()?busyLabel():submitLabel() }}</button></div>
 </form>
 <tp-image-preview [open]="!!preview()" [src]="preview()?.url || ''" [title]="preview()?.title || 'Vista previa de la imagen'" (closed)="preview.set(null)" />
 
