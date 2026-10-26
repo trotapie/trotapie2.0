@@ -7,7 +7,7 @@
     </nav>
     <div class="workspace-tools">
       <button tpButton icon="search" variant="icon" type="button" (click)="openSearch()" aria-label="Buscar sección o catálogo" title="Buscar sección o catálogo (Ctrl + K)" aria-haspopup="dialog" [attr.aria-expanded]="searchOpen()"></button>
-      <button tpButton [icon]="theme.dark() ? 'sun' : 'moon'" variant="icon" type="button" (click)="toggleTheme($event)" aria-label="Cambiar tema" title="Cambiar tema"></button>
+      <!-- <button tpButton [icon]="theme.dark() ? 'sun' : 'moon'" variant="icon" type="button" (click)="toggleTheme($event)" aria-label="Cambiar tema" title="Cambiar tema"></button> -->
       <details tpDetailsMotion class="account-menu"><summary aria-label="Menú de usuario"><span class="account-avatar">{{(auth.identity()?.name||'T').slice(0,1)}}</span></summary><div class="nav-dropdown"><strong>{{auth.identity()?.name||(preview?'Vista de diseño':'Trotapie')}}</strong><small>{{auth.identity()?.email||'Sin datos de una sesión real'}}</small><a routerLink="/">Ver sitio público<tp-icon name="arrow"/></a>@if(!preview){<button tpButton icon="logout" variant="quiet" (click)="logout()">Cerrar sesión</button>}@else{<a tpButton icon="lock" routerLink="/acceso">Iniciar sesión</a>}</div></details>
     </div>
   </header>

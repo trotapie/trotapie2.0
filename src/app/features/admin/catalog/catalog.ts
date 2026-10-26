@@ -1,4 +1,6 @@
 import {quoteAdminSegment} from '../../quotations/models/quote-route';
+import {viewChild} from '@angular/core';
+import {protectUnsavedChanges} from '../../../core/guards/unsaved-changes.guard';
 import {combineLatest} from 'rxjs';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {DestroyRef} from '@angular/core';
@@ -15,6 +17,10 @@ import {TpSelectSearchComponent} from '../../../shared/components/tp-select-sear
 import {TpActionMenuItem,TpActionsMenuComponent} from '../../../shared/components/tp-actions-menu/tp-actions-menu.component';
 @Component({selector:'tp-catalog',imports:[CatalogPicker,DecimalPipe,CatalogScrollDirective,TpSelectSearchComponent,TpActionsMenuComponent,QuoteColumnFilters,RouterLink,FormsModule,PageHeader,Button,Icon,State,FilterBar,DataTable,ImageCard,Dialog,ResourceForm],templateUrl:'./catalog.html',styleUrl:'./catalog.scss'})
 export class Catalog implements OnInit,OnDestroy {toast=inject(TpToastService);
+ private editorForm=viewChild<ResourceForm>('editorForm');
+ private pendingChanges=protectUnsavedChanges(()=>this.kind!=='circuitos'&&this.editorOpen()&&!this.editorLoading()&&!!this.editorForm()?.hasChanges(),()=>this.kind!=='circuitos'&&(this.saving()||this.removing()));
+ canDeactivate(){return this.pendingChanges.confirm();}
+ closeEditor(){if(this.canDeactivate())this.editorOpen.set(false);}
  destinationTypeOptions=[{value:'NACIONAL',label:'Nacionales'},{value:'INTERNACIONAL',label:'Internacionales'}];
  quoteTypeOptions=[{value:'individual',label:'Individuales'},{value:'comparativa',label:'Comparativas'}];
  destinationFilters=signal<Row>({soloActivos:false});filtersOpen=signal(false);filterLoading=signal(false);filterError=signal('');filterFields=signal<FieldDefinition[]>([]);
@@ -67,7 +73,7 @@ export class Catalog implements OnInit,OnDestroy {toast=inject(TpToastService);
  private destroyRef=inject(DestroyRef);
  catalogTitle=computed(()=>catalogLabels[this.catalog()]||catalogLabels[Object.keys(catalogAliases).find(key=>catalogAliases[key]===this.catalog())||'']||'Catálogos');
  catalogPickerOptions=computed(()=>this.catalogKeys.map(key=>({value:catalogKey(key),label:this.catalogLabels[key]})).sort((a,b)=>a.label.localeCompare(b.label,'es',{sensitivity:'base'})));
- switchCatalog(key:string){const routeKey=Object.keys(catalogAliases).find(alias=>catalogAliases[alias]===key)||key;void this.router.navigate([this.base+'/catalogos',routeKey]);}
+  switchCatalog(key:string){if(!this.canDeactivate())return;this.editorOpen.set(false);const routeKey=Object.keys(catalogAliases).find(alias=>catalogAliases[alias]===key)||key;void this.router.navigate([this.base+'/catalogos',routeKey]);}
  catalog=signal(this.kind==='atracciones'?'atracciones':catalogKey(this.route.snapshot.paramMap.get('catalog')||this.route.snapshot.queryParamMap.get('catalog')||'idiomas'));catalogLabels=catalogLabels;catalogKeys=Object.keys(catalogLabels);search=signal(this.route.snapshot.queryParamMap.get('buscar')||'');status=signal(this.route.snapshot.queryParamMap.get('estado')||'');destinationType=signal<'NACIONAL'|'INTERNACIONAL'>('NACIONAL');multiple=signal(false);view=signal('table');loading=signal(true);error=signal('');page=signal<Page>({items:[],total:0,page:0});editorOpen=signal(false);editorLoading=signal(false);editorError=signal('');selected=signal<TravelRecord|null>(null);fields=signal<FieldDefinition[]>([]);value=signal<Row>({});saving=signal(false);removing=signal(false);removeOpen=signal(false);private timer?:ReturnType<typeof setTimeout>;private generation=0;
  definition=computed<ResourceDefinition>(()=>this.kind==='catalogos'||this.kind==='atracciones'?catalogDefinition(this.catalog(),this.kind==='atracciones'):definitions[this.kind]||{kind:'cotizaciones',title:'Cotizaciones',description:'Cada propuesta es el comienzo de una historia. Consulta y da seguimiento a tus solicitudes.',singular:'cotización',icon:'quote',permission:'cotizaciones.edit',fields:[],columns:[{key:'hotel_nombre',label:'Hotel'},{key:'empleado_nombre',label:'Asesor'},{key:'created_at',label:'Fecha'}]});
  canEdit(){return !this.preview&&this.data.auth.hasPermission(this.definition().permission);}

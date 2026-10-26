@@ -171,7 +171,7 @@
   [open]="editorOpen()"
   [title]="(selected() ? 'Editar ' : 'Crear ') + definition().singular"
   [busy]="saving()"
-  (closed)="editorOpen.set(false)"
+  (closed)="closeEditor()"
 >
   @if (preview) {
     <div class="preview-notice">Inicia sesión para guardar cambios en la agencia.</div>
@@ -213,13 +213,14 @@
       </div>
     }
     <tp-resource-form
+      #editorForm
       [fields]="fields()"
       [value]="value()"
       [editing]="!!selected()"
       [busy]="saving()"
       [disabled]="preview || !canEdit()"
       (saved)="save($event)"
-      (cancelled)="editorOpen.set(false)"
+      (cancelled)="closeEditor()"
     />
     @if (selected() && canEdit() && kind !== 'clientes') {
       <div class="delete-area">
