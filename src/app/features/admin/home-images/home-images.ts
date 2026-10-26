@@ -33,6 +33,9 @@ export class HomeImages implements OnInit {
   readonly saving = signal(false);
   readonly editorError = signal('');
   readonly translating = signal(false);
+  readonly deleteTarget = signal<TravelRecord | null>(null);
+  readonly deleting = signal(false);
+  readonly deleteError = signal('');
   readonly translationsOpen = signal(false);
   readonly savedTranslations = computed(() => this.languages()
     .filter(language => language.codigo !== 'es')
@@ -51,7 +54,7 @@ export class HomeImages implements OnInit {
   readonly importProgress = signal<{completed: number; total: number} | null>(null);
   private readonly pendingImport = protectUnsavedChanges(
     () => this.editorOpen() && !!this.editor()?.hasChanges(),
-    () => this.importing() || this.translating() || this.saving(),
+    () => this.importing() || this.translating() || this.saving() || this.deleting(),
   );
   canDeactivate() { return this.pendingImport.confirm(); }
   readonly fields = computed<FieldDefinition[]>(() => [
@@ -60,8 +63,36 @@ export class HomeImages implements OnInit {
     {key: 'activo', label: 'Mostrar en el inicio', type: 'checkbox'},
   ]);
   canEdit() { return this.data.auth.hasPermission('destinos.edit'); }
+  requestDelete(record: TravelRecord) {
+    if (!this.canEdit() || this.loading() || this.importing() || this.saving() || this.deleting() || this.editorOpen()) return;
+    this.deleteError.set('');
+    this.deleteTarget.set(record);
+  }
+  closeDelete() {
+    if (!this.deleting()) this.deleteTarget.set(null);
+  }
+  async confirmDelete() {
+    const record = this.deleteTarget();
+    if (!record || !this.canEdit() || this.deleting() || this.saving() || this.importing()) return;
+    this.deleting.set(true);
+    this.deleteError.set('');
+    this.pendingImport.sync();
+    try {
+      await this.data.legacy.eliminarImagenFondoAdmin(Number(record.id));
+      this.records.update(records => records.filter(image => image.id !== record.id));
+      this.data.invalidate();
+      this.deleteTarget.set(null);
+      this.toast.success('La imagen se eliminó de Trotapie. El archivo de Google Drive se conserva.');
+    } catch (error) {
+      this.deleteError.set(error && typeof error === 'object' && 'message' in error
+        ? String(error.message) : 'No pudimos eliminar la imagen. Intenta nuevamente.');
+    } finally {
+      this.deleting.set(false);
+      this.pendingImport.sync();
+    }
+  }
   openDriveImport() {
-    if (!this.canEdit() || this.loading() || this.saving() || this.importing() || this.editorOpen()) return;
+    if (!this.canEdit() || this.loading() || this.saving() || this.importing() || this.editorOpen() || this.deleting() || this.deleteTarget()) return;
     this.importOpen.set(true);
   }
   closeDriveImport() {
@@ -111,7 +142,7 @@ export class HomeImages implements OnInit {
     finally { this.loading.set(false); }
   }
   open(record: TravelRecord | null) {
-    if (!this.canEdit() || this.importing() || this.saving() || this.translating()) return;
+    if (!this.canEdit() || this.importing() || this.saving() || this.translating() || this.deleting() || this.deleteTarget()) return;
     this.selected.set(record); this.editorError.set('');
     this.translationsOpen.set(false);
     const value: Row = record ? {...record.raw} : {activo: true};

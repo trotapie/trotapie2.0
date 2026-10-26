@@ -104,7 +104,29 @@
 }
 .image-card-bottom.has-actions { min-height:40px; padding-right:48px; }
 
+// Opt-in sizing for the home-image manager; other card lists keep their layout.
+:host(.uniform-size) {
+  height: 252px;
+  flex: 0 0 auto;
+}
+
+:host(.uniform-size) .image-card-body {
+  min-height: 0;
+}
+
+:host(.uniform-size) .image-card h3 {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
 @media (max-width: 600px) {
+  :host(.uniform-size) {
+    height: 152px;
+  }
+
   .image-card {
     flex-direction: row;
     min-height: 112px;

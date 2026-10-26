@@ -1,8 +1,15 @@
 .home-images-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr));
+  grid-template-columns: repeat(auto-fill, min(100%, 280px));
+  align-items: start;
   gap: 20px;
 }
+
+.home-image-entry { position: relative; min-width: 0; }
+.home-image-entry > button { position: absolute; right: 12px; bottom: 12px; width: 40px; height: 40px; padding: 0; }
+.home-images-grid > tp-state { grid-column: 1 / -1; }
+.delete-image-preview img { display: block; width: 100%; max-height: 220px; object-fit: contain; border-radius: 12px; }
+.delete-image-preview h3 { margin: 16px 0; overflow-wrap: anywhere; }
 
 .translations-note { color: var(--muted); font-size: 13px; line-height: 1.7; margin: 0 0 20px; }
 .translations-list { margin: 0; }

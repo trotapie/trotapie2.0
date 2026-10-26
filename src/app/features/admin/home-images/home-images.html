@@ -1,5 +1,5 @@
 <tp-page-header title="Imágenes del inicio" eyebrow="Trotapie / Contenido" backTo="/admin/dashboard" description="Gestiona las fotografías del inicio y de Lugares para inspirar. La portada se elige al azar entre las imágenes activas; las primeras tres activas aparecen en las tarjetas.">
-  <button tpButton icon="refresh" [busy]="loading()" [disabled]="importing() || saving()" (click)="load()">Actualizar</button>
+  <button tpButton icon="refresh" [busy]="loading()" [disabled]="importing() || saving() || deleting()" (click)="load()">Actualizar</button>
   @if(canEdit()){
     <button tpButton icon="download" (click)="openDriveImport()" [disabled]="loading() || importing() || saving() || !!error()">Importar desde Drive</button>
     <button tpButton variant="primary" icon="plus" (click)="open(null)" [disabled]="loading() || importing() || saving() || !!error()">Agregar imagen</button>
@@ -35,13 +35,34 @@
 @else if(error()){<tp-state mode="error" [message]="error()" (retry)="load()"/>}
 @else {
   <section class="home-images-grid" aria-label="Imágenes del inicio">
-    @for(record of records(); track record.id){<tp-image-card [record]="record" label="Editar imagen" (selected)="open($event)"/>}
+    @for(record of records(); track record.id){
+      <article class="home-image-entry">
+        <tp-image-card class="uniform-size" [record]="record" [hasActions]="canEdit()" label="Editar imagen" (selected)="open($event)"/>
+        @if(canEdit()){
+          <button tpButton type="button" variant="danger" icon="trash" title="Eliminar imagen" [disabled]="importing() || saving() || deleting()" [attr.aria-label]="'Eliminar imagen: '+record.title" (click)="requestDelete(record)"></button>
+        }
+      </article>
+    }
     @empty{<tp-state title="Agrega tu primera imagen" message="Las imágenes activas se mostrarán en el inicio."/>}
   </section>
 }
 <tp-dialog [open]="editorOpen()" [title]="selected() ? 'Editar imagen del inicio' : 'Agregar imagen del inicio'" [busy]="saving() || translating()" (closed)="closeEditor()">
   @if(editorError()){<div class="error-banner" role="alert">{{editorError()}}</div>}
   <tp-resource-form [fields]="fields()" [value]="value()" [editing]="!!selected()" [busy]="saving() || translating()" [busyLabel]="translating() ? 'Traduciendo…' : 'Guardando…'" [disabled]="!canEdit()" (saved)="save($event)" (cancelled)="closeEditor()" (previewRequested)="translationsOpen.set(true)"/>
+</tp-dialog>
+<tp-dialog [open]="!!deleteTarget()" title="Eliminar imagen del inicio" [busy]="deleting()" (closed)="closeDelete()">
+  @if(deleteTarget(); as record){
+    <div class="delete-image-preview">
+      <img [src]="record.image" [alt]="record.title"/>
+      <h3>{{record.title}}</h3>
+    </div>
+    <p>¿Quieres eliminar esta imagen de Trotapie? Esta acción no se puede deshacer. El archivo original de Google Drive no se borrará.</p>
+    @if(deleteError()){<div class="error-banner" role="alert">{{deleteError()}}</div>}
+  }
+  <div class="dialog-actions">
+      <button tpButton type="button" [disabled]="deleting()" (click)="closeDelete()">Cancelar</button>
+      <button tpButton type="button" variant="danger" [busy]="deleting()" [disabled]="!canEdit() || !deleteTarget()" (click)="confirmDelete()">{{deleting() ? 'Eliminando…' : 'Eliminar imagen'}}</button>
+    </div>
 </tp-dialog>
 <tp-dialog [open]="translationsOpen()" title="Traducciones del destino" (closed)="translationsOpen.set(false)">
   <p class="translations-note">Estas son las traducciones guardadas. Al guardar cambios, se traducirá automáticamente el nombre en español.</p>
