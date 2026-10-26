@@ -49,3 +49,5 @@ Thumbs.db
 !.env.example
 src/environments/environment.generated.ts
 .design-preview/
+.chrome_tmp/
+.chrome_tmp2/

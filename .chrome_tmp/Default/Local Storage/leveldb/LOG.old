@@ -1,4 +1,0 @@
-2026/10/09-15:55:38.586 f934 Reusing MANIFEST d:\Users\Alex_Saenz\Documents\Proyectos\Rediseño trotapie\Trotapie nuevo\.chrome_tmp\Default\Local Storage\leveldb/MANIFEST-000001
-2026/10/09-15:55:38.587 f934 Recovering log #3
-2026/10/09-15:55:38.587 f934 (ignoring error) d:\Users\Alex_Saenz\Documents\Proyectos\Rediseño trotapie\Trotapie nuevo\.chrome_tmp\Default\Local Storage\leveldb/000003.log: dropping 311 bytes; Corruption: checksum mismatch
-2026/10/09-15:55:38.587 f934 Reusing old log d:\Users\Alex_Saenz\Documents\Proyectos\Rediseño trotapie\Trotapie nuevo\.chrome_tmp\Default\Local Storage\leveldb/000003.log 
