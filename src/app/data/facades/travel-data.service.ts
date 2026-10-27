@@ -12,6 +12,8 @@ import { CatalogosAdminService, CatalogoAdminKey } from '../queries/catalogos-ad
 import { CircuitosService } from '../queries/circuitos.service';
 import { LanguageService } from '../../core/services/language.service';
 import {QuoteFilters,emptyQuoteFilters,quoteDateBounds} from '../../features/quotes/models/quote-filters';
+import { summarizeDashboard } from '../models/dashboard-statistics';
+import {hotelCatalogFilters,hotelStatusColumnAvailable,activeHotelDestinationOptions,hasHotelDestination,type HotelExtraFilters} from '../utils/hotel-catalog-filters';
 
 import {Row,TravelRecord,Page,PAGE_SIZE,normalizeRecord} from '../models/travel-record';
 export type {Row,TravelRecord,Page} from '../models/travel-record';
@@ -33,6 +35,49 @@ export class TravelDataService {
   private key(name: string) { return `${this.auth.identity()?.id || 'public'}:${this.language.language()}:${name}`; }
   cached<T>(name: string, load: () => Promise<T>, ttl = 60_000) { return this.backend.cache.get(this.key(name), load, ttl); }
   invalidate() { this.backend.cache.clear(); }
+  hotelStatusAvailable(){if(!this.auth.identity())return Promise.resolve(false);return this.cached('hotel-status-schema',async()=>{
+    const {error}=await this.backend.client.from('v_hoteles_gestion_admin').select('activo').limit(0);
+    if(error&&['42P01','42703','PGRST205','PGRST204'].includes(error.code))return false;
+    if(error)throw error;
+    return true;
+  });}
+  async activeHotelDestinations(type:'NACIONAL'|'INTERNACIONAL'){
+    return activeHotelDestinationOptions(page=>this.publicDestinations(type,page));
+  }
+  async hotelAdminPage(page=0,search='',destinationId?:number,status='',activeDestinationIds?:number[],extras:HotelExtraFilters={}):Promise<Page>{
+    if(!hasHotelDestination(destinationId))return {items:[],total:0,page};
+    if(activeDestinationIds&&(!activeDestinationIds.length||destinationId&&!activeDestinationIds.includes(destinationId)))return {items:[],total:0,page};
+    const available=await this.hotelStatusAvailable();
+    return this.cached(`hotel-admin:${page}:${search}:${destinationId||''}:${status}:${available}:${activeDestinationIds?.join(',')??'all'}:${JSON.stringify(extras)}`,async()=>{
+      let query=this.backend.client.from(available?'v_hoteles_gestion_admin':'v_hoteles_catalogo_admin').select('*',{count:'exact'});
+      query=hotelCatalogFilters(query,search,destinationId,status,available,extras);
+      if(extras.sort==='nombre-asc'||extras.sort==='nombre-desc')query=query.order('nombre_hotel',{ascending:extras.sort==='nombre-asc'});
+      else query=query.order('orden',{ascending:extras.sort!=='orden-desc'});
+      query=query.order('id');
+      if(activeDestinationIds)query=query.in('catalogo_destino_id_resuelto',activeDestinationIds);
+      if(extras.stars){
+        const ids:number[]=[];
+        for(let offset=0;;offset+=1000){
+          const matches=await this.backend.client.from('hoteles').select('id').eq('catalogo_destino_id',destinationId!).eq('estrellas',extras.stars).order('id').range(offset,offset+999);
+          if(matches.error)throw matches.error;
+          ids.push(...(matches.data||[]).map(row=>Number(row.id)));
+          if((matches.data?.length||0)<1000)break;
+        }
+        if(!ids.length)return {items:[],total:0,page};
+        query=query.in('id',ids);
+      }
+      const {data,count,error}=await query.range(page*PAGE_SIZE,(page+1)*PAGE_SIZE-1);
+      if(error)throw error;
+      let rows:Row[]=data||[];
+      if(!available&&rows.length){
+        const result=await this.backend.client.from('hoteles').select('id,fondo').in('id',rows.map(row=>row['id']));
+        if(result.error)throw result.error;
+        const photos=new Map((result.data||[]).map(row=>[row.id,row.fondo]));
+        rows=rows.map(row=>({...row,fondo:photos.get(row['id'])}));
+      }
+      return {items:rows.map(row=>normalizeRecord({...row,destino_nombre:row['catalogo_destino_nombre_resuelto']||'Sin destino asignado'},'hoteles')),total:count||0,page};
+    });
+  }
   async coverImages() { return this.cached('cover', () => this.legacy.getImagenesFondo(this.language.language()), 300_000); }
   async publicDestinations(type: 'NACIONAL' | 'INTERNACIONAL' = 'NACIONAL', page = 0, search = ''): Promise<Page> {
     return this.cached(`destinations:${type}:${page}:${search}`, async () => {
@@ -46,7 +91,9 @@ export class TravelDataService {
   }
   async hotelPage(destinationId: number, page = 0): Promise<Page> {
     return this.cached(`hotels:${destinationId}:${page}`, async () => {
-      const { data, count, error } = await this.backend.client.from('hoteles').select('id, estrellas, fondo, orden, ubicacion, traducciones:hotel_traducciones(idioma_id, nombre_hotel, descripcion), catalogoDestino:catalogo_destino_id!inner(id,nombre)', { count: 'exact' }).eq('catalogoDestino.id', destinationId).order('orden').order('id').range(page * PAGE_SIZE, (page + 1) * PAGE_SIZE - 1);
+      let query=this.backend.client.from('hoteles').select('id, estrellas, fondo, orden, ubicacion, traducciones:hotel_traducciones(idioma_id, nombre_hotel, descripcion), catalogoDestino:catalogo_destino_id!inner(id,nombre)', { count: 'exact' }).eq('catalogoDestino.id', destinationId);
+      if(await this.cached('hotel-status-column',()=>hotelStatusColumnAvailable(this.backend.client)))query=query.eq('activo',true);
+      const { data, count, error } = await query.order('orden').order('id').range(page * PAGE_SIZE, (page + 1) * PAGE_SIZE - 1);
       if (error) throw error;
       // Resolve language ids through the established query, not a fixed schema assumption.
       const idiomaId = await this.hotels.getIdiomaId(this.language.language());
@@ -120,15 +167,14 @@ export class TravelDataService {
   }
   async dashboard() {
     return this.cached('dashboard', async () => {
-      const request = (filter?: string) => {
-        let query = this.backend.client.rpc('obtener_solicitudes_cotizacion', {}, { count: 'exact', head: true });
-        if (filter) query = query.ilike('estatus_nombre', `%${filter}%`);
-        return query;
-      };
-      const [recent, total, pending, quoted] = await Promise.all([this.quotePage(), request(), request('pend'), request('cotiz')]);
-      for (const result of [total, pending, quoted]) if (result.error) throw result.error;
-      const admin = this.auth.identity()?.role === 'admin';
-      return { recent: recent.items.slice(0, 5), total: admin ? total.count || 0 : null, pending: admin ? pending.count || 0 : null, quoted: admin ? quoted.count || 0 : null };
+      // Reuse the quotation list's permissions, creation dates and stable ordering.
+      // Read every page: rankings must not represent only the five recent rows.
+      const first = await this.quotePage();
+      const records = [...first.items];
+      for (let page = 1; page * PAGE_SIZE < first.total; page++) {
+        records.push(...(await this.quotePage(page)).items);
+      }
+      return summarizeDashboard(records);
     }, 30_000);
   }
   async destinationCatalogPage(filters:FiltrosDestinoCatalogo):Promise<Page>{return this.cached(`destination-catalog:${JSON.stringify(filters)}`,async()=>{const p=await this.destinations.buscarDestinosCatalogo({...filters,pageSize:filters.pageSize??PAGE_SIZE});return {items:p.items.map(r=>normalizeRecord({id:r.destinoId,nombre:r.destinoNombre,division_area_nombre:r.divisionAreaNombre,imagen_destino:r.imagenDestino,activo:r.activo,tipo_turistico_nombre:r.tipoTuristicoNombre||'Sin clasificación',prioridad_label:r.prioridad===1?'Destacado':'Estándar',ubicacion_label:[r.divisionAreaNombre,r.paisNombre,r.regionNombre].filter(Boolean).join(' · ')},'destinos')),total:p.total,page:p.page||0};});}

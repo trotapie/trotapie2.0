@@ -1,0 +1,117 @@
+<tp-page-header [title]="model()?.['nombre_hotel'] || 'Editar hotel'" description="Información, ubicación y fotografías. Configura cómo se presenta este hotel." eyebrow="Trotapie / Hoteles / Configuración">
+  <a tpButton variant="back" icon="left" [routerLink]="returnTo">Regresar</a>
+  <a tpButton icon="arrow" [routerLink]="['/hotel',id]">Ver página pública</a>
+   <button tpButton icon="check" variant="primary" [busy]="saving()" [disabled]="!model()||saving()||importingImages()" (click)="save()">Guardar hotel</button>
+</tp-page-header>
+@if(error()){<div class="error-banner" role="alert">{{error()}}</div>}
+@if(loading()){
+  <tp-state mode="loading"/>
+} @else if(model();as hotel){
+  <div class="hotel-editor-tabs" role="group" aria-label="Secciones del hotel">
+    @for(item of tabs;track item.id){<button tpButton [icon]="item.icon" [variant]="tab()===item.id?'primary':'secondary'" [attr.aria-pressed]="tab()===item.id" (click)="tab.set(item.id)">{{item.label}}</button>}
+  </div>
+  <section class="panel hotel-editor-panel" [attr.inert]="saving()?'':null">
+    @if(tab()==='information'){
+      <div class="panel-heading"><div><h2>Información del hotel</h2><p>Los datos que acompañan a tus propuestas de viaje.</p></div></div>
+      @if(optionsLoading()){<p role="status">Cargando opciones de régimen…</p>}
+      @if(optionsError()){<div role="status">{{optionsError()}} <button tpButton type="button" (click)="loadOptions()">Reintentar</button></div>}
+      <div class="form-grid">
+        @for(field of fields();track field.key){
+          @if(field.ref==='hotel-destinations'){
+            <tp-hotel-destination-select [label]="field.label" [value]="hotel[field.key]" [required]="!!field.required" (changed)="hotel[field.key]=$event"/>
+          } @else if(field.type==='select'){
+            <app-tp-select-search [label]="field.label" [options]="$any(field.options||[])" [required]="!!field.required" [(ngModel)]="hotel[field.key]"/>
+          } @else {
+            <tp-field [label]="field.label" [forId]="'hotel-'+field.key" [class.form-full]="field.type==='textarea'">
+              @if(field.type==='textarea'){<textarea [id]="'hotel-'+field.key" class="long-text" [(ngModel)]="hotel[field.key]"></textarea>}
+              @else{<input [id]="'hotel-'+field.key" [type]="field.type||'text'" [required]="!!field.required" [min]="field.min??null" [(ngModel)]="hotel[field.key]"/>}
+            </tp-field>
+          }
+        }
+      </div>
+    }
+    @if(tab()==='location'){
+      <div class="panel-heading"><div><h2>Ubicación del hotel</h2><p>Agrega la dirección o el enlace del mapa que compartes con tus viajeros.</p></div></div>
+      <tp-field label="Ubicación / enlace del mapa" forId="hotel-location"><textarea id="hotel-location" [(ngModel)]="hotel['ubicacion']"></textarea></tp-field>
+      <div class="location-actions"><button tpButton icon="pin" [disabled]="!hotel['ubicacion']?.trim()" (click)="locationOpen.set(true)">Ver ubicación</button></div>
+    }
+    @if(tab()==='photos'){
+      <div class="panel-heading"><div><h2>Fotografías del hotel</h2><p>Organiza y clasifica la galería. Los cambios se conservan con Guardar hotel.</p></div></div>
+      <div class="cover-layout">
+        @if(hotel['fondo']){<button class="cover-preview" type="button" aria-label="Ampliar fotografía principal" (click)="preview.set(hotel['fondo'])"><img [src]="hotel['fondo']" alt="Fotografía principal del hotel"/></button>}
+        <tp-field label="Fotografía principal" forId="hotel-cover"><input id="hotel-cover" type="url" [(ngModel)]="hotel['fondo']"/><small>Pega el enlace público de la fotografía principal.</small></tp-field>
+      </div>
+      <div class="add-photo">
+        <tp-field label="Agregar fotografía" forId="hotel-new-photo"><input id="hotel-new-photo" type="url" [(ngModel)]="newImage" placeholder="https://…" (keydown.enter)="addPhoto()"/></tp-field>
+        <button tpButton icon="plus" [disabled]="!newImage.trim()" (click)="addPhoto()">Agregar fotografía</button>
+      </div>
+      <div class="drive-import" [attr.aria-busy]="importingImages()">
+      <div class="add-photo">
+        <tp-field label="Importar carpeta de Google Drive" forId="hotel-drive-folder"><input id="hotel-drive-folder" [(ngModel)]="driveFolder" [disabled]="importingImages()" placeholder="Enlace o ID de la carpeta" aria-describedby="hotel-drive-hint"/></tp-field>
+        <button tpButton type="button" icon="download" [busy]="importingImages()" [disabled]="importingImages()||!driveFolder.trim()" (click)="importDrive()">{{importingImages()?'Importando…':'Importar desde Drive'}}</button>
+      </div>
+      <small id="hotel-drive-hint">La carpeta debe permitir acceso público mediante el enlace. Se agregan las imágenes sin duplicados; después pulsa Guardar hotel.</small>
+      </div>
+      @if(importingImages()){<p role="status">Consultando la carpeta de Drive e importando fotografías…</p>}
+      @if(importError()){<p class="error-banner" role="alert">{{importError()}}</p>}
+      @if(imageTypesLoading()){<p role="status">Cargando clasificaciones de imágenes…</p>}
+      @if(imageTypesError()){<p role="alert">{{imageTypesError()}} <button tpButton type="button" (click)="loadImageTypes()">Reintentar</button></p>}
+      <section class="photo-folders" aria-labelledby="hotel-photo-folders-title">
+        <div class="folder-heading"><div><h3 id="hotel-photo-folders-title">Carpetas</h3><p>Selecciona una carpeta para ver sus archivos. Se organizan automáticamente por tipo de imagen.</p></div><button tpButton type="button" [variant]="activePhotoFolder()==='all'?'primary':'secondary'" [attr.aria-pressed]="activePhotoFolder()==='all'" (click)="selectPhotoFolder('all')">Ver todas · {{photos().length}}</button></div>
+        <div class="photo-folder-list" role="group" aria-label="Carpetas de imágenes por tipo">
+          @for(folder of photoFolders();track folder.id){
+            <button class="photo-folder" type="button" [class.photo-folder--active]="activePhotoFolder()===folder.id" [attr.aria-pressed]="activePhotoFolder()===folder.id" aria-controls="hotel-folder-files" (click)="selectPhotoFolder(folder.id)">
+              <span class="folder-mosaic" [class.folder-mosaic--single]="folder.urls.length<2">
+                @for(url of folder.urls.slice(0,3);track url){<img [src]="url" alt="" loading="lazy"/>}
+                @empty{<span class="folder-empty">Sin imágenes</span>}
+              </span>
+              <strong>{{folder.id===null?'Sin tipo asignado':folder.label}}</strong>
+              <span class="folder-description">{{folder.id===null?'Imágenes pendientes de clasificar':'Imágenes clasificadas por tipo'}}</span>
+              <span class="folder-count">{{folder.urls.length}} archivos</span>
+            </button>
+          }
+        </div>
+      </section>
+      <div class="folder-heading files-heading" id="hotel-folder-files"><div><h3>Archivos</h3><p role="status">{{photoFolderLabel()}} · {{visiblePhotos().length}} archivos</p></div></div>
+      @if(visiblePhotos().length){
+        <div class="photo-bulk" role="group" aria-label="Clasificar varias fotografías">
+          <div class="photo-selection-actions">
+            <span role="status">{{selectedPhotos().size}} fotografías seleccionadas</span>
+            <button tpButton type="button" (click)="selectAllPhotos()">Seleccionar todas las visibles</button>
+            <button tpButton type="button" [disabled]="!selectedPhotos().size" (click)="clearPhotoSelection()">Limpiar selección</button>
+          </div>
+          <div class="photo-bulk-controls">
+            <app-tp-select-search label="Tipo para las seleccionadas" placeholder="Elige un tipo" [options]="bulkTypeOptions()" [(ngModel)]="bulkPhotoType" [disabled]="imageTypesLoading()||!!imageTypesError()"/>
+            <button tpButton type="button" variant="primary" [disabled]="!selectedPhotos().size||bulkPhotoType===null||imageTypesLoading()||!!imageTypesError()||importingImages()" (click)="classifySelectedPhotos()">Asignar tipo</button>
+          </div>
+          <small>Selecciona las imágenes y asigna un tipo en conjunto. Los cambios se conservan con Guardar hotel.</small>
+        </div>
+      }
+      <div class="hotel-photo-grid">
+        @for(url of visiblePhotos();track url){
+          <article class="hotel-photo" [class.hotel-photo--selected]="selectedPhotos().has(url)">
+            <div class="photo-card-media">
+              <button type="button" class="photo-preview" aria-label="Ampliar fotografía del hotel" (click)="preview.set(url)"><img [src]="url" alt="Fotografía del hotel" loading="lazy"/></button>
+              <label class="photo-select"><input type="checkbox" [attr.aria-label]="'Seleccionar fotografía '+($index+1)" [checked]="selectedPhotos().has(url)" (change)="togglePhotoSelection(url,$any($event.target).checked)"/></label>
+              <button tpButton type="button" class="photo-card-edit" icon="edit" variant="icon" [attr.aria-label]="'Editar clasificación de la fotografía '+($index+1)" (click)="openPhotoEditor(url)"></button>
+            </div>
+            <div class="photo-card-body">
+              <div class="photo-card-info"><strong>Fotografía {{$index+1}}</strong><span>{{photoTypeLabel(url)}}</span></div>
+              <div class="photo-card-actions"><button tpButton type="button" icon="edit" variant="icon" aria-label="Editar clasificación" (click)="openPhotoEditor(url)"></button><button tpButton type="button" icon="trash" variant="icon" aria-label="Eliminar fotografía" (click)="removePhoto(url)"></button></div>
+            </div>
+          </article>
+        } @empty{<tp-state title="Esta carpeta está vacía" message="Las imágenes nuevas aparecen en Sin tipo asignado. Usa Ver todas para revisar la galería completa."/>}
+      </div>
+    }
+  </section>
+} @else{<tp-state mode="error" message="No pudimos cargar el hotel." (retry)="ngOnInit()"/>}
+<tp-location-map [open]="locationOpen()" [location]="model()?.['ubicacion']||''" [name]="model()?.['nombre_hotel']||'Hotel'" (closed)="locationOpen.set(false)"/>
+<tp-image-preview [open]="!!preview()" [src]="preview()" title="Fotografía del hotel" (closed)="preview.set('')"/>
+<tp-dialog [open]="!!editingPhoto()" title="Clasificar fotografía" (closed)="editingPhoto.set('')">
+  @if(editingPhoto();as url){
+    <img class="photo-editor-preview" [src]="url" alt="Fotografía que se está clasificando"/>
+    <app-tp-select-search label="Tipo de imagen" placeholder="Sin tipo" [options]="photoTypeOptions(url)" [(ngModel)]="editingPhotoType" [disabled]="imageTypesLoading()||!!imageTypesError()"/>
+    <small>La clasificación se conservará al pulsar Guardar hotel.</small>
+  }
+  <div class="dialog-actions"><button tpButton type="button" (click)="editingPhoto.set('')">Cancelar</button><button tpButton type="button" variant="primary" [disabled]="!editingPhoto()||imageTypesLoading()||!!imageTypesError()" (click)="applyPhotoClassification()">Aplicar</button></div>
+</tp-dialog>

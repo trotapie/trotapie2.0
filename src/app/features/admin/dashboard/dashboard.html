@@ -7,7 +7,6 @@
 </section>
 @if(error()){<div class="error-banner" role="alert">{{error()}} <button tpButton icon="refresh" (click)="load()">Reintentar</button></div>}
 @if(loading()){<tp-state mode="loading"/>}@else{
-<tp-dashboard-statistics [snapshot]="snapshot()" />
 <section class="dashboard-bento" aria-label="Resumen de la agencia">
   <div class="bento-metrics stack">
     <article class="panel metric-panel"><div class="metric-heading"><h2>Por atender</h2><a tpButton variant="icon" icon="arrow" [routerLink]="base+'/cotizaciones'" [queryParams]="{estado:'Pendiente'}" aria-label="Ver cotizaciones pendientes"></a></div><strong>{{value(snapshot().pending)}}</strong><div class="metric-bottom"><p>Solicitudes pendientes</p><tp-icon name="clock"/></div></article>
@@ -18,4 +17,5 @@
   <article class="panel recent-panel"><div class="panel-heading"><div><h2>Solicitudes recientes</h2><p>Una vista rápida de tus próximos viajes</p></div><a tpButton icon="right" variant="quiet" [routerLink]="base+'/cotizaciones'">Ver todas</a></div>@if(snapshot().recent.length){<tp-data-table [records]="snapshot().recent" title="Cliente / pasajero" [columns]="[{key:'hotel_nombre',label:'Hotel'},{key:'empleado_nombre',label:'Asesor'}]" (selected)="openQuote($event)"/>}@else{<tp-state [title]="preview?'Tu actividad, en un solo lugar':'No hay solicitudes recientes'" [message]="preview?'Inicia sesión para consultar el resumen de tu agencia.':'Registra una solicitud para empezar a dar seguimiento.'"/>}</article>
   <aside class="panel next-panel"><span class="eyebrow">De la idea al viaje</span><div class="next-icon"><tp-icon name="suitcase"/></div><h2>El siguiente viaje<br/>empieza contigo.</h2><p>Prepara una propuesta individual o reúne alternativas en una comparativa.</p>@if(preview||auth.hasPermission('cotizaciones.create')){<a tpButton variant="primary" icon="plus" routerLink="/admin/cotizaciones/nueva">Crear cotización</a>}<a tpButton icon="globe" variant="quiet" routerLink="/">Explorar sitio público</a></aside>
 </section>
+<tp-dashboard-statistics [snapshot]="snapshot()" />
 }

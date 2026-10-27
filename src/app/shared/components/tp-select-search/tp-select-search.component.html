@@ -9,6 +9,7 @@
     <tp-icon [name]="abierto ? 'chevron-up' : 'chevron-down'"></tp-icon>
   </button>
   <ng-template cdkConnectedOverlay [cdkConnectedOverlayOrigin]="trigger" [cdkConnectedOverlayOpen]="abierto"
+    [cdkConnectedOverlayWidth]="'min(max(26rem, ' + triggerButton.offsetWidth + 'px), calc(100vw - 24px))'" [cdkConnectedOverlayMaxWidth]="'calc(100vw - 24px)'" [cdkConnectedOverlayMaxHeight]="'min(30rem, calc(100dvh - 24px))'"
     [cdkConnectedOverlayHasBackdrop]="true" cdkConnectedOverlayBackdropClass="cdk-overlay-transparent-backdrop" [cdkConnectedOverlayViewportMargin]="12" [cdkConnectedOverlayPositions]="posiciones" [cdkConnectedOverlayPush]="true"
     [cdkConnectedOverlayFlexibleDimensions]="true" (overlayKeydown)="$event.key==='Escape' && cerrar()" (backdropClick)="cerrar()" (detach)="cerrar()">
     <section #optionsPanel tpMotion="menu" tpPopupKeyboard (dismissed)="cerrar()" class="tp-select-search__panel" role="listbox" [attr.aria-label]="label || placeholder">
@@ -16,10 +17,11 @@
       <div class="tp-select-search__search">
         <tp-icon [name]="'search'"></tp-icon>
         <input #searchInput type="search" [placeholder]="searchPlaceholder" [value]="busqueda"
-          (input)="busqueda = $any($event.target).value"  aria-label="Filtrar opciones" />
+          (input)="buscar($any($event.target).value)" aria-label="Filtrar opciones" />
       </div>
       }
-      <div class="tp-select-search__options">
+      <div class="tp-select-search__options" [attr.aria-busy]="loading">
+        @if(loading){<p class="tp-select-search__empty" role="status">Buscando opciones…</p>}
         @if (opcionesFiltradas.length) {
           @for (option of opcionesFiltradas; track trackByValue($index, option)) {
             @if (option.group && ($first || option.group !== opcionesFiltradas[$index - 1]?.group)) {
@@ -31,7 +33,7 @@
               @if (sameValue(option.value, valorSeleccionado)) { <tp-icon [name]="'check'"></tp-icon> }
             </button>
           }
-        } @else { <p class="tp-select-search__empty">{{ emptyMessage }}</p> }
+        } @else if(!loading) { <p class="tp-select-search__empty" role="status">{{ emptyMessage }}</p> }
       </div>
       @if (showClear && valorSeleccionado !== null) {
         <button type="button" class="tp-select-search__clear" (click)="limpiar()">Limpiar selección</button>

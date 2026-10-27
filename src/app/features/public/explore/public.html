@@ -144,6 +144,7 @@
       } @else {
         <tp-destination-facts
           [facts]="detail()?.datos_rapidos || []"
+          [location]="detail()?.ubicacion || null"
           [english]="data.language.language() === 'en'"
         />
         <tp-hotel-suggestions
@@ -161,9 +162,11 @@
             <span class="eyebrow">{{
               text('Escapadas que inspiran', 'Getaways that inspire')
             }}</span>
-            <h2>
+            <h2 [class.hotel-destination-title]="mode === 'hoteles' && id && hotelDestinationName()">
               {{
-                mode === 'destino' || (mode === 'hoteles' && id)
+                mode === 'hoteles' && id && hotelDestinationName()
+                  ? hotelDestinationName()
+                  : mode === 'destino' || (mode === 'hoteles' && id)
                   ? text('Encuentra tu estancia', 'Find your stay')
                   : mode === 'circuitos'
                     ? text('Viajes para descubrir más', 'Journeys to discover more')
@@ -174,7 +177,9 @@
             </h2>
             <p>
               {{
-                text(
+                mode === 'hoteles' && id
+                  ? text('Encuentra tu estancia en este destino.', 'Find your stay in this destination.')
+                  : text(
                   'Elige un lugar. Lo demás lo planeamos contigo.',
                   'Choose a place. We will plan the rest with you.'
                 )

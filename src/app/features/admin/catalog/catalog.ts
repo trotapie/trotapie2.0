@@ -21,12 +21,49 @@ export class Catalog implements OnInit,OnDestroy {toast=inject(TpToastService);
  private pendingChanges=protectUnsavedChanges(()=>this.kind!=='circuitos'&&this.editorOpen()&&!this.editorLoading()&&!!this.editorForm()?.hasChanges(),()=>this.kind!=='circuitos'&&(this.saving()||this.removing()));
  canDeactivate(){return this.pendingChanges.confirm();}
  closeEditor(){if(this.canDeactivate())this.editorOpen.set(false);}
- destinationTypeOptions=[{value:'NACIONAL',label:'Nacionales'},{value:'INTERNACIONAL',label:'Internacionales'}];
+  destinationTypeOptions:{value:'NACIONAL'|'INTERNACIONAL';label:string}[]=[{value:'NACIONAL',label:'Nacionales'},{value:'INTERNACIONAL',label:'Internacionales'}];
  quoteTypeOptions=[{value:'individual',label:'Individuales'},{value:'comparativa',label:'Comparativas'}];
  destinationFilters=signal<Row>({soloActivos:false});filtersOpen=signal(false);filterLoading=signal(false);filterError=signal('');filterFields=signal<FieldDefinition[]>([]);
  hotelDestinationId=Number(inject(ActivatedRoute).snapshot.paramMap.get('destinationId'))||undefined;
  destinationName=inject(ActivatedRoute).snapshot.queryParamMap.get('nombre')||'este destino';
- returnTo=inject(ActivatedRoute).snapshot.queryParamMap.get('volver')||'';
+  returnTo=inject(ActivatedRoute).snapshot.queryParamMap.get('volver')||'';
+  hotelFilterDestination=signal<number|null>(null);
+  hotelDestinations=signal<{value:number;label:string}[]>([]);
+  hotelDestinationType=signal<'NACIONAL'|'INTERNACIONAL'>('NACIONAL');
+  hotelFilterStatus=signal('');
+  hotelRegime=signal<number|null>(null);
+  hotelStars=signal<number|null>(null);
+  hotelSort=signal('catalogo');
+  hotelFiltersOpen=signal(false);
+  hotelFilterDraft=signal<Row>({});
+  hotelModalFields=computed<FieldDefinition[]>(()=>[
+    {key:'regimeId',label:'Régimen',type:'select',options:[{value:'',label:'Todos los regímenes'},...this.hotelRegimes()]},
+    {key:'stars',label:'Estrellas',type:'select',options:[{value:'',label:'Todas las categorías'},...this.hotelStarOptions]},
+    {key:'sort',label:'Ordenar por',type:'select',options:this.hotelSortOptions},
+    ...(this.hotelStatusReady()?[{key:'status',label:'Estado del hotel',type:'select' as const,options:this.hotelStatusOptions}]:[])
+  ]);
+  openHotelFilters(){this.hotelFilterDraft.set({regimeId:this.hotelRegime()||'',stars:this.hotelStars()||'',sort:this.hotelSort(),status:this.hotelFilterStatus()});this.hotelFiltersOpen.set(true);}
+  applyHotelFilters(value:Row){this.hotelRegime.set(Number(value['regimeId'])||null);this.hotelStars.set(Number(value['stars'])||null);this.hotelSort.set(value['sort']||'catalogo');this.hotelFilterStatus.set(this.hotelStatusReady()?value['status']||'':'');this.hotelFiltersOpen.set(false);void this.load();}
+  hotelRegimes=signal<{value:number;label:string}[]>([]);
+  hotelStarOptions=[1,2,3,4,5].map(value=>({value,label:value+' estrella'+(value===1?'':'s')}));
+  hotelSortOptions=[{value:'catalogo',label:'Orden del catálogo'},{value:'nombre-asc',label:'Nombre: A → Z'},{value:'nombre-desc',label:'Nombre: Z → A'},{value:'orden-desc',label:'Orden: mayor a menor'}];
+  hotelFiltersError=signal('');
+  hotelFilterCount=computed(()=>Number(!!this.hotelFilterStatus())+Number(!!this.hotelRegime())+Number(!!this.hotelStars())+Number(this.hotelSort()!=='catalogo'));
+  hotelStatusReady=signal(false);
+  hotelStatusOptions=[{value:'',label:'Activos e inactivos'},{value:'activo',label:'Activos'},{value:'inactivo',label:'Inactivos'}];
+  async prepareHotels(generation:number){const type=this.hotelDestinationType();try{
+    const [ready,destinations,regimes]=await Promise.all([this.data.hotelStatusAvailable(),this.data.activeHotelDestinations(type),this.data.cached('hotel-filter-regimes',()=>this.data.legacy.obtenerRegimenesAdmin())]);
+    if(generation!==this.generation)return;
+    this.hotelStatusReady.set(ready);
+    this.hotelDestinations.set(destinations);
+    if(!this.hotelDestinationId&&!destinations.some(destination=>destination.value===this.hotelFilterDestination()))this.hotelFilterDestination.set(destinations[0]?.value??null);
+    this.hotelRegimes.set(regimes.map(row=>({value:Number(row.id),label:row.descripcion})));
+    this.hotelFiltersError.set('');
+  }catch(e){if(generation===this.generation)this.hotelFiltersError.set('No pudimos cargar los destinos activos. Intenta actualizar nuevamente.');throw e;}}
+  changeHotelType(type:'NACIONAL'|'INTERNACIONAL'){this.hotelDestinationType.set(type);this.hotelFilterDestination.set(null);this.hotelDestinations.set([]);void this.load();}
+  changeHotelDestination(value:number|null){const id=Number(value)||null;this.hotelFilterDestination.set(id&&this.hotelDestinations().some(option=>option.value===id)?id:null);this.page.set({items:[],total:0,page:0});void this.load();}
+  clearHotelFilters(){this.hotelFilterStatus.set('');this.hotelRegime.set(null);this.hotelStars.set(null);this.hotelSort.set('catalogo');void this.load();}
+  async toggleHotel(record:TravelRecord){if(!this.canEdit()||this.saving()||!this.hotelStatusReady())return;this.saving.set(true);try{await this.resources.hotelActive(record.id,record.status==='Inactivo');this.toast.success('Estado del hotel actualizado.');await this.load(this.page().page);}catch(e){this.toast.error(e instanceof Error?e.message:'No pudimos cambiar el estado del hotel.');}finally{this.saving.set(false);}}
  tableColumns=computed(()=>this.kind==='destinos'?[{key:'tipo_turistico_nombre',label:'Clasificación'},{key:'prioridad_label',label:'Prioridad'},{key:'ubicacion_label',label:'Ubicación'}]:this.definition().columns);
  filterCount=computed(()=>Object.values(this.destinationFilters()).filter(Boolean).length);
  rowActions=(record:TravelRecord):TpActionMenuItem[]=>this.kind==='destinos'?[
@@ -35,7 +72,11 @@ export class Catalog implements OnInit,OnDestroy {toast=inject(TpToastService);
   {id:'hotels',label:'Ver hoteles',icon:'hotel',disabled:!this.preview&&!this.data.auth.hasPermission('hoteles.view')},
   {id:'public',label:'Ver página pública',icon:'arrow',disabled:record.status==='Inactivo'},
   ...(record.status!=='Inactivo'?[{id:'deactivate',label:'Desactivar destino',icon:'trash',danger:true,disabled:!this.canEdit()}]:[])
- ]:[{id:'open',label:'Consultar registro',icon:'arrow'}];
+  ]:this.kind==='hoteles'?[
+    {id:'edit',label:this.canEdit()?'Editar hotel':'Consultar hotel',icon:'edit'},
+    {id:'hotel-status',label:record.status==='Inactivo'?'Activar hotel':'Inactivar hotel',icon:'check',disabled:!this.canEdit()||!this.hotelStatusReady()||this.saving()}
+  ]:[{id:'open',label:'Consultar registro',icon:'arrow'}];
+  recordAction(event:{id:string;record:TravelRecord}){if(this.kind==='hoteles'){if(event.id==='hotel-status')void this.toggleHotel(event.record);else void this.open(event.record);return;}this.destinationAction(event);}
   destinationAction(event:{id:string;record:TravelRecord}){const r=event.record;switch(event.id){case 'edit':void this.open(r);break;case 'content':void this.router.navigate(['/admin/destinos',r.id,'contenido']);break;case 'public':void this.router.navigate(['/destinos',r.id]);break;case 'hotels':{const f=this.destinationFilters();const volver=this.router.createUrlTree([this.base,'destinos'],{queryParams:{buscar:this.search()||null,tipo:this.destinationType(),division:f['divisionAreaId']||null,region:f['regionId']||null,pais:f['paisId']||null,clasificacion:f['tipoTuristicoId']||null,activos:f['soloActivos']||null,estadoDestino:f['estado']||null,prioridad:f['prioridad']||null,imagen:f['imagen']||null,ordenListado:f['ordenListado']||null,pagina:this.page().page}}).toString();void this.openDestinationHotels(r,volver);break;}case 'deactivate':this.selected.set(r);this.editorError.set('');this.removeOpen.set(true);}}
   private async openDestinationHotels(record:TravelRecord,volver:string){if(await this.router.navigateByUrl(volver,{replaceUrl:true}))await this.router.navigate([this.base,'destinos',record.id,'hoteles'],{queryParams:{nombre:record.title,volver}});}
  changeDestinationType(value:'NACIONAL'|'INTERNACIONAL'){this.destinationType.set(value);this.destinationFilters.set({soloActivos:false});void this.load();}
@@ -78,17 +119,31 @@ export class Catalog implements OnInit,OnDestroy {toast=inject(TpToastService);
  definition=computed<ResourceDefinition>(()=>this.kind==='catalogos'||this.kind==='atracciones'?catalogDefinition(this.catalog(),this.kind==='atracciones'):definitions[this.kind]||{kind:'cotizaciones',title:'Cotizaciones',description:'Cada propuesta es el comienzo de una historia. Consulta y da seguimiento a tus solicitudes.',singular:'cotización',icon:'quote',permission:'cotizaciones.edit',fields:[],columns:[{key:'hotel_nombre',label:'Hotel'},{key:'empleado_nombre',label:'Asesor'},{key:'created_at',label:'Fecha'}]});
  canEdit(){return !this.preview&&this.data.auth.hasPermission(this.definition().permission);}
  ngOnInit(){if(this.kind==='catalogos'){let initialized=false;combineLatest([this.route.paramMap,this.route.queryParamMap]).pipe(takeUntilDestroyed(this.destroyRef)).subscribe(([params,query])=>{const key=catalogKey(params.get('catalog')||query.get('catalog')||'idiomas');if(initialized&&key===this.catalog())return;initialized=true;clearTimeout(this.timer);this.catalog.set(key);this.search.set(query.get('buscar')||'');this.editorOpen.set(false);this.removeOpen.set(false);this.selected.set(null);this.view.set(this.definition().visual?'cards':'table');void this.load(0);});return;}const q=this.route.snapshot.queryParamMap;if(this.kind==='destinos'){this.destinationType.set(q.get('tipo')==='INTERNACIONAL'?'INTERNACIONAL':'NACIONAL');this.destinationFilters.set({soloActivos:q.get('activos')==='true',divisionAreaId:Number(q.get('division'))||null,regionId:Number(q.get('region'))||null,paisId:Number(q.get('pais'))||null,tipoTuristicoId:Number(q.get('clasificacion'))||null});}this.view.set(this.kind==='destinos'?'table':this.definition().visual?'cards':'table');void this.load(this.kind==='destinos'?Math.max(0,Number(q.get('pagina'))||0):0);}ngOnDestroy(){clearTimeout(this.timer);this.generation++;}
- async load(page=0){const generation=++this.generation;this.loading.set(true);this.error.set('');try{let data:Page;
+  private hotelFiltersRestored=false;
+  private restoreHotelFilters(){
+    if(this.hotelFiltersRestored)return;
+    this.hotelFiltersRestored=true;
+    const q=this.route.snapshot.queryParamMap;
+    this.hotelDestinationType.set(q.get('tipoHotel')==='INTERNACIONAL'?'INTERNACIONAL':'NACIONAL');
+    this.hotelFilterDestination.set(Number(q.get('destinoHotel'))||null);
+    this.hotelRegime.set(Number(q.get('regimenHotel'))||null);
+    this.hotelStars.set(Number(q.get('estrellasHotel'))||null);
+    this.hotelSort.set(q.get('ordenHotel')||'catalogo');
+    this.hotelFilterStatus.set(q.get('estadoHotel')||'');
+  }
+  async load(page=0){const generation=++this.generation;this.loading.set(true);this.error.set('');try{let data:Page;
+  if(this.kind==='hoteles'){this.restoreHotelFilters();await this.prepareHotels(generation);if(generation!==this.generation)return;}
  if(this.kind==='destinos')data=await this.destinationPage(page);
- else if(this.kind==='hoteles'&&!this.hotelDestinationId){await this.router.navigate([this.base,'destinos']);return;}
+  else if(this.kind==='hoteles')data=await this.data.hotelAdminPage(page,this.search(),this.hotelDestinationId||this.hotelFilterDestination()||undefined,this.hotelFilterStatus(),this.hotelDestinationId?undefined:this.hotelDestinations().map(option=>option.value),{regimeId:this.hotelRegime(),stars:this.hotelStars(),sort:this.hotelSort()});
  else if(this.preview){if(this.kind==='hoteles')data=await this.data.resource('hoteles',page,this.search(),this.catalog(),this.destinationType(),this.hotelDestinationId);else if(this.kind==='circuitos'){const rows=await this.data.circuits.listCircuitosPublicos();data={items:rows.map(r=>({id:String(r.id),title:r.nombre,subtitle:'Circuito',image:r.imagen_principal,status:'Activo',raw:r})),total:rows.length,page};}else data={items:[],total:0,page};}
  else data=this.kind==='cotizaciones'?await this.data.quotePage(page,this.search(),this.status(),this.multiple(),this.quoteFilters()):await this.data.resource(this.kind,page,this.search(),this.catalog(),this.destinationType(),this.hotelDestinationId);
  if(generation===this.generation)this.page.set(data);
  }catch(e){if(generation===this.generation)this.error.set(e instanceof Error?e.message:'No pudimos cargar la información.');}finally{if(generation===this.generation)this.loading.set(false);}}
  changeSearch(text:string){this.search.set(text);clearTimeout(this.timer);this.timer=setTimeout(()=>void this.load(),300);}
  async open(record:TravelRecord|null){if(this.kind==='cotizaciones'){if(record)await this.router.navigate(['/admin/cotizaciones',this.multiple()?record.raw['public_id']||record.id:quoteAdminSegment(record.raw['id']||record.id,record.raw['public_id'])],{queryParams:{tipo:this.multiple()?'comparativa':'individual'}});return;}
- this.selected.set(record);this.editorError.set('');this.editorOpen.set(true);this.editorLoading.set(true);
- try{const initial:Row=record?(this.preview?{...record.raw,nombre:record.title,nombre_hotel:record.title}:await this.resources.detail(this.kind,record)):{activo:true,estatus:true,orden:0,prioridad:2,tipo_desino_id:1,catalogo_destino_id:this.hotelDestinationId};this.value.set(initial);this.fields.set(this.preview?this.definition().fields:await this.resources.options(this.definition().fields));}
+  if(this.kind==='hoteles'&&record&&this.canEdit()){const volver=this.router.createUrlTree([], {relativeTo:this.route,queryParams:{...this.route.snapshot.queryParams,buscar:this.search()||null,tipoHotel:this.hotelDestinationType(),destinoHotel:this.hotelFilterDestination(),regimenHotel:this.hotelRegime(),estrellasHotel:this.hotelStars(),ordenHotel:this.hotelSort(),estadoHotel:this.hotelFilterStatus()||null}}).toString();await this.router.navigate(['/admin/hoteles',record.id,'editar'],{queryParams:{volver,destino:record.raw['catalogo_destino_id_resuelto']||this.hotelDestinationId||this.hotelFilterDestination()}});return;}
+  this.selected.set(record);this.editorError.set('');this.editorOpen.set(true);this.editorLoading.set(true);
+   try{const initial:Row=record?(this.preview?{...record.raw,nombre:record.title,nombre_hotel:record.title}:await this.resources.detail(this.kind,record)):{activo:true,estatus:true,orden:0,prioridad:2,catalogo_destino_id:this.hotelDestinationId||this.hotelFilterDestination()};this.value.set(initial);this.fields.set(this.preview?this.definition().fields:await this.resources.options(this.definition().fields));}
  catch(e){this.editorError.set(e instanceof Error?e.message:'No pudimos cargar este registro.');}finally{this.editorLoading.set(false);}}
  async save(value:Row){if(!this.canEdit())return;this.saving.set(true);this.editorError.set('');try{await this.resources.save(this.definition(),value,this.selected()?.id||null,this.catalog());this.editorOpen.set(false);this.toast.success('Los cambios se guardaron correctamente.');await this.load(this.page().page);}catch(e){this.toast.error(e instanceof Error?e.message:'No se pudo guardar.');}finally{this.saving.set(false);}}
  async remove(){if(!this.canEdit()||!this.selected())return;this.removing.set(true);this.editorError.set('');try{await this.resources.remove(this.definition(),this.selected()!,this.catalog());this.removeOpen.set(false);this.editorOpen.set(false);this.toast.success(this.kind==='destinos'?'Destino desactivado.':'Registro eliminado.');await this.load();}catch(e){this.toast.error(e instanceof Error?e.message:'No se pudo completar la acción.');}finally{this.removing.set(false);}}

@@ -4,6 +4,7 @@ import { LanguageService } from '../../core/services/language.service';
 import { Page, PAGE_SIZE, normalizeRecord, Row } from '../models/travel-record';
 import { randomSample } from '../../core/utils/random-sample';
 import {InternationalCountry} from '../models/international-geography';
+import {hotelStatusColumnAvailable} from '../utils/hotel-catalog-filters';
 const HOTEL_COLUMNS =
   'id,estrellas,fondo,orden,ubicacion,traducciones:hotel_traducciones(idioma_id,nombre_hotel,descripcion),catalogoDestino:catalogo_destino_id!inner(id,nombre)';
 
@@ -17,10 +18,16 @@ export class PublicTravelService {
   }
   hotels = {
     infoHotel: async (id: number, lang: string) => {
+      if(await this.hotelStatusAvailable()){
+        const {data,error}=await this.backend.client.from('hoteles').select('id').eq('id',id).eq('activo',true).maybeSingle();
+        if(error)throw error;
+        if(!data)return null;
+      }
       const { HotelesService } = await import('../queries/hoteles.service');
       return this.injector.get(HotelesService).infoHotel(id, lang);
     },
   };
+  private hotelStatusAvailable(){return this.cached('hotel-status-column',()=>hotelStatusColumnAvailable(this.backend.client));}
   destinations = {
     obtenerDetalleDestino: async (id: number, lang: string) => {
       const { DestinosService } = await import('../queries/destinos.service');
@@ -157,6 +164,7 @@ export class PublicTravelService {
       const languageId=await this.hotelLanguageId();
       const columns=filters.search.trim()?HOTEL_COLUMNS.replace('traducciones:hotel_traducciones(', 'traducciones:hotel_traducciones!inner('):HOTEL_COLUMNS;
       let query=this.backend.client.from('hoteles').select(columns+(filters.regime?',regimenes:regimen_hotel!inner(regimen_id)':''),{count:'exact'}).eq('catalogo_destino_id',id);
+      if(await this.hotelStatusAvailable())query=query.eq('activo',true);
       if(filters.search.trim())query=query.ilike('traducciones.nombre_hotel','%'+filters.search.replace(/[%_,]/g,'').trim()+'%').eq('traducciones.idioma_id',languageId);
       if(filters.starsMin!==null)query=query.gte('estrellas',filters.starsMin);
       if(filters.starsMax!==null)query=query.lte('estrellas',filters.starsMax);
@@ -173,18 +181,21 @@ export class PublicTravelService {
 
   /** Cache the small ID pool; retrieve translated details for just the four chosen hotels. */
   async featuredHotels(destinationId: number): Promise<Page> {
+    const statusAvailable=await this.hotelStatusAvailable();
     const ids = await this.backend.cache.get(
       'public:hotel-ids:' + destinationId,
       async () => {
         const pool: number[] = [];
         const batchSize = 1000;
         for (let from = 0; ; from += batchSize) {
-          const result = await this.backend.client
+          let query = this.backend.client
             .from('hoteles')
             .select('id', { count: 'exact' })
             .eq('catalogo_destino_id', destinationId)
             .order('id')
             .range(from, from + batchSize - 1);
+          if(statusAvailable)query=query.eq('activo',true);
+          const result=await query;
           if (result.error) throw result.error;
           pool.push(...(result.data || []).map((row) => Number(row.id)));
           if (!result.data?.length || pool.length >= (result.count ?? pool.length)) break;
@@ -195,12 +206,14 @@ export class PublicTravelService {
     );
     const selected = randomSample(ids, 4);
     if (!selected.length) return { items: [], total: 0, page: 0 };
-    const [result, languageId] = await Promise.all([
-      this.backend.client
+    let detailsQuery=this.backend.client
         .from('hoteles')
         .select(HOTEL_COLUMNS)
         .eq('catalogo_destino_id', destinationId)
-        .in('id', selected),
+        .in('id', selected);
+    if(statusAvailable)detailsQuery=detailsQuery.eq('activo',true);
+    const [result, languageId] = await Promise.all([
+      detailsQuery,
       this.hotelLanguageId(),
     ]);
     if (result.error) throw result.error;

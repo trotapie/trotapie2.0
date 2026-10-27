@@ -64,6 +64,15 @@
       <button tpButton icon="filter" type="button" (click)="openDestinationFilters()">Filtros{{filterCount() ? ' ('+filterCount()+')' : ''}}</button>
       @if(filterCount()){<button tpButton variant="quiet" icon="close" (click)="clearDestinationFilters()">Limpiar</button>}
     }
+    @if(kind==='hoteles'){
+      @if(!hotelDestinationId){
+        <div class="hotel-type-pills" role="group" aria-label="Tipo de destino">
+          @for(type of destinationTypeOptions;track type.value){<button type="button" class="hotel-nav-pill" [class.is-selected]="hotelDestinationType()===type.value" [attr.aria-pressed]="hotelDestinationType()===type.value" (click)="changeHotelType(type.value)">{{type.label}}</button>}
+        </div>
+      }
+      <button tpButton icon="filter" type="button" (click)="openHotelFilters()">Filtros{{hotelFilterCount()?' ('+hotelFilterCount()+')':''}}</button>
+      @if(hotelFilterCount()){<button tpButton variant="quiet" icon="close" (click)="clearHotelFilters()">Limpiar</button>}
+    }
     <div class="view-options" role="group" aria-label="Vista de registros">
       <button
         tpButton
@@ -84,6 +93,7 @@
         (click)="view.set('table')"
       ></button>
     </div>
+    <!-- Exportar esta página: reservado para habilitar más adelante.
     <button
       tpButton
       variant="icon"
@@ -93,7 +103,15 @@
       [disabled]="!page().items.length"
       (click)="export()"
     ></button>
+    -->
   </tp-filter-bar>
+  @if(kind==='hoteles'&&!hotelDestinationId){
+    <section class="hotel-destination-nav" aria-label="Elegir destino activo">
+      <app-tp-select-search class="hotel-destination-select" [label]="'Destinos '+(hotelDestinationType()==='NACIONAL'?'nacionales':'internacionales')" placeholder="Selecciona un destino" [showClear]="false" [options]="hotelDestinations()" [ngModel]="hotelFilterDestination()" (ngModelChange)="changeHotelDestination($event)"/>
+      @if(!hotelDestinations().length){<span class="hotel-destination-empty" role="status">{{loading()?'Cargando destinos…':hotelFiltersError()?'No se pudieron cargar los destinos.':'No hay destinos activos en esta categoría.'}}</span>}
+    </section>
+  }
+  @if(kind==='hoteles'&&!loading()&&!hotelStatusReady()){<p class="hotel-status-note" role="status">La activación e inactivación de hoteles requiere habilitar el campo de estado en Supabase. Puedes consultar, crear y editar hoteles mientras tanto.</p>}
   @if(kind === 'cotizaciones') {
     <tp-quote-column-filters [value]="quoteFilters()" [status]="status()" [multiple]="multiple()" (changed)="changeQuoteFilters($event)" (statusChanged)="changeQuoteStatus($event)" (cleared)="clearQuoteFilters()" />
   }
@@ -101,6 +119,8 @@
     <tp-state mode="loading" />
   } @else if (error()) {
     <tp-state mode="error" [message]="error()" (retry)="load()" />
+  } @else if(kind==='hoteles'&&!hotelDestinationId&&!hotelFilterDestination()){
+    <tp-state title="Selecciona un destino" message="Elige Nacionales o Internacionales y después un destino activo para consultar únicamente sus hoteles."/>
   } @else if (!page().items.length) {
     <tp-state
       [title]="preview ? 'Tu información tendrá su propio espacio' : 'Sin resultados por ahora'"
@@ -117,12 +137,12 @@
           <div class="record-card">
           <tp-image-card
             [record]="record"
-            [hasActions]="kind==='destinos'"
+            [hasActions]="kind==='destinos'||kind==='hoteles'"
             [imageFit]="kind === 'destinos' ? 'contain' : 'cover'"
             label="Consultar registro"
             (selected)="open($event)"
           />
-          @if(kind==='destinos'){<app-tp-actions-menu class="record-card-menu" [actions]="rowActions(record)" [ariaLabel]="'Acciones de '+record.title" (actionSelected)="destinationAction({id:$event,record})" />}
+          @if(kind==='destinos'||kind==='hoteles'){<app-tp-actions-menu class="record-card-menu" [actions]="rowActions(record)" [ariaLabel]="'Acciones de '+record.title" (actionSelected)="recordAction({id:$event,record})" />}
           </div>
         }
       </div>
@@ -132,7 +152,7 @@
         [records]="page().items"
         [columns]="tableColumns()"
         [actions]="rowActions"
-        (actionSelected)="destinationAction($event)"
+        (actionSelected)="recordAction($event)"
         [title]="kind === 'cotizaciones' ? 'Cliente / pasajero' : 'Nombre'"
         (selected)="open($event)"
       />
@@ -162,6 +182,10 @@
     </div>
   }
 </section>
+<tp-dialog [open]="hotelFiltersOpen()" title="Filtrar hoteles" eyebrow="Personaliza los resultados" placement="adaptive" (closed)="hotelFiltersOpen.set(false)">
+  <p>Puedes preparar tus filtros en cualquier momento. Se aplicarán a los hoteles del destino que selecciones.</p>
+  <tp-resource-form submitLabel="Aplicar filtros" [fields]="hotelModalFields()" [value]="hotelFilterDraft()" (saved)="applyHotelFilters($event)" (cancelled)="hotelFiltersOpen.set(false)"/>
+</tp-dialog>
 <tp-dialog [open]="filtersOpen()" title="Filtrar destinos" eyebrow="Encuentra tu próximo destino" placement="adaptive" (closed)="filtersOpen.set(false)">
   @if(filterLoading()){<tp-state mode="loading" />}
   @else if(filterError()){<tp-state mode="error" [message]="filterError()" (retry)="openDestinationFilters()" />}

@@ -107,6 +107,7 @@ export class PublicPage implements OnInit, OnDestroy {
   applyHotelFilters(){if(!this.hotelStarRangeValid())return;clearTimeout(this.timer);this.hotelFilters.set({...this.hotelFilterDraft(),search:this.hotelFilterDraft().search.trim()});this.hotelFiltersOpen.set(false);void this.load(0);}
   clearHotelFilters(){clearTimeout(this.timer);this.hotelFilters.set({search:'',starsMin:null,starsMax:null,regime:null});void this.load(0);}
   hotelPageSize=signal(10);
+  hotelDestinationName = signal('');
   hotelGridSize(size:number){if(this.mode!=='hoteles'||!this.id||this.hotelPageSize()===size)return;this.hotelPageSize.set(size);void this.load(0);}
   homeSection=signal<'home'|'destinations'>('home');
   activeSection=computed(()=>this.mode==='home'?this.homeSection():this.mode==='circuitos'||this.mode==='circuito'?'circuits':'destinations');
@@ -237,9 +238,20 @@ export class PublicPage implements OnInit, OnDestroy {
         });
         this.page.set(hotels);
       } else if (this.mode === 'hoteles' && this.id) {
-        const p = await this.data.hotelPage(this.id, page, this.hotelPageSize(),this.hotelFilters());
-        if (generation === this.generation) this.page.set(p);
-        if(!this.hotelRegimes().length)this.hotelRegimes.set(await this.data.hotelRegimeOptions());
+        const [p, regimes, destinationName] = await Promise.all([
+          this.data.hotelPage(this.id, page, this.hotelPageSize(),this.hotelFilters()),
+          this.data.hotelRegimeOptions(),
+          this.data.cached('hotel-destination-name:' + this.id, async () => {
+            const { data, error } = await this.data.backend.client
+              .from('catalogo_destinos').select('nombre').eq('id', this.id).maybeSingle();
+            if (error) throw error;
+            return data?.nombre || '';
+          }),
+        ]);
+        if (generation !== this.generation) return;
+        this.page.set(p);
+        this.hotelRegimes.set(regimes);
+        this.hotelDestinationName.set(destinationName);
       } else if (this.mode === 'circuitos') {
         const rows = await this.data.cached('public-circuits', () =>
           this.data.circuits.listCircuitosPublicos(this.data.language.language()),

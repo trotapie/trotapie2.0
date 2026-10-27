@@ -1,10 +1,11 @@
 import {Component,inject,signal,computed,OnInit} from '@angular/core';import {Router,RouterLink,ActivatedRoute} from '@angular/router';
 import {DashboardStatistics} from './components/dashboard-statistics/dashboard-statistics';
+import {DashboardSnapshot} from '../../../data/models/dashboard-statistics';
 import {TravelDataService,TravelRecord,normalizeRecord} from '../../../data/facades/travel-data.service';import {AuthService} from '../../../core/services/auth.service';import {Button} from '../../../shared/components/button/button';import {Icon} from '../../../shared/components/icon/icon';import {DataTable} from '../../../shared/components/data-table/data-table';import {ImageCard} from '../../../shared/components/image-card/image-card';import {State} from '../../../shared/components/state/state';
 @Component({selector:'tp-dashboard',imports:[DashboardStatistics,RouterLink,Button,Icon,DataTable,ImageCard,State],templateUrl:'./dashboard.html',styleUrl:'./dashboard.scss'})
 export class Dashboard implements OnInit {
   data=inject(TravelDataService);auth=inject(AuthService);router=inject(Router);route=inject(ActivatedRoute);preview=!!this.route.snapshot.data['preview'];base=this.preview?'/vista-previa':'/admin';
-  loading=signal(true);error=signal('');cover=signal<any>(null);destinations=signal<TravelRecord[]>([]);snapshot=signal<{total:number|null;pending:number|null;quoted:number|null;recent:TravelRecord[]}>({total:null,pending:null,quoted:null,recent:[]});
+  loading=signal(true);error=signal('');cover=signal<any>(null);destinations=signal<TravelRecord[]>([]);snapshot=signal<DashboardSnapshot>({total:null,pending:null,quoted:null,recent:[]});
   ratio=computed(()=>this.snapshot().total ? Math.round((this.snapshot().quoted||0)/this.snapshot().total!*100) : 0);
   ngOnInit(){void this.load();}
   async load(){this.loading.set(true);this.error.set('');try{

@@ -155,6 +155,12 @@
   font-size: 32px;
   margin: 10px 0;
 }
+.public-section-heading h2.hotel-destination-title {
+  font-size: clamp(36px, 6vw, 64px);
+  line-height: 1.08;
+  letter-spacing: -0.04em;
+  overflow-wrap: anywhere;
+}
 .public-section-heading p {
   font-size: 12px;
 }

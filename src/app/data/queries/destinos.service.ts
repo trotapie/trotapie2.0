@@ -284,6 +284,21 @@ export class DestinosService {
     if (error) throw error;
   }
 
+  async crearCatalogoDestinoAdmin(payload: {
+    nombre: string;
+    slug: string;
+    orden: number;
+    prioridad: 1 | 2;
+    division_area_id: number;
+    tipo_turistico_id: number | null;
+    imagen_destino: string | null;
+    activo: boolean;
+  }) {
+    const { data, error } = await this.client.from('catalogo_destinos').insert(payload).select('id').single();
+    if (error) throw error;
+    return data;
+  }
+
   async crearDestinoAdmin(
     payload: {
       nombre: string;

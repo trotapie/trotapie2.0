@@ -1,4 +1,5 @@
 import {spanishImageText,imageTranslationKey,needsImageTranslation} from '../utils/image-translation';
+import {applyPhotoBulkAction,type PhotoBulkAction} from '../utils/photo-bulk-action';
 import {ChangeTracker} from '../../../core/utils/change-snapshot';
 import {protectUnsavedChanges} from '../../../core/guards/unsaved-changes.guard';
 import {TpToastService} from '../../../shared/services/tp-toast.service';
@@ -14,6 +15,19 @@ export class DestinationEditor implements OnInit {toast=inject(TpToastService);s
   private changes=new ChangeTracker<IPreviewDestinoAdmin>();
   readonly locationOpen=signal(false);
   readonly importingImages=signal(false);
+  bulkImages(a:IActividadPreviewAdmin,images:Record<string,any>[],action:PhotoBulkAction){
+    if(this.saving()||!this.service.data.auth.hasPermission('destinos.edit')||!this.model()?.actividades.includes(a))return;
+    const selected=(a.imagenes||[]).filter(image=>images.includes(image));
+    if(!selected.length)return;
+    if(action==='delete'&&!window.confirm(`¿Eliminar ${selected.length} fotografías de esta atracción? La eliminación se aplicará al guardar el contenido del destino.`))return;
+    const previous=a.imagenes||[];
+    a.imagenes=applyPhotoBulkAction(previous,selected,action);
+    // Preserve translation tracking for the updated image objects.
+    if(action!=='delete')a.imagenes.forEach((image,index)=>{const key=this.translatedKeys.get(previous[index]);if(key)this.translatedKeys.set(image,key);});
+    if(action==='delete'&&selected.some(image=>image.imagen_url===a.imagen_fondo))a.imagen_fondo=a.imagenes.find(image=>image.activa)?.imagen_url||a.imagenes[0]?.imagen_url||'';
+    this.model.set({...this.model()!});
+    this.toast.success('Fotografías actualizadas. Guarda el contenido del destino para conservar los cambios.');
+  }
   toggleImage(a:IActividadPreviewAdmin,image:Record<string,any>,active:boolean){
     if(this.saving()||!this.service.data.auth.hasPermission('destinos.edit')||!a.imagenes?.includes(image as any))return;
     image['activa']=active;this.model.set({...this.model()!});

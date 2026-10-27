@@ -1,6 +1,10 @@
 :host{display:block}.catalog-summary{display:flex;align-items:center;justify-content:space-between;gap:24px;margin-bottom:20px;padding:20px 24px;border-radius:24px;background:var(--surface)}.catalog-summary>div{display:flex;align-items:center;gap:16px}.catalog-summary>div>tp-icon{box-sizing:content-box;padding:16px;background:var(--brand-soft);color:var(--brand);border-radius:18px}.catalog-summary small{display:block;font-size:11px;color:var(--muted)}.catalog-summary strong{display:block;font-size:28px;font-weight:500;letter-spacing:-.04em}.catalog-summary>span{font-size:11px;max-width:360px;color:var(--muted);text-align:right}.editor-specific-actions{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:20px}.delete-area{padding-top:24px;margin-top:20px;border-top:1px solid var(--line)}
 @media(max-width:700px){.catalog-summary{padding:18px}.catalog-summary>span{display:none}.catalog-panel{padding:16px}.editor-specific-actions .btn{width:100%}}
 :host .destination-type-select { width:210px; min-width:180px; }
+:host { min-width:0; max-width:100%; }
+.catalog-panel { min-width:0; max-width:100%; }
+.hotel-status-note{font-size:12px;color:var(--muted);line-height:1.6;margin:0 0 16px}
+.hotel-type-pills{display:flex;flex-wrap:wrap;gap:6px;max-width:100%}.hotel-nav-pill{flex:0 0 auto;border:0;border-radius:999px;min-height:44px;padding:12px 18px;background:var(--muted-surface);color:var(--muted);font:inherit;font-size:12px;cursor:pointer;white-space:nowrap;transition:background .15s,color .15s}.hotel-nav-pill:hover{background:var(--brand-soft);color:var(--ink)}.hotel-nav-pill.is-selected{background:var(--ink);color:var(--surface)}.hotel-nav-pill:focus-visible{outline:2px solid var(--brand);outline-offset:3px}.hotel-destination-nav{min-width:0;max-width:100%;padding:4px 0 20px}.hotel-destination-select{display:block;width:320px;max-width:100%;min-width:0}.hotel-destination-empty{display:block;font-size:12px;color:var(--muted);padding:12px 0}
 :host .quote-type-select { width:180px; min-width:160px; }
 @media(max-width:600px){:host .destination-type-select{width:100%;flex-basis:100%;}}
 .catalog-panel tp-filter-bar button.btn { min-height:48px; }

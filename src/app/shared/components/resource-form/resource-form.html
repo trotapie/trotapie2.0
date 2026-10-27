@@ -1,8 +1,11 @@
 <form #form="ngForm" (ngSubmit)="form.valid&&!busy()&&!disabled()&&saved.emit(model())">
-  <div class="form-grid">@for(field of fields();track field.key){@if(!field.only||field.only==='edit'&&editing()||field.only==='create'&&!editing()){
+  <div class="form-grid">@for(field of fields();track field.key){@if(visible(field)&&(!field.only||field.only==='edit'&&editing()||field.only==='create'&&!editing())){
     <div [class.form-full]="field.type==='textarea'">
       @if(field.type==='checkbox'){
         <app-custom-switch [stacked]="true" [label]="field.label" [name]="field.key" [ngModel]="model()[field.key]" [disabled]="disabled()||busy()" (ngModelChange)="set(field.key,$event)" />
+      }@else if(field.ref==='hotel-destinations'){
+        <tp-hotel-destination-select [label]="field.label" [value]="model()[field.key]" [required]="!!field.required" [disabled]="disabled()||busy()" (changed)="set(field.key,$event)"/>
+        <input type="hidden" [name]="field.key" [ngModel]="model()[field.key]" [required]="!!field.required" [disabled]="disabled()||busy()"/>
       }@else if(field.type==='select'){
         <app-tp-select-search [label]="field.label" [name]="field.key" [options]="$any(field.options||[])" [ngModel]="model()[field.key]" [required]="!!field.required" [disabled]="disabled()||busy()" (ngModelChange)="set(field.key,$event)" />
       }@else if(field.type==='textarea'){

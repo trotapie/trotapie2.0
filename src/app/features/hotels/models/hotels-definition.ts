@@ -8,6 +8,7 @@ export const hotelsDefinition:ResourceDefinition = {
   "permission": "hoteles.edit",
   "visual": false,
   "columns": [
+    {"key":"destino_nombre","label":"Destino"},
     {
       "key": "regimen",
       "label": "Régimen"
@@ -23,7 +24,7 @@ export const hotelsDefinition:ResourceDefinition = {
       "key": "catalogo_destino_id",
       "label": "Destino del catálogo",
       "type": "select",
-      "ref": "destinations",
+      "ref": "hotel-destinations",
       "required": true
     },
     {

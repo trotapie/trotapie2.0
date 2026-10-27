@@ -33,6 +33,10 @@ export class TpSelectSearchComponent implements ControlValueAccessor {
   @Input() hoverHighlight = true;
   @Input() showClear = true;
   @Input() showSearch = true;
+  @Input() remoteSearch = false;
+  @Input() loading = false;
+  @Output() searchChanged = new EventEmitter<string>();
+  @Output() opened = new EventEmitter<void>();
   @Output() selectionChange = new EventEmitter<string | number | null>();
   @ViewChild('searchInput') private searchInput?: ElementRef<HTMLInputElement>;
   @ViewChild('triggerButton') private triggerButton?: ElementRef<HTMLButtonElement>;
@@ -50,6 +54,7 @@ export class TpSelectSearchComponent implements ControlValueAccessor {
   private onTouched: () => void = () => undefined;
 
   get opcionesFiltradas(): TpSelectSearchOption[] {
+    if(this.remoteSearch)return this.options;
     const normalize=(value:string)=>value.trim().normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLocaleLowerCase();
     const filtro=normalize(this.busqueda);
     return filtro?this.options.filter(option=>normalize(option.label).includes(filtro)):this.options;
@@ -69,6 +74,7 @@ export class TpSelectSearchComponent implements ControlValueAccessor {
   abrir(): void {
     if (this.isDisabled) return;
     this.abierto = true;
+    this.opened.emit();
     setTimeout(() => {
       if (!this.abierto) return;
       if (this.showSearch) this.searchInput?.nativeElement.focus();
@@ -94,6 +100,8 @@ export class TpSelectSearchComponent implements ControlValueAccessor {
     this.selectionChange.emit(option.value);
     this.cerrar();
   }
+
+  buscar(value:string):void{this.busqueda=value;this.searchChanged.emit(value);}
 
   limpiar(): void {
     this.valorSeleccionado = null;
