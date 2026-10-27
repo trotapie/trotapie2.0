@@ -748,4 +748,4 @@ app-root {
   min-height: 100dvh;
 }
 
-:root{--app-frame-gap:24px}@media(max-width:700px){:root{--app-frame-gap:10px}}
+:root{--app-frame-gap:24px}@media(max-width:700px){:root{--app-frame-gap:0px}}
