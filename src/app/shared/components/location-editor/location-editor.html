@@ -1,0 +1,27 @@
+<div class="location-editor">
+  @if(location()){
+    @if(point()){
+      @for(current of [location()];track current){
+        @defer(on immediate){<tp-location-map-viewer [location]="current" [name]="name()"/>}
+        @placeholder{<p role="status">Cargando mapa…</p>}
+      }
+    }@else if(addressMap();as map){
+      <iframe [src]="map" [title]="'Mapa de '+name()" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+    }@else{
+      <p class="location-note">Ubicación agregada. Para mostrar la vista previa, usa el enlace completo de Maps con coordenadas o una dirección.</p>
+      @if(externalUrl();as url){<a tpButton icon="pin" [href]="url" target="_blank" rel="noopener noreferrer">Abrir ubicación</a>}
+    }
+  }@else{<p class="location-note">Todavía no has agregado una ubicación.</p>}
+  <div class="location-editor-actions">
+    <button tpButton type="button" [icon]="location()?'edit':'pin'" [disabled]="disabled()" (click)="open()">{{location()?'Editar ubicación':'Agregar ubicación'}}</button>
+    @if(location()){<button tpButton type="button" variant="quiet" [disabled]="disabled()" (click)="remove()">Quitar ubicación</button>}
+  </div>
+</div>
+<tp-dialog [open]="editing()" title="Configurar ubicación" [fixedChrome]="true" (closed)="editing.set(false)">
+  <p class="location-note">Pega el enlace completo del mapa, las coordenadas o la dirección. El cambio se conservará al guardar el formulario principal.</p>
+  <tp-field label="Dirección o enlace del mapa"><textarea aria-label="Dirección o enlace del mapa" [ngModel]="draft()" (ngModelChange)="draft.set($event)" [ngModelOptions]="{standalone:true}" [disabled]="disabled()" placeholder="Pega aquí el enlace de Maps o escribe la dirección"></textarea></tp-field>
+  <div class="dialog-actions">
+    <button tpButton type="button" (click)="editing.set(false)">Cancelar</button>
+    <button tpButton type="button" variant="primary" icon="check" [disabled]="disabled()||!draft().trim()" (click)="accept()">Aceptar</button>
+  </div>
+</tp-dialog>

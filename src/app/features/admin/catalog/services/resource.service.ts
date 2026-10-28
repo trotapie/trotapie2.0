@@ -3,6 +3,7 @@ import {TravelDataService,TravelRecord,Row} from '../../../../data/facades/trave
 import {ResourceDefinition,FieldDefinition} from '../../../../shared/models/resource-definition';
 import type {CatalogoAdminKey} from '../../../../data/queries/catalogos-admin.service';
 import {destinationCatalogPayload,destinationSlug} from '../../../destinations/models/destination-catalog-payload';
+import {hotelEditorDraft,hotelDetailPayload,hotelDraftValidation} from '../../../hotels/models/hotel-editor-model';
 @Injectable({providedIn:'root'})
 export class ResourceService {
  data=inject(TravelDataService);
@@ -11,7 +12,7 @@ export class ResourceService {
  },300_000);return{...f,options:rows.map((r:any)=>({value:r.id,label:r.nombre||r.descripcion||r.rol||r.nombre_habitacion||String(r.id)}))};}));}
  async detail(kind:string,record:TravelRecord):Promise<Row>{
  if(kind==='destinos')return await this.data.destinations.obtenerCatalogoDestinoAdmin(Number(record.id))||record.raw;
- if(kind==='hoteles'){const d:any=await this.data.hotels.infoHotel(Number(record.id),'es');if(!d)throw new Error('No encontramos este hotel.');return{...d,catalogo_destino_id:d.catalogo_destino_id||record.raw['catalogo_destino_id_resuelto'],galleryUrls:(d.imagenes||[]).map((i:any)=>i.url_imagen).join('\n'),activityIds:(d.actividades||[]).map((a:any)=>a.id),regimeIds:(d.regimenes||[]).map((a:any)=>a.id),roomTypeIds:d.tipos_habitacion_ids||[]};}
+ if(kind==='hoteles'){const d:any=await this.data.hotels.infoHotel(Number(record.id),'es');if(!d)throw new Error('No encontramos este hotel.');return hotelEditorDraft({...d,catalogo_destino_id:d.catalogo_destino_id||record.raw['catalogo_destino_id_resuelto']});}
  if(kind==='circuitos')return await this.data.circuits.infoCircuito(Number(record.id),'es')||record.raw;
  return{...record.raw};}
  async save(def:ResourceDefinition,v:Row,id:string|null,catalog='idiomas'){
@@ -24,7 +25,7 @@ export class ResourceService {
     else await this.data.destinations.crearCatalogoDestinoAdmin({...payload,slug:destinationSlug(payload.nombre)});
     break;
   }
- case 'hoteles':{const existing:Row[]=v['imagenes']||[],urls=txt(v['galleryUrls']).split(/\r?\n/).map(s=>s.trim()).filter(Boolean);const images=urls.map(url=>{const e=existing.find(i=>i['url_imagen']===url);return{id:e?.['id']||null,url_imagen:url,tipo_imagen_id:e?.['tipo_imagen_id']||null};});const removed=existing.filter(i=>!urls.includes(i['url_imagen'])).map(i=>({...i,eliminar:true}));const translations=(v['traducciones']||[]).filter((t:any)=>t.idioma_id!==1);translations.push({idioma_id:1,nombre_hotel:txt(v['nombre_hotel']),descripcion:txt(v['descripcion'])||null,plan_todo_incluido:v['traducciones']?.find((t:any)=>t.idioma_id===1)?.plan_todo_incluido||null});const payload={nombre_hotel:txt(v['nombre_hotel']),descripcion:txt(v['descripcion'])||null,orden:num(v['orden']),estrellas:num(v['estrellas']),fondo:txt(v['fondo'])||null,ubicacion:txt(v['ubicacion'])||null,destino_id:num(v['destino_id']),catalogo_destino_id:num(v['catalogo_destino_id']),descuento_id:num(v['descuento_id']),regimen_id:num(v['regimen_id']),regimen_ids:v['regimeIds']||[],actividad_ids:v['activityIds']||[],room_type_ids:v['roomTypeIds']||[],horarios:v['horarios']||null,imagenes:[...images,...removed] as any,traducciones:translations};if(id)await this.data.legacy.actualizarHotelDetalleAdmin({...payload,hotelId:n});else await this.data.legacy.crearHotelDetalleAdmin(payload);break;}
+ case 'hoteles':{const validation=hotelDraftValidation(v);if(validation)throw new Error(validation);const payload=hotelDetailPayload(v);if(id)await this.data.legacy.actualizarHotelDetalleAdmin({...payload,hotelId:n});else await this.data.legacy.crearHotelDetalleAdmin(payload);break;}
  case 'clientes':{const payload={nombre:txt(v['nombre']),nombre_completo:txt(v['nombre_completo'])||txt(v['nombre']),tratamiento_id:num(v['tratamiento_id']),email:txt(v['email'])||null,telefono:txt(v['telefono']),recibir_ofertas:!!v['recibir_ofertas']};if(id){const r=await this.data.backend.client.from('clientes').update(payload).eq('id',n).select('id').single();if(r.error)throw r.error;}else await this.data.legacy.upsertCliente(payload);break;}
   case 'empleados':{const p={nombre:txt(v['nombre']),cargo_id:num(v['cargo_id']),telefono:txt(v['telefono']),email:txt(v['email'])};if(id){await this.data.employees.actualizarEmpleadoAdmin(n,p);if(v['estatus_id'])await this.data.employees.actualizarEstatusEmpleadoAdmin(n,Number(v['estatus_id']));}else await this.data.employees.crearEmpleadoAdmin(p);break;}
  case 'circuitos':{const p={nombre:txt(v['nombre']),descripcion:txt(v['descripcion']),precio_total:Number(v['precio_total'])||0,duracion_dias:Number(v['duracion_dias'])||1,duracion_noches:Number(v['duracion_noches'])||0,imagen_principal:txt(v['imagen_principal']),activo:v['activo']!==false,destinos:v['destinos']||[],hoteles:v['hoteles']||[],actividades:v['actividades']||[],imagenes:v['imagenes']||[],traducciones:v['traducciones']||[]};if(id)await this.data.circuits.actualizarCircuito(n,p);else await this.data.circuits.crearCircuito(p);break;}

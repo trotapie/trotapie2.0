@@ -5,15 +5,15 @@ import {protectUnsavedChanges} from '../../../core/guards/unsaved-changes.guard'
 import {TpToastService} from '../../../shared/services/tp-toast.service';
 import {AttractionsWorkspace} from '../components/attractions-workspace/attractions-workspace';
 import {LanguageMenu} from '../../../shared/components/language-menu/language-menu';
-import {LocationMap} from '../../../shared/components/location-map/location-map';
+import {LocationEditor} from '../../../shared/components/location-editor/location-editor';
 import {driveImageThumbnailUrl} from '../../../data/utils/drive-image-url';
 import {TpSelectSearchComponent} from '../../../shared/components/tp-select-search/tp-select-search.component';
 import {availableQuickFactTypes, appendQuickFact} from '../utils/quick-facts';
 import {Component,inject,signal,OnInit} from '@angular/core';import {RouterLink,ActivatedRoute} from '@angular/router';import {FormsModule} from '@angular/forms';import {DestinationEditorService} from '../services/destination-editor.service';import type {IPreviewDestinoAdmin,IActividadPreviewAdmin} from '../../../data/queries/supabase.service';import {PageHeader} from '../../../shared/components/page-header/page-header';import {Button} from '../../../shared/components/button/button';import {Field} from '../../../shared/components/field/field';import {State} from '../../../shared/components/state/state';import {Dialog} from '../../../shared/components/dialog/dialog';import {ImageComposer} from '../../../shared/components/image-composer/image-composer';import {Icon} from '../../../shared/components/icon/icon';
-@Component({selector:'tp-destination-editor',imports:[AttractionsWorkspace,LanguageMenu,LocationMap,TpSelectSearchComponent,RouterLink,FormsModule,PageHeader,Button,Field,State,Dialog,ImageComposer,Icon],templateUrl:'./destination-editor.html',styleUrl:'./destination-editor.scss'})
+@Component({selector:'tp-destination-editor',imports:[AttractionsWorkspace,LanguageMenu,LocationEditor,TpSelectSearchComponent,RouterLink,FormsModule,PageHeader,Button,Field,State,Dialog,ImageComposer,Icon],templateUrl:'./destination-editor.html',styleUrl:'./destination-editor.scss'})
 export class DestinationEditor implements OnInit {toast=inject(TpToastService);service=inject(DestinationEditorService);route=inject(ActivatedRoute);id=Number(this.route.snapshot.paramMap.get('id'));loading=signal(true);error=signal('');saving=signal(false);model=signal<IPreviewDestinoAdmin|null>(null);tab=signal('text');language=signal(1);activity=signal<IActividadPreviewAdmin|null>(null);image=signal<Record<string,any>|null>(null);imageDialog=signal(false);newImage='';driveFolder='';translatingImage=signal(false);private originalImage:Record<string,any>|null=null;private translatedKeys=new WeakMap<object,string>();private editorTranslationKey:string|undefined;private dragIndex:number|null=null;
   private changes=new ChangeTracker<IPreviewDestinoAdmin>();
-  readonly locationOpen=signal(false);
+  setLocation(value:string){this.model.update(model=>model?{...model,ubicacion:value}:model);}
   readonly importingImages=signal(false);
   bulkImages(a:IActividadPreviewAdmin,images:Record<string,any>[],action:PhotoBulkAction){
     if(this.saving()||!this.service.data.auth.hasPermission('destinos.edit')||!this.model()?.actividades.includes(a))return;

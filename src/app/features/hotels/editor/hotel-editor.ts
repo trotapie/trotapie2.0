@@ -13,19 +13,22 @@ import {Field} from '../../../shared/components/field/field';
 import {State} from '../../../shared/components/state/state';
 import {TpSelectSearchComponent} from '../../../shared/components/tp-select-search/tp-select-search.component';
 import {HotelDestinationSelect} from '../../../shared/components/hotel-destination-select/hotel-destination-select';
-import {LocationMap} from '../../../shared/components/location-map/location-map';
+import {LocationEditor} from '../../../shared/components/location-editor/location-editor';
 import {ImagePreview} from '../../../shared/components/image-preview/image-preview';
 import {Dialog} from '../../../shared/components/dialog/dialog';
 import {TpToastService} from '../../../shared/services/tp-toast.service';
 import {driveImageThumbnailUrl} from '../../../data/utils/drive-image-url';
 import {classifyHotelPhoto,classifyHotelPhotos,groupHotelPhotos} from '../models/hotel-photo-classification';
 import type {TpSelectSearchOption} from '../../../shared/components/tp-select-search/tp-select-search.component';
+import {TpMultiselectComponent} from '../../../shared/components/tp-multiselect/tp-multiselect.component';
+import {HOTEL_TIME_FIELDS,hotelIds,hotelDraftValidation,hotelContentValue,setHotelContentValue} from '../models/hotel-editor-model';
+import {LanguageMenu} from '../../../shared/components/language-menu/language-menu';
 
 @Component({
   selector:'tp-hotel-editor',
-  imports:[RouterLink,FormsModule,PageHeader,Button,Field,State,TpSelectSearchComponent,HotelDestinationSelect,LocationMap,ImagePreview,Dialog],
+  imports:[RouterLink,FormsModule,PageHeader,Button,Field,State,TpSelectSearchComponent,TpMultiselectComponent,HotelDestinationSelect,LocationEditor,ImagePreview,Dialog,LanguageMenu],
   templateUrl:'./hotel-editor.html',
-  styleUrls:['./hotel-editor.scss','./hotel-photo-folders.scss']
+  styleUrls:['./hotel-editor.scss','./hotel-photo-folders.scss','./hotel-details.scss']
 })
 export class HotelEditor implements OnInit {
   private resources=inject(ResourceService);
@@ -44,6 +47,30 @@ export class HotelEditor implements OnInit {
   readonly fields=signal<FieldDefinition[]>([]);
   readonly optionsError=signal('');
   readonly optionsLoading=signal(false);
+  readonly regimes=signal<TpSelectSearchOption[]>([]);
+  readonly activities=signal<TpSelectSearchOption[]>([]);
+  readonly roomTypes=signal<TpSelectSearchOption[]>([]);
+  readonly discounts=signal<TpSelectSearchOption[]>([]);
+  readonly languages=signal<Array<{id:number;codigo:string;nombre:string}>>([]);
+  readonly contentLanguage=signal('es');
+  readonly contentLanguageCodes=computed(()=>['es',...this.languages().filter(language=>language.codigo!=='es').map(language=>language.codigo)]);
+  private contentLanguageId(){return this.contentLanguage()==='es'?1:this.languages().find(language=>language.codigo===this.contentLanguage())?.id||1;}
+  changeContentLanguage(code:string){if(this.contentLanguageCodes().includes(code))this.contentLanguage.set(code);}
+  setLocation(value:string){this.model.update(model=>model?{...model,ubicacion:value}:model);}
+  contentValue(key:'nombre_hotel'|'descripcion'|'plan_todo_incluido'){return hotelContentValue(this.model(),this.contentLanguageId(),key);}
+  setContentValue(key:'nombre_hotel'|'descripcion'|'plan_todo_incluido',value:string){this.model.update(model=>setHotelContentValue(model!,this.contentLanguageId(),key,value));}
+  readonly translating=signal(false);
+  readonly translationError=signal('');
+  readonly timeFields=HOTEL_TIME_FIELDS;
+  readonly selectionPreview=signal<'regimeIds'|'activityIds'|'roomTypeIds'|null>(null);
+  selectionCount(key:'regimeIds'|'activityIds'|'roomTypeIds'){return hotelIds(this.model()?.[key]).length;}
+  selectionTitle(){return this.selectionPreview()==='regimeIds'?'Regímenes seleccionados':this.selectionPreview()==='activityIds'?'Actividades y amenidades seleccionadas':'Tipos de habitación seleccionados';}
+  selectedItems(){
+    const key=this.selectionPreview();if(!key)return [];
+    const options=key==='regimeIds'?this.regimes():key==='activityIds'?this.activities():this.roomTypes();
+    const ids=hotelIds(this.model()?.[key]);
+    return this.selectionOptions(key,options).filter(option=>ids.includes(Number(option.value)));
+  }
   readonly imageTypes=signal<TpSelectSearchOption[]>([]);
   readonly imageTypesLoading=signal(false);
   readonly imageTypesError=signal('');
@@ -60,17 +87,16 @@ export class HotelEditor implements OnInit {
   private imageTypesGeneration=0;
   private optionsGeneration=0;
   readonly tab=signal('information');
-  readonly locationOpen=signal(false);
   readonly preview=signal('');
-  readonly tabs=[{id:'information',label:'Información',icon:'edit'},{id:'location',label:'Ubicación',icon:'pin'},{id:'photos',label:'Fotografías',icon:'star'}];
+  readonly tabs=[{id:'information',label:'Información',icon:'edit'},{id:'services',label:'Servicios y habitaciones',icon:'hotel'},{id:'additional',label:'Datos adicionales',icon:'calendar'},{id:'location',label:'Ubicación',icon:'pin'},{id:'photos',label:'Fotografías',icon:'star'}];
   newImage='';
   driveFolder='';
-  private pendingChanges=protectUnsavedChanges(()=>this.changes.hasChanges(this.model())||!!this.newImage.trim(),()=>this.saving()||this.importingImages());
+  private pendingChanges=protectUnsavedChanges(()=>this.changes.hasChanges(this.model())||!!this.newImage.trim(),()=>this.saving()||this.importingImages()||this.translating());
   canDeactivate(){return this.pendingChanges.confirm();}
 
   async ngOnInit(){
     this.loading.set(true);this.error.set('');
-    this.fields.set(hotelsDefinition.fields.filter(field=>!['fondo','ubicacion','galleryUrls'].includes(field.key)));
+    this.fields.set(hotelsDefinition.fields.filter(field=>!['fondo','ubicacion','galleryUrls','regimen_id'].includes(field.key)));
     void this.loadOptions();
     void this.loadImageTypes();
     try{
@@ -84,11 +110,56 @@ export class HotelEditor implements OnInit {
     const generation=++this.optionsGeneration;
     this.optionsLoading.set(true);this.optionsError.set('');
     try{
-      const fields=await this.resources.options(this.fields());
-      if(generation===this.optionsGeneration)this.fields.set(fields);
+      const data=this.resources.data;
+      const [regimes,activities,rooms,discounts,languages]=await Promise.all([
+        data.legacy.obtenerRegimenesAdmin(),data.legacy.obtenerActividadesAdmin(),
+        data.catalogs.obtenerCatalogoAdmin('tipos_habitacion'),data.legacy.obtenerDescuentosAdmin(),
+        data.legacy.obtenerIdiomasPreviewAdmin(),
+      ]);
+      if(generation!==this.optionsGeneration)return;
+      this.regimes.set(regimes.map(item=>({value:Number(item.id),label:item.descripcion})));
+      this.activities.set(activities.map(item=>({value:item.id,label:item.descripcion+(item.activo?'':' (inactiva)')})));
+      this.roomTypes.set(rooms.map((item:Row)=>({value:Number(item['id']),label:item['nombre_habitacion']})));
+      this.discounts.set([{value:'',label:'Sin descuento'},...discounts.map(item=>({value:item.id,label:item.tipo_descuento}))]);
+      this.languages.set(languages);
     }catch{
-      if(generation===this.optionsGeneration)this.optionsError.set('No pudimos cargar las opciones de régimen. Puedes reintentar sin perder tus cambios.');
+      if(generation===this.optionsGeneration)this.optionsError.set('No pudimos cargar los catálogos del hotel. Reintenta sin perder tus cambios.');
     }finally{if(generation===this.optionsGeneration)this.optionsLoading.set(false);}
+  }
+
+  selectionOptions(key:'regimeIds'|'activityIds'|'roomTypeIds',options:TpSelectSearchOption[]):TpSelectSearchOption[]{
+    const selected=hotelIds(this.model()?.[key]);
+    // Keep saved IDs available even when their catalog entry has no translation.
+    return [...options,...selected.filter(id=>!options.some(option=>Number(option.value)===id)).map(id=>({value:id,label:`Registro guardado #${id}`}))];
+  }
+  primaryRegimeOptions(){return [{value:'',label:'Sin régimen principal'},...this.selectionOptions('regimeIds',this.regimes()).filter(option=>hotelIds(this.model()?.['regimeIds']).includes(Number(option.value)))];}
+  changeSelection(key:'regimeIds'|'activityIds'|'roomTypeIds',values:unknown){
+    const ids=hotelIds(values);
+    this.model.update(model=>{const next={...model!,[key]:ids};if(key==='regimeIds'&&!ids.includes(Number(next['regimen_id'])))next['regimen_id']=ids.length===1?ids[0]:null;return next;});
+  }
+  async translate(){
+    const model=this.model();if(!model||this.translating()||this.saving())return;
+    if(!String(model['nombre_hotel']||'').trim()){this.translationError.set('Escribe primero el nombre del hotel en Información.');return;}
+    if(!window.confirm('¿Generar las traducciones desde español? Se reemplazarán los textos de los otros idiomas en este borrador.'))return;
+    this.translating.set(true);this.translationError.set('');
+    try{
+      const [content,plans]=await Promise.all([
+        this.resources.data.legacy.traducirDesdeEspanol({title:model['nombre_hotel'],description:model['descripcion']||''}),
+        model['planDescripcion']?.trim()?this.resources.data.legacy.traducirDesdeEspanol({title:'',description:model['planDescripcion']}):Promise.resolve(null),
+      ]);
+      const targets=this.languages().filter(language=>language.codigo!=='es');
+      for(const language of targets){
+        const translated=content[language.codigo];
+        if(!translated?.title?.trim()||(model['descripcion']?.trim()&&!translated?.description?.trim())||(plans&&!plans[language.codigo]?.description?.trim()))throw new Error(`No se recibió la traducción completa a ${language.nombre}. Tus textos anteriores se conservan.`);
+      }
+      for(const language of targets){
+        this.model.update(model=>setHotelContentValue(model!,language.id,'nombre_hotel',content[language.codigo].title));
+        this.model.update(model=>setHotelContentValue(model!,language.id,'descripcion',content[language.codigo].description||''));
+        this.model.update(model=>setHotelContentValue(model!,language.id,'plan_todo_incluido',plans?.[language.codigo]?.description||''));
+      }
+      this.toast.success('Traducciones generadas en el borrador. Pulsa Guardar hotel para conservarlas.');
+    }catch(error){this.translationError.set(error instanceof Error?error.message:'No pudimos generar las traducciones.');}
+    finally{this.translating.set(false);}
   }
 
   photos():string[]{return String(this.model()?.['galleryUrls']||'').split(/\r?\n/).map(url=>url.trim()).filter(Boolean);}
@@ -185,7 +256,7 @@ export class HotelEditor implements OnInit {
   }
   async save(){
     const model=this.model();
-    if(!model||this.saving()||this.importingImages())return;
+    if(!model||this.saving()||this.importingImages()||this.translating())return;
     if(!String(model['nombre_hotel']||'').trim()||!Number(model['catalogo_destino_id'])){
       this.tab.set('information');this.error.set('Completa el nombre del hotel y el destino del catálogo.');return;
     }
@@ -193,6 +264,8 @@ export class HotelEditor implements OnInit {
       this.tab.set('information');this.error.set('El orden de presentación debe ser mayor o igual a cero.');return;
     }
     if(this.newImage.trim()){this.tab.set('photos');this.error.set('Agrega la fotografía pendiente o limpia su dirección antes de guardar.');return;}
+    const validation=hotelDraftValidation(model);
+    if(validation){this.error.set(validation);this.tab.set('additional');return;}
     this.saving.set(true);this.error.set('');
     try{
       await this.resources.save(hotelsDefinition,model,this.id);

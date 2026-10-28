@@ -1,23 +1,34 @@
-<tp-page-header [title]="model()?.['nombre_hotel'] || 'Editar hotel'" description="Información, ubicación y fotografías. Configura cómo se presenta este hotel." eyebrow="Trotapie / Hoteles / Configuración">
+<tp-page-header [title]="model()?.['nombre_hotel'] || 'Editar hotel'" description="Configura información, servicios, estancia y fotografías. Los cambios se aplican al guardar." eyebrow="Trotapie / Hoteles / Configuración">
   <a tpButton variant="back" icon="left" [routerLink]="returnTo">Regresar</a>
   <a tpButton icon="arrow" [routerLink]="['/hotel',id]">Ver página pública</a>
-   <button tpButton icon="check" variant="primary" [busy]="saving()" [disabled]="!model()||saving()||importingImages()" (click)="save()">Guardar hotel</button>
+   <button tpButton icon="check" variant="primary" [busy]="saving()" [disabled]="!model()||saving()||importingImages()||translating()" (click)="save()">Guardar hotel</button>
 </tp-page-header>
 @if(error()){<div class="error-banner" role="alert">{{error()}}</div>}
 @if(loading()){
   <tp-state mode="loading"/>
 } @else if(model();as hotel){
-  <div class="hotel-editor-tabs" role="group" aria-label="Secciones del hotel">
-    @for(item of tabs;track item.id){<button tpButton [icon]="item.icon" [variant]="tab()===item.id?'primary':'secondary'" [attr.aria-pressed]="tab()===item.id" (click)="tab.set(item.id)">{{item.label}}</button>}
-  </div>
-  <section class="panel hotel-editor-panel" [attr.inert]="saving()?'':null">
+  <div class="hotel-editor-toolbar">
+    <div class="hotel-editor-tabs" role="group" aria-label="Secciones del hotel">
+      @for(item of tabs;track item.id){<button tpButton [icon]="item.icon" [variant]="tab()===item.id?'primary':'secondary'" [attr.aria-pressed]="tab()===item.id" (click)="tab.set(item.id)">{{item.label}}</button>}
+    </div>
     @if(tab()==='information'){
-      <div class="panel-heading"><div><h2>Información del hotel</h2><p>Los datos que acompañan a tus propuestas de viaje.</p></div></div>
-      @if(optionsLoading()){<p role="status">Cargando opciones de régimen…</p>}
-      @if(optionsError()){<div role="status">{{optionsError()}} <button tpButton type="button" (click)="loadOptions()">Reintentar</button></div>}
+      <div class="language-control" role="group" aria-label="Idioma del contenido"><span>Idioma del contenido</span><tp-language-menu [value]="contentLanguage()" [availableCodes]="contentLanguageCodes()" [changeGlobal]="false" (changed)="changeContentLanguage($event)"/></div>
+    }
+  </div>
+  @if(optionsLoading()){<p role="status">Cargando regímenes, amenidades, habitaciones e idiomas…</p>}
+  @if(optionsError()){<div class="error-banner" role="alert">{{optionsError()}} <button tpButton type="button" icon="sync" (click)="loadOptions()">Reintentar</button></div>}
+  @if(translating()){<p role="status">Generando traducciones. Tus cambios todavía no se han guardado.</p>}
+  @if(translationError()){<p class="error-banner" role="alert">{{translationError()}}</p>}
+  <section class="panel hotel-editor-panel" [attr.inert]="saving()||translating()?'':null">
+    @if(tab()==='information'){
+      <div class="panel-heading translation-heading"><div><h2>Información del hotel</h2><p>Edita el nombre y la descripción en el idioma seleccionado. El resto de la configuración es común a todos los idiomas.</p></div><button tpButton type="button" icon="globe" [disabled]="optionsLoading()||!!optionsError()||languages().length<2" (click)="translate()">Traducir desde español</button></div>
       <div class="form-grid">
         @for(field of fields();track field.key){
-          @if(field.ref==='hotel-destinations'){
+          @if(field.key==='nombre_hotel'){
+            <tp-field [label]="field.label" forId="hotel-name"><input id="hotel-name" [required]="contentLanguage()==='es'" [ngModel]="contentValue('nombre_hotel')" (ngModelChange)="setContentValue('nombre_hotel',$event)"/></tp-field>
+          } @else if(field.key==='descripcion'){
+            <tp-field [label]="field.label" forId="hotel-description" class="form-full"><textarea id="hotel-description" class="long-text" [ngModel]="contentValue('descripcion')" (ngModelChange)="setContentValue('descripcion',$event)"></textarea></tp-field>
+          } @else if(field.ref==='hotel-destinations'){
             <tp-hotel-destination-select [label]="field.label" [value]="hotel[field.key]" [required]="!!field.required" (changed)="hotel[field.key]=$event"/>
           } @else if(field.type==='select'){
             <app-tp-select-search [label]="field.label" [options]="$any(field.options||[])" [required]="!!field.required" [(ngModel)]="hotel[field.key]"/>
@@ -30,10 +41,53 @@
         }
       </div>
     }
+    @if(tab()==='services'){
+      <div class="panel-heading"><div><h2>Servicios y habitaciones</h2><p>Selecciona las opciones que ofrece este hotel. Puedes buscar y elegir varias en cada catálogo.</p></div></div>
+      <div class="hotel-service-grid">
+        <div class="service-section">
+          <h3>Regímenes de alojamiento</h3>
+          <div class="selection-input-row">
+            <app-tp-multiselect label="Regímenes disponibles" placeholder="Seleccionar regímenes" [options]="selectionOptions('regimeIds',regimes())" [ngModel]="hotel['regimeIds']" (ngModelChange)="changeSelection('regimeIds',$event)" [disabled]="optionsLoading()||!!optionsError()"/>
+            @if(selectionCount('regimeIds')>1){<button tpButton type="button" icon="eye" variant="icon" aria-label="Ver regímenes seleccionados" title="Ver regímenes seleccionados" (click)="selectionPreview.set('regimeIds')"></button>}
+          </div>
+          <app-tp-select-search label="Régimen principal" [options]="primaryRegimeOptions()" [(ngModel)]="hotel['regimen_id']" [disabled]="optionsLoading()||!!optionsError()"/>
+          <small>El principal debe formar parte de los regímenes seleccionados y será la opción sugerida al cotizar.</small>
+        </div>
+        <div class="service-section">
+          <h3>Actividades y amenidades</h3>
+          <div class="selection-input-row">
+            <app-tp-multiselect label="Amenidades del hotel" placeholder="Seleccionar amenidades" [options]="selectionOptions('activityIds',activities())" [ngModel]="hotel['activityIds']" (ngModelChange)="changeSelection('activityIds',$event)" [disabled]="optionsLoading()||!!optionsError()"/>
+            @if(selectionCount('activityIds')>1){<button tpButton type="button" icon="eye" variant="icon" aria-label="Ver actividades y amenidades seleccionadas" title="Ver actividades y amenidades seleccionadas" (click)="selectionPreview.set('activityIds')"></button>}
+          </div>
+          <small>Selecciona los servicios disponibles para tus viajeros.</small>
+        </div>
+        <div class="service-section">
+          <h3>Tipos de habitación</h3>
+          <div class="selection-input-row">
+            <app-tp-multiselect label="Habitaciones disponibles" placeholder="Seleccionar tipos de habitación" [options]="selectionOptions('roomTypeIds',roomTypes())" [ngModel]="hotel['roomTypeIds']" (ngModelChange)="changeSelection('roomTypeIds',$event)" [disabled]="optionsLoading()||!!optionsError()"/>
+            @if(selectionCount('roomTypeIds')>1){<button tpButton type="button" icon="eye" variant="icon" aria-label="Ver tipos de habitación seleccionados" title="Ver tipos de habitación seleccionados" (click)="selectionPreview.set('roomTypeIds')"></button>}
+          </div>
+          <small>Estos tipos de habitación estarán disponibles en las tarifas de las cotizaciones de este hotel.</small>
+        </div>
+      </div>
+    }
+    @if(tab()==='additional'){
+      <div class="panel-heading"><div><h2>Datos adicionales</h2><p>Descuentos, horarios de estancia y detalles del plan de alojamiento.</p></div></div>
+      <div class="form-grid">
+        <app-tp-select-search label="Descuento del hotel" [options]="discounts()" [(ngModel)]="hotel['descuento_id']" [disabled]="optionsLoading()||!!optionsError()"/>
+        <div class="form-full service-section"><h3>Horarios del hotel</h3><p class="section-note">Deja un horario vacío para utilizar la configuración general, cuando esté disponible.</p>
+          <div class="form-grid">
+            @for(field of timeFields;track field.key){
+              <tp-field [label]="field.label" [forId]="'hotel-time-'+field.key"><input [id]="'hotel-time-'+field.key" type="time" [(ngModel)]="hotel['horarios'][field.key]"/></tp-field>
+            }
+          </div>
+        </div>
+        <tp-field class="form-full" label="Descripción del plan todo incluido" forId="hotel-inclusive-plan"><textarea id="hotel-inclusive-plan" class="long-text" [ngModel]="contentValue('plan_todo_incluido')" (ngModelChange)="setContentValue('plan_todo_incluido',$event)" placeholder="Describe lo que incluye el plan de este hotel."></textarea><small>Edita este texto en el idioma seleccionado arriba.</small></tp-field>
+      </div>
+    }
     @if(tab()==='location'){
       <div class="panel-heading"><div><h2>Ubicación del hotel</h2><p>Agrega la dirección o el enlace del mapa que compartes con tus viajeros.</p></div></div>
-      <tp-field label="Ubicación / enlace del mapa" forId="hotel-location"><textarea id="hotel-location" [(ngModel)]="hotel['ubicacion']"></textarea></tp-field>
-      <div class="location-actions"><button tpButton icon="pin" [disabled]="!hotel['ubicacion']?.trim()" (click)="locationOpen.set(true)">Ver ubicación</button></div>
+      <tp-location-editor [value]="hotel['ubicacion']" [name]="hotel['nombre_hotel']||'Hotel'" [disabled]="saving()||translating()" (changed)="setLocation($event)"/>
     }
     @if(tab()==='photos'){
       <div class="panel-heading"><div><h2>Fotografías del hotel</h2><p>Organiza y clasifica la galería. Los cambios se conservan con Guardar hotel.</p></div></div>
@@ -105,7 +159,11 @@
     }
   </section>
 } @else{<tp-state mode="error" message="No pudimos cargar el hotel." (retry)="ngOnInit()"/>}
-<tp-location-map [open]="locationOpen()" [location]="model()?.['ubicacion']||''" [name]="model()?.['nombre_hotel']||'Hotel'" (closed)="locationOpen.set(false)"/>
+<tp-dialog [open]="!!selectionPreview()" [title]="selectionTitle()" [fixedChrome]="true" (closed)="selectionPreview.set(null)">
+  <p class="section-note">{{selectedItems().length}} seleccionados en este hotel. Los cambios pendientes se aplicarán al guardar.</p>
+  <ul class="selected-items">@for(item of selectedItems();track item.value){<li><span>{{item.label}}</span>@if(selectionPreview()==='regimeIds'&&+item.value===+model()?.['regimen_id']){<small>Principal</small>}</li>}</ul>
+  <div class="dialog-actions"><button tpButton type="button" icon="check" (click)="selectionPreview.set(null)">Cerrar</button></div>
+</tp-dialog>
 <tp-image-preview [open]="!!preview()" [src]="preview()" title="Fotografía del hotel" (closed)="preview.set('')"/>
 <tp-dialog [open]="!!editingPhoto()" title="Clasificar fotografía" (closed)="editingPhoto.set('')">
   @if(editingPhoto();as url){
