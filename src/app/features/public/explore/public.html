@@ -120,7 +120,7 @@
         }
         @if (mode === 'hotel' && detail().imagenes?.length) {
           <section class="hotel-photo-gallery" aria-label="Galería del hotel">
-            <app-imagenes-carrusel [imagenesCargadas]="detail().imagenes" [hotel]="detail()" layout="grid"/>
+            <app-imagenes-carrusel [imagenesCargadas]="detail().imagenes" [hotel]="detail()" [soloClasificadas]="true" layout="grid"/>
           </section>
         }
         @if (mode === 'destino' && detail().detalle?.descripcion_larga) {

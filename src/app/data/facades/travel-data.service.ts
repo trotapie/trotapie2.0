@@ -16,6 +16,7 @@ import { summarizeDashboard } from '../models/dashboard-statistics';
 import {hotelCatalogFilters,hotelStatusColumnAvailable,activeHotelDestinationOptions,hasHotelDestination,type HotelExtraFilters} from '../utils/hotel-catalog-filters';
 
 import {Row,TravelRecord,Page,PAGE_SIZE,normalizeRecord} from '../models/travel-record';
+import {employeeAccessLabel,filterEmployees} from '../../features/employees/models/employee-management';
 export type {Row,TravelRecord,Page} from '../models/travel-record';
 export {PAGE_SIZE,normalizeRecord} from '../models/travel-record';
 
@@ -178,7 +179,32 @@ export class TravelDataService {
     }, 30_000);
   }
   async destinationCatalogPage(filters:FiltrosDestinoCatalogo):Promise<Page>{return this.cached(`destination-catalog:${JSON.stringify(filters)}`,async()=>{const p=await this.destinations.buscarDestinosCatalogo({...filters,pageSize:filters.pageSize??PAGE_SIZE});return {items:p.items.map(r=>normalizeRecord({id:r.destinoId,nombre:r.destinoNombre,division_area_nombre:r.divisionAreaNombre,imagen_destino:r.imagenDestino,activo:r.activo,tipo_turistico_nombre:r.tipoTuristicoNombre||'Sin clasificación',prioridad_label:r.prioridad===1?'Destacado':'Estándar',ubicacion_label:[r.divisionAreaNombre,r.paisNombre,r.regionNombre].filter(Boolean).join(' · ')},'destinos')),total:p.total,page:p.page||0};});}
+  async employeePage(page=0,search='',filters:Row={}):Promise<Page>{
+    const rows=await this.cached('employee-management',async()=>{
+      const [statuses,roles]=await Promise.all([this.employees.obtenerEstatusEmpleadoAdmin(),this.employees.rolesAdmin()]);
+      const employees:Row[]=[];
+      for(let offset=0;;offset+=500){
+        const result=await this.employees.empleados({incluirInhabilitados:true}).range(offset,offset+499);
+        if(result.error)throw result.error;
+        employees.push(...(result.data||[]));
+        if((result.data?.length||0)<500)break;
+      }
+      let assignments:Record<number,number|null>={};
+      // Older deployments may not yet expose the bulk role lookup.
+      try{if(employees.length)assignments=await this.employees.rolesEmpleadosAdmin(employees.map(row=>Number(row['id'])));}catch{}
+      return employees.map(row=>({...row,
+        cargo_label:row['cargo']?.rol||'Sin cargo',
+        rol_label:roles.error?'Por confirmar':(roles.data||[]).find(role=>Number(role.id)===Number(assignments[row['id']]))?.name||(row['auth_user_id']?'Por confirmar':'Sin rol'),
+        estatus_nombre:statuses.find(status=>Number(status.id)===Number(row['estatus_id']))?.nombre||'Sin estatus',
+        estatus_clave:statuses.find(status=>Number(status.id)===Number(row['estatus_id']))?.clave?.trim().toLowerCase()||'',
+        acceso_label:employeeAccessLabel(row)
+      }));
+    });
+    const filtered=filterEmployees(rows,search,filters);
+    return {items:filtered.slice(page*PAGE_SIZE,(page+1)*PAGE_SIZE).map(row=>normalizeRecord(row,'empleados')),total:filtered.length,page};
+  }
   async resource(kind: string, page = 0, search = '', catalog = 'idiomas', type:'NACIONAL'|'INTERNACIONAL'='NACIONAL',destinationId?:number): Promise<Page> {
+    if(kind==='empleados')return this.employeePage(page,search);
     return this.cached(`resource:${kind}:${page}:${search}:${catalog}:${type}:${destinationId||''}`, async () => {
       if (kind === 'destinos') {
         const p = await this.destinations.buscarDestinosCatalogo({ tipo: type, page, pageSize: PAGE_SIZE, busqueda: search });

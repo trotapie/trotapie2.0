@@ -5,7 +5,7 @@ import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {BannerComponent} from '../../../shared/components/banner/banner.component';
 import {QuoteTariffEditor} from './quote-tariff-editor';
 import {QuoteTariffList} from './quote-tariff-list';
-import {QuoteData,quoteTariffRooms,quoteTariffPayload,quoteTariffValidation} from '../models/quote-tariffs';
+import {QUOTE_TARIFFS,QuoteData,quoteTariffRooms,quoteTariffPayload,quoteTariffValidation} from '../models/quote-tariffs';
 import {TpSelectSearchComponent} from '../../../shared/components/tp-select-search/tp-select-search.component';
 import {QUOTE_STATUS_OPTIONS} from '../models/quote-status';
 import {ImagenesCarruselComponent} from '../../../shared/components/imagenes-carrusel/imagenes-carrusel.component';
@@ -42,7 +42,8 @@ export class QuoteDetail implements OnInit {toast=inject(TpToastService);
     this.data.catalogs.obtenerCatalogoAdmin('origen_reservacion'),hotelId?this.data.quotes.tiposHabitacionPorHotel(hotelId):Promise.resolve([])
    ]);
    this.policyCatalog.set(policies);this.catalogTariffs.set(tariffs.filter((tariff:any)=>tariff.activo));
-   this.origins.set(origins.filter((origin:any)=>origin.estatus!==false));this.roomTypes.set(types);
+    this.origins.update(current=>[...current.filter(item=>!origins.some((origin:any)=>Number(origin.id)===Number(item.id))),...origins]);
+    this.roomTypes.update(current=>[...current.filter(item=>!types.some((type:any)=>Number(type.id)===Number(item.id))),...types]);
   }
   catch(error){this.policyError.set(error instanceof Error?error.message:'No pudimos cargar los catálogos de tarifas, políticas y habitaciones.');}
   finally{this.policyLoading.set(false);}
@@ -92,7 +93,19 @@ export class QuoteDetail implements OnInit {toast=inject(TpToastService);
   });
   void this.loadWithCatalog();
  }
- private async loadWithCatalog(){await this.load();if(!this.publicView&&!this.multiple&&this.record())void this.loadPolicyCatalog();}
+  private async loadWithCatalog(){await this.load();if(this.record())await this.loadTariffNames();}
+  private async loadTariffNames(){
+    const record=this.record();
+    const rooms=this.hotels().flatMap(hotel=>quoteTariffRooms(hotel));
+    const validIds=(values:any[])=>[...new Set(values.map(Number).filter(id=>Number.isSafeInteger(id)&&id>0))];
+    const typeIds=validIds(rooms.flatMap(room=>QUOTE_TARIFFS.map(tariff=>room[tariff.roomKey]?.id)));
+    const originIds=validIds(rooms.flatMap(room=>QUOTE_TARIFFS.map(tariff=>room[tariff.originKey])));
+    // Labels load independently of the private editor's policy catalogs, including on public links.
+    await Promise.allSettled([
+      this.data.quotes.obtenerTiposHabitacionPorIds(typeIds).then(types=>{if(this.record()===record)this.roomTypes.set(types);}),
+      this.data.quotes.obtenerOrigenesReservacionPorIds(originIds).then(origins=>{if(this.record()===record)this.origins.set(origins);})
+    ]);
+  }
  async load(){
   if(this.preview){this.loading.set(false);this.error.set('Inicia sesión para consultar el detalle de una cotización.');return;}
   this.loading.set(true);this.error.set('');

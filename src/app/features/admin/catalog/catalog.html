@@ -17,14 +17,17 @@
   @if (kind === 'cotizaciones') {
     @if (preview || data.auth.hasPermission('cotizaciones.create')) {
       <a tpButton icon="plus" variant="primary" [routerLink]="base + '/cotizaciones/nueva'"
-        >Nueva individual</a
-      ><a
+         >Nueva</a
+       >
+      <!-- Oculto temporalmente: creación de cotizaciones comparativas.
+      <a
         tpButton
         icon="quote"
         [routerLink]="base + '/cotizaciones/nueva'"
         [queryParams]="{ tipo: 'comparativa' }"
-        >Nueva comparativa</a
-      >
+         >Nueva comparativa</a
+       >
+      -->
     }
   } @else if (preview || canEdit()) {
     <button tpButton icon="plus" variant="primary" (click)="open(null)">
@@ -57,7 +60,15 @@
 <section class="panel catalog-panel" tpCatalogScroll>
   <tp-filter-bar [search]="search()" (searchChanged)="changeSearch($event)">
     @if (kind === 'cotizaciones') {
+      <!-- Oculto temporalmente: selector de tipo de cotización.
       <app-tp-select-search class="quote-type-select" label="Tipo de cotización" [options]="quoteTypeOptions" [ngModel]="multiple() ? 'comparativa' : 'individual'" (ngModelChange)="changeQuoteType($event==='comparativa')" [showClear]="false" [showSearch]="false"/>
+      -->
+      <button tpButton icon="filter" type="button" (click)="openQuoteFilters()">Filtros{{quoteFilterCount()?' ('+quoteFilterCount()+')':''}}</button>
+      @if(quoteFilterCount()){<button tpButton variant="quiet" icon="close" type="button" (click)="clearQuoteFilters()">Limpiar</button>}
+    }
+    @if(kind==='empleados'){
+      <button tpButton icon="filter" type="button" (click)="openEmployeeFilters()">Filtros{{employeeFilterCount()?' ('+employeeFilterCount()+')':''}}</button>
+      @if(employeeFilterCount()){<button tpButton variant="quiet" icon="close" type="button" (click)="clearEmployeeFilters()">Limpiar</button>}
     }
     @if (kind === 'destinos') {
       <app-tp-select-search class="destination-type-select" label="Tipo de destino" [options]="destinationTypeOptions" [showClear]="false" [ngModel]="destinationType()" (ngModelChange)="changeDestinationType($event)" />
@@ -112,9 +123,6 @@
     </section>
   }
   @if(kind==='hoteles'&&!loading()&&!hotelStatusReady()){<p class="hotel-status-note" role="status">La activación e inactivación de hoteles requiere habilitar el campo de estado en Supabase. Puedes consultar, crear y editar hoteles mientras tanto.</p>}
-  @if(kind === 'cotizaciones') {
-    <tp-quote-column-filters [value]="quoteFilters()" [status]="status()" [multiple]="multiple()" (changed)="changeQuoteFilters($event)" (statusChanged)="changeQuoteStatus($event)" (cleared)="clearQuoteFilters()" />
-  }
   @if (loading()) {
     <tp-state mode="loading" />
   } @else if (error()) {
@@ -137,12 +145,12 @@
           <div class="record-card">
           <tp-image-card
             [record]="record"
-            [hasActions]="kind==='destinos'||kind==='hoteles'"
+            [hasActions]="kind==='destinos'||kind==='hoteles'||kind==='empleados'"
             [imageFit]="kind === 'destinos' ? 'contain' : 'cover'"
             label="Consultar registro"
             (selected)="open($event)"
           />
-          @if(kind==='destinos'||kind==='hoteles'){<app-tp-actions-menu class="record-card-menu" [actions]="rowActions(record)" [ariaLabel]="'Acciones de '+record.title" (actionSelected)="recordAction({id:$event,record})" />}
+          @if(kind==='destinos'||kind==='hoteles'||kind==='empleados'){<app-tp-actions-menu class="record-card-menu" [actions]="rowActions(record)" [ariaLabel]="'Acciones de '+record.title" (actionSelected)="recordAction({id:$event,record})" />}
           </div>
         }
       </div>
@@ -182,6 +190,45 @@
     </div>
   }
 </section>
+<tp-dialog [open]="employeeFiltersOpen()" title="Filtrar empleados" placement="adaptive" (closed)="employeeFiltersOpen.set(false)">
+  @if(filterLoading()){<tp-state mode="loading"/>}
+  @else if(filterError()){<tp-state mode="error" [message]="filterError()" (retry)="openEmployeeFilters()"/>}
+  @else{<tp-resource-form submitLabel="Aplicar filtros" [fields]="employeeFilterFields()" [value]="employeeFilters()" (saved)="applyEmployeeFilters($event)" (cancelled)="employeeFiltersOpen.set(false)"/>}
+</tp-dialog>
+<tp-dialog [open]="!!employeeSignature()" [title]="'Firma de '+(employeeSignature()?.title||'empleado')" size="wide" (closed)="employeeSignature.set(null)">
+  <p class="signature-preview-hint">Vista previa de los datos que acompañan sus cotizaciones.</p>
+  <app-banner [empleado]="employeeSignatureData()"/>
+  <div class="dialog-actions">
+    @if(canEdit()&&employeeSignature()){<button tpButton icon="edit" type="button" (click)="open(employeeSignature());employeeSignature.set(null)">Editar datos de la firma</button>}
+  </div>
+</tp-dialog>
+<tp-dialog [open]="!!employeePending()" title="Confirmar acción del empleado" [busy]="employeeBusy()" (closed)="employeePending.set(null)">
+  @if(employeePending();as pending){
+    <p><strong>{{pending.record.title}}</strong></p>
+    @switch(pending.action){
+      @case('remove-access'){<p>Se retirará su usuario de acceso al sistema. Se conservarán la información del empleado y sus cotizaciones.</p>}
+      @case('delete-employee'){<p>Se eliminará al empleado. Los registros relacionados pueden impedir su eliminación para conservar el historial. Esta acción no se puede deshacer.</p>}
+      @default{<p>{{pending.record.raw['estatus_clave']==='activo'?'El empleado quedará inactivo. Su información y cotizaciones se conservarán.':'El empleado volverá a estar activo. Esto no crea ni restablece un usuario de acceso.'}}</p>}
+    }
+    @if(employeeError()){<div class="error-banner" role="alert">{{employeeError()}}</div>}
+  }
+  <div class="dialog-actions">
+    @if(employeePending();as pending){
+      <button tpButton icon="close" [disabled]="employeeBusy()" (click)="employeePending.set(null)">Cancelar</button>
+      <button tpButton [icon]="pending.action==='delete-employee'?'trash':'check'" [variant]="pending.action==='employee-status'&&pending.record.raw['estatus_clave']!=='activo'?'primary':'danger'" [busy]="employeeBusy()" [disabled]="employeeBusy()" (click)="confirmEmployeeAction()">{{pending.action==='remove-access'?'Confirmar retiro de acceso':pending.action==='delete-employee'?'Eliminar empleado':pending.record.raw['estatus_clave']==='activo'?'Inhabilitar empleado':'Habilitar empleado'}}</button>
+    }
+  </div>
+</tp-dialog>
+<tp-dialog [open]="quoteFiltersOpen()" title="Filtrar cotizaciones" eyebrow="Personaliza los resultados" placement="adaptive" (closed)="quoteFiltersOpen.set(false)">
+  @if(quoteFiltersOpen()){
+    <tp-quote-column-filters [value]="quoteFilterDraft()" [status]="quoteStatusDraft()" [multiple]="multiple()" (changed)="quoteFilterDraft.set($event)" (statusChanged)="quoteStatusDraft.set($event)"/>
+  }
+  <div class="dialog-actions">
+    <button tpButton variant="quiet" type="button" (click)="resetQuoteFilterDraft()">Limpiar filtros</button>
+    <button tpButton type="button" (click)="quoteFiltersOpen.set(false)">Cancelar</button>
+    <button tpButton variant="primary" icon="filter" type="button" (click)="applyQuoteFilters()">Aplicar filtros</button>
+  </div>
+</tp-dialog>
 <tp-dialog [open]="hotelFiltersOpen()" title="Filtrar hoteles" eyebrow="Personaliza los resultados" placement="adaptive" (closed)="hotelFiltersOpen.set(false)">
   <p>Puedes preparar tus filtros en cualquier momento. Se aplicarán a los hoteles del destino que selecciones.</p>
   <tp-resource-form submitLabel="Aplicar filtros" [fields]="hotelModalFields()" [value]="hotelFilterDraft()" (saved)="applyHotelFilters($event)" (cancelled)="hotelFiltersOpen.set(false)"/>
@@ -215,6 +262,7 @@
         >
       </div>
     }
+    <!-- Entrega posterior: gestión de acceso, roles y permisos.
     @if (selected() && kind === 'empleados') {
       <div class="editor-specific-actions">
         <a tpButton icon="lock" [routerLink]="['/admin/empleados', selected()!.id, 'acceso']"
@@ -222,6 +270,7 @@
         >
       </div>
     }
+    -->
     @if (selected() && kind === 'circuitos') {
       <div class="editor-specific-actions">
         <a tpButton icon="edit" [routerLink]="['/admin/circuitos', selected()!.id, 'flyer']"
@@ -229,6 +278,7 @@
         >
       </div>
     }
+    <!-- Entrega posterior: permisos del rol.
     @if (selected() && kind === 'configuracion') {
       <div class="editor-specific-actions">
         <a tpButton icon="settings" [routerLink]="['/admin/roles', selected()!.id]"
@@ -236,6 +286,7 @@
         >
       </div>
     }
+    -->
     <tp-resource-form
       #editorForm
       [fields]="fields()"
@@ -246,7 +297,7 @@
       (saved)="save($event)"
       (cancelled)="closeEditor()"
     />
-    @if (selected() && canEdit() && kind !== 'clientes') {
+    @if (selected() && canEdit() && kind !== 'clientes' && !(kind==='empleados' && selected()!.title.trim().toLowerCase()==='otro')) {
       <div class="delete-area">
         <button tpButton icon="trash" variant="danger" (click)="removeOpen.set(true)">
           {{ kind === 'destinos' ? 'Desactivar destino' : 'Eliminar registro' }}

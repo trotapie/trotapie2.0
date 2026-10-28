@@ -1,3 +1,5 @@
+import {isClassifiedImage} from '../../../data/utils/classified-image';
+
 type QuoteRow = Record<string, any>;
 export interface QuotePrice { label: string; amount: number; conditions: string[]; deadline: string | null; room: string | null; }
 
@@ -24,11 +26,9 @@ export function quotePrices(row: QuoteRow): QuotePrice[] {
     {label:labels.a_meses,value:room.precio_a_meses,conditions:room.condiciones_precio_meses,deadline:room.fecha_limite_meses || row.fecha_limite_meses}
   ].flatMap(price => {const value=amount(price.value);return value===null?[]:[{label:price.label,amount:value,conditions:conditions(price.conditions),deadline:price.deadline || null,room:rooms.length>1?`Habitación ${index+1}`:null}];}));
 }
-export function quotePhotos(row: QuoteRow): Array<{url_imagen:string;nombre:string}> {
+export function quotePhotos(row: QuoteRow): Array<{url_imagen:string;nombre:string;tipo_imagen_id:number;tipo?:any}> {
   const images=Array.isArray(row.imagenes)?row.imagenes:[];
-  const photos=images.map(image=>({url_imagen:typeof image==='string'?image:image.url_imagen||image.url||image.imagen_url||'',nombre:typeof image==='string'?'':image.descripcion||image.nombre||''})).filter(photo=>!!photo.url_imagen);
-  const cover=row.hotel_fondo||row.fondo||row.imagen_hotel||row.hotel?.fondo;
-  return photos.length?photos:cover?[{url_imagen:cover,nombre:''}]:[];
+  return images.filter(isClassifiedImage).map(image=>({...image,url_imagen:image.url_imagen||image.url||image.imagen_url||'',nombre:image.descripcion||image.nombre||'',tipo_imagen_id:Number(image.tipo_imagen_id??image.tipo?.id)})).filter(photo=>!!photo.url_imagen);
 }
 export function quoteRoomText(row: QuoteRow): string {
   return typeof row.habitaciones==='string'?row.habitaciones:row.habitaciones?.es||row.habitaciones?.traduccion||'';

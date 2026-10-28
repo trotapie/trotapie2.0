@@ -15,7 +15,9 @@ import {QuoteColumnFilters} from '../../quotes/components/quote-column-filters/q
 import {QuoteFilters,emptyQuoteFilters} from '../../quotes/models/quote-filters';
 import {TpSelectSearchComponent} from '../../../shared/components/tp-select-search/tp-select-search.component';
 import {TpActionMenuItem,TpActionsMenuComponent} from '../../../shared/components/tp-actions-menu/tp-actions-menu.component';
-@Component({selector:'tp-catalog',imports:[CatalogPicker,DecimalPipe,CatalogScrollDirective,TpSelectSearchComponent,TpActionsMenuComponent,QuoteColumnFilters,RouterLink,FormsModule,PageHeader,Button,Icon,State,FilterBar,DataTable,ImageCard,Dialog,ResourceForm],templateUrl:'./catalog.html',styleUrl:'./catalog.scss'})
+import {BannerComponent} from '../../../shared/components/banner/banner.component';
+import {employeeActions,isProtectedEmployee} from '../../employees/models/employee-management';
+@Component({selector:'tp-catalog',imports:[BannerComponent,CatalogPicker,DecimalPipe,CatalogScrollDirective,TpSelectSearchComponent,TpActionsMenuComponent,QuoteColumnFilters,RouterLink,FormsModule,PageHeader,Button,Icon,State,FilterBar,DataTable,ImageCard,Dialog,ResourceForm],templateUrl:'./catalog.html',styleUrl:'./catalog.scss'})
 export class Catalog implements OnInit,OnDestroy {toast=inject(TpToastService);
  private editorForm=viewChild<ResourceForm>('editorForm');
  private pendingChanges=protectUnsavedChanges(()=>this.kind!=='circuitos'&&this.editorOpen()&&!this.editorLoading()&&!!this.editorForm()?.hasChanges(),()=>this.kind!=='circuitos'&&(this.saving()||this.removing()));
@@ -66,7 +68,53 @@ export class Catalog implements OnInit,OnDestroy {toast=inject(TpToastService);
   async toggleHotel(record:TravelRecord){if(!this.canEdit()||this.saving()||!this.hotelStatusReady())return;this.saving.set(true);try{await this.resources.hotelActive(record.id,record.status==='Inactivo');this.toast.success('Estado del hotel actualizado.');await this.load(this.page().page);}catch(e){this.toast.error(e instanceof Error?e.message:'No pudimos cambiar el estado del hotel.');}finally{this.saving.set(false);}}
  tableColumns=computed(()=>this.kind==='destinos'?[{key:'tipo_turistico_nombre',label:'Clasificación'},{key:'prioridad_label',label:'Prioridad'},{key:'ubicacion_label',label:'Ubicación'}]:this.definition().columns);
  filterCount=computed(()=>Object.values(this.destinationFilters()).filter(Boolean).length);
- rowActions=(record:TravelRecord):TpActionMenuItem[]=>this.kind==='destinos'?[
+  employeeFilters=signal<Row>({});employeeFiltersOpen=signal(false);employeeFilterFields=signal<FieldDefinition[]>([]);
+  employeeFilterCount=computed(()=>Object.values(this.employeeFilters()).filter(Boolean).length);
+  employeePending=signal<{record:TravelRecord;action:string}|null>(null);employeeBusy=signal(false);employeeError=signal('');
+  employeeSignature=signal<TravelRecord|null>(null);
+  employeeSignatureData=computed(()=>{const record=this.employeeSignature();return record?{nombre:record.title,cargo:record.raw['cargo']?.rol||null,email:record.raw['email']||null,telefono:record.raw['telefono']||null}:null;});
+  async openEmployeeFilters(){this.employeeFiltersOpen.set(true);this.filterLoading.set(true);this.filterError.set('');try{
+    const [cargos,statuses]=await Promise.all([this.data.employees.rolesEmpresaAdmin(),this.data.employees.obtenerEstatusEmpleadoAdmin()]);
+    if(cargos.error)throw cargos.error;
+    this.employeeFilterFields.set([
+      {key:'cargo',label:'Cargo',type:'select',options:[{value:'',label:'Todos los cargos'},...(cargos.data||[]).map(row=>({value:row.id,label:row.rol}))]},
+      {key:'email',label:'Correo'},
+      {key:'status',label:'Estado del empleado',type:'select',options:[{value:'',label:'Todos los estados'},...statuses.map(row=>({value:row.id,label:row.nombre}))]},
+      {key:'access',label:'Acceso',type:'select',options:[{value:'',label:'Todos los accesos'},...['Primer ingreso','Activo','Sin usuario'].map(value=>({value,label:value}))]}
+    ]);
+  }catch{this.filterError.set('No pudimos cargar los filtros de empleados.');}finally{this.filterLoading.set(false);}}
+  applyEmployeeFilters(value:Row){this.employeeFilters.set({...value});this.employeeFiltersOpen.set(false);void this.load();}
+  clearEmployeeFilters(){this.employeeFilters.set({});void this.load();}
+  employeeAction(event:{id:string;record:TravelRecord}){
+    if(event.id==='signature'){this.employeeSignature.set(event.record);return;}
+    if(!this.canEdit()||this.employeeBusy())return;
+    if(event.id==='edit'){void this.open(event.record);return;}
+    // Entrega posterior: pantalla de gestión de acceso y permisos.
+    // if(event.id==='access'){void this.router.navigate(['/admin/empleados',event.record.id,'acceso']);return;}
+    if(!['remove-access','delete-employee','employee-status'].includes(event.id))return;
+    if(isProtectedEmployee(event.record.raw)){this.toast.error('El empleado “Otro” está protegido.');return;}
+    if(event.id==='remove-access'&&!event.record.raw['auth_user_id'])return;
+    this.employeeError.set('');this.employeePending.set({record:event.record,action:event.id});
+  }
+  async confirmEmployeeAction(){
+    const pending=this.employeePending();if(!pending||!this.canEdit()||this.employeeBusy()||isProtectedEmployee(pending.record.raw))return;
+    this.employeeBusy.set(true);this.employeeError.set('');
+    try{
+      const id=Number(pending.record.id);
+      if(pending.action==='remove-access')await this.data.employees.quitarAccesoEmpleadoAdmin(id);
+      else if(pending.action==='delete-employee')await this.data.employees.eliminarEmpleadoAdmin(id);
+      else{
+        const clave=pending.record.raw['estatus_clave']==='activo'?'inactivo':'activo';
+        const statuses=await this.data.employees.obtenerEstatusEmpleadoAdmin();
+        const target=statuses.find(row=>row.activo&&String(row.clave).trim().toLowerCase()===clave);
+        if(!target)throw new Error('No existe un estado '+clave+' habilitado.');
+        await this.data.employees.actualizarEstatusEmpleadoAdmin(id,Number(target.id));
+      }
+      this.data.invalidate();this.employeePending.set(null);this.toast.success('Empleado actualizado correctamente.');await this.load(this.page().page);
+      if(!this.page().items.length&&this.page().page>0)await this.load(this.page().page-1);
+    }catch(e){this.employeeError.set(e instanceof Error?e.message:'No pudimos completar la acción.');}finally{this.employeeBusy.set(false);}
+  }
+  rowActions=(record:TravelRecord):TpActionMenuItem[]=>this.kind==='empleados'?employeeActions(record.raw,this.canEdit(),this.employeeBusy()):this.kind==='destinos'?[
   {id:'edit',label:'Editar destino',icon:'edit',disabled:!this.canEdit()},
   {id:'content',label:'Configurar preview',icon:'quote',disabled:!this.canEdit()},
   {id:'hotels',label:'Ver hoteles',icon:'hotel',disabled:!this.preview&&!this.data.auth.hasPermission('hoteles.view')},
@@ -76,7 +124,7 @@ export class Catalog implements OnInit,OnDestroy {toast=inject(TpToastService);
     {id:'edit',label:this.canEdit()?'Editar hotel':'Consultar hotel',icon:'edit'},
     {id:'hotel-status',label:record.status==='Inactivo'?'Activar hotel':'Inactivar hotel',icon:'check',disabled:!this.canEdit()||!this.hotelStatusReady()||this.saving()}
   ]:[{id:'open',label:'Consultar registro',icon:'arrow'}];
-  recordAction(event:{id:string;record:TravelRecord}){if(this.kind==='hoteles'){if(event.id==='hotel-status')void this.toggleHotel(event.record);else void this.open(event.record);return;}this.destinationAction(event);}
+  recordAction(event:{id:string;record:TravelRecord}){if(this.kind==='empleados'){this.employeeAction(event);return;}if(this.kind==='hoteles'){if(event.id==='hotel-status')void this.toggleHotel(event.record);else void this.open(event.record);return;}this.destinationAction(event);}
   destinationAction(event:{id:string;record:TravelRecord}){const r=event.record;switch(event.id){case 'edit':void this.open(r);break;case 'content':void this.router.navigate(['/admin/destinos',r.id,'contenido']);break;case 'public':void this.router.navigate(['/destinos',r.id]);break;case 'hotels':{const f=this.destinationFilters();const volver=this.router.createUrlTree([this.base,'destinos'],{queryParams:{buscar:this.search()||null,tipo:this.destinationType(),division:f['divisionAreaId']||null,region:f['regionId']||null,pais:f['paisId']||null,clasificacion:f['tipoTuristicoId']||null,activos:f['soloActivos']||null,estadoDestino:f['estado']||null,prioridad:f['prioridad']||null,imagen:f['imagen']||null,ordenListado:f['ordenListado']||null,pagina:this.page().page}}).toString();void this.openDestinationHotels(r,volver);break;}case 'deactivate':this.selected.set(r);this.editorError.set('');this.removeOpen.set(true);}}
   private async openDestinationHotels(record:TravelRecord,volver:string){if(await this.router.navigateByUrl(volver,{replaceUrl:true}))await this.router.navigate([this.base,'destinos',record.id,'hoteles'],{queryParams:{nombre:record.title,volver}});}
  changeDestinationType(value:'NACIONAL'|'INTERNACIONAL'){this.destinationType.set(value);this.destinationFilters.set({soloActivos:false});void this.load();}
@@ -105,10 +153,15 @@ export class Catalog implements OnInit,OnDestroy {toast=inject(TpToastService);
  pageSize=computed(()=>this.kind==='destinos'?10:24);
   private destinationPage(page:number){if(!this.destinationFiltersRestored){this.destinationFiltersRestored=true;const q=this.route.snapshot.queryParamMap;this.destinationFilters.update(f=>({...f,estado:q.get('estadoDestino')||'',prioridad:Number(q.get('prioridad'))||'',imagen:q.get('imagen')||'',ordenListado:q.get('ordenListado')||'',tipoTuristicoId:q.get('clasificacion')==='sin'?'sin':f['tipoTuristicoId']}));}const f=this.destinationFilters();return this.data.destinationCatalogPage({tipo:this.destinationType(),page,pageSize:this.pageSize(),busqueda:this.search(),soloActivos:!!f['soloActivos'],estado:f['estado']||undefined,prioridad:Number(f['prioridad'])===1?1:Number(f['prioridad'])===2?2:undefined,imagen:f['imagen']||undefined,ordenListado:f['ordenListado']||undefined,sinClasificacion:f['tipoTuristicoId']==='sin',divisionAreaIds:f['divisionAreaId']?[Number(f['divisionAreaId'])]:[],regionIds:f['regionId']?[Number(f['regionId'])]:[],paisIds:f['paisId']?[Number(f['paisId'])]:[],tipoTuristicoId:Number(f['tipoTuristicoId'])||null});}
   private destinationFiltersRestored=false;
- quoteFilters=signal<QuoteFilters>(emptyQuoteFilters());
- changeQuoteFilters(value:QuoteFilters){this.quoteFilters.set(value);clearTimeout(this.timer);this.timer=setTimeout(()=>void this.load(),300);}
+  quoteFilters=signal<QuoteFilters>(emptyQuoteFilters());
+  quoteFiltersOpen=signal(false);
+  quoteFilterDraft=signal<QuoteFilters>(emptyQuoteFilters());
+  quoteStatusDraft=signal('');
+  quoteFilterCount=computed(()=>Object.values(this.quoteFilters()).filter(Boolean).length+Number(!!this.status()));
+  openQuoteFilters(){this.quoteFilterDraft.set({...this.quoteFilters()});this.quoteStatusDraft.set(this.status());this.quoteFiltersOpen.set(true);}
+  resetQuoteFilterDraft(){this.quoteFilterDraft.set(emptyQuoteFilters());this.quoteStatusDraft.set('');}
+  applyQuoteFilters(){clearTimeout(this.timer);this.quoteFilters.set({...this.quoteFilterDraft()});this.status.set(this.quoteStatusDraft());this.quoteFiltersOpen.set(false);void this.load();}
  clearQuoteFilters(){clearTimeout(this.timer);this.quoteFilters.set(emptyQuoteFilters());this.status.set('');this.search.set('');void this.load();}
- changeQuoteStatus(value:string){clearTimeout(this.timer);this.status.set(value);void this.load();}
  changeQuoteType(value:boolean){clearTimeout(this.timer);this.multiple.set(value);if(value)this.quoteFilters.update(filters=>({...filters,hotel:''}));void this.load();}
  data=inject(TravelDataService);resources=inject(ResourceService);router=inject(Router);route=inject(ActivatedRoute);kind=this.route.snapshot.data['kind']||'destinos';preview=!!this.route.snapshot.data['preview'];base=this.preview?'/vista-previa':'/admin';
  private destroyRef=inject(DestroyRef);
@@ -136,14 +189,14 @@ export class Catalog implements OnInit,OnDestroy {toast=inject(TpToastService);
  if(this.kind==='destinos')data=await this.destinationPage(page);
   else if(this.kind==='hoteles')data=await this.data.hotelAdminPage(page,this.search(),this.hotelDestinationId||this.hotelFilterDestination()||undefined,this.hotelFilterStatus(),this.hotelDestinationId?undefined:this.hotelDestinations().map(option=>option.value),{regimeId:this.hotelRegime(),stars:this.hotelStars(),sort:this.hotelSort()});
  else if(this.preview){if(this.kind==='hoteles')data=await this.data.resource('hoteles',page,this.search(),this.catalog(),this.destinationType(),this.hotelDestinationId);else if(this.kind==='circuitos'){const rows=await this.data.circuits.listCircuitosPublicos();data={items:rows.map(r=>({id:String(r.id),title:r.nombre,subtitle:'Circuito',image:r.imagen_principal,status:'Activo',raw:r})),total:rows.length,page};}else data={items:[],total:0,page};}
- else data=this.kind==='cotizaciones'?await this.data.quotePage(page,this.search(),this.status(),this.multiple(),this.quoteFilters()):await this.data.resource(this.kind,page,this.search(),this.catalog(),this.destinationType(),this.hotelDestinationId);
+  else data=this.kind==='empleados'?await this.data.employeePage(page,this.search(),this.employeeFilters()):this.kind==='cotizaciones'?await this.data.quotePage(page,this.search(),this.status(),this.multiple(),this.quoteFilters()):await this.data.resource(this.kind,page,this.search(),this.catalog(),this.destinationType(),this.hotelDestinationId);
  if(generation===this.generation)this.page.set(data);
  }catch(e){if(generation===this.generation)this.error.set(e instanceof Error?e.message:'No pudimos cargar la información.');}finally{if(generation===this.generation)this.loading.set(false);}}
  changeSearch(text:string){this.search.set(text);clearTimeout(this.timer);this.timer=setTimeout(()=>void this.load(),300);}
  async open(record:TravelRecord|null){if(this.kind==='cotizaciones'){if(record)await this.router.navigate(['/admin/cotizaciones',this.multiple()?record.raw['public_id']||record.id:quoteAdminSegment(record.raw['id']||record.id,record.raw['public_id'])],{queryParams:{tipo:this.multiple()?'comparativa':'individual'}});return;}
   if(this.kind==='hoteles'&&record&&this.canEdit()){const volver=this.router.createUrlTree([], {relativeTo:this.route,queryParams:{...this.route.snapshot.queryParams,buscar:this.search()||null,tipoHotel:this.hotelDestinationType(),destinoHotel:this.hotelFilterDestination(),regimenHotel:this.hotelRegime(),estrellasHotel:this.hotelStars(),ordenHotel:this.hotelSort(),estadoHotel:this.hotelFilterStatus()||null}}).toString();await this.router.navigate(['/admin/hoteles',record.id,'editar'],{queryParams:{volver,destino:record.raw['catalogo_destino_id_resuelto']||this.hotelDestinationId||this.hotelFilterDestination()}});return;}
-  this.selected.set(record);this.editorError.set('');this.editorOpen.set(true);this.editorLoading.set(true);
-   try{const initial:Row=record?(this.preview?{...record.raw,nombre:record.title,nombre_hotel:record.title}:await this.resources.detail(this.kind,record)):{activo:true,estatus:true,orden:0,prioridad:2,catalogo_destino_id:this.hotelDestinationId||this.hotelFilterDestination()};this.value.set(initial);this.fields.set(this.preview?this.definition().fields:await this.resources.options(this.definition().fields));}
+   this.selected.set(record);this.editorError.set('');this.editorOpen.set(true);this.editorLoading.set(true);
+   try{const initial:Row=record?(this.preview?{...record.raw,nombre:record.title,nombre_hotel:record.title}:await this.resources.detail(this.kind,record)):{activo:true,estatus:true,orden:0,prioridad:2,catalogo_destino_id:this.hotelDestinationId||this.hotelFilterDestination()};this.value.set(initial);const fields=this.kind==='empleados'&&isProtectedEmployee(initial)?this.definition().fields.filter(field=>field.key!=='estatus_id'):this.definition().fields;this.fields.set(this.preview?fields:await this.resources.options(fields));}
  catch(e){this.editorError.set(e instanceof Error?e.message:'No pudimos cargar este registro.');}finally{this.editorLoading.set(false);}}
  async save(value:Row){if(!this.canEdit())return;this.saving.set(true);this.editorError.set('');try{await this.resources.save(this.definition(),value,this.selected()?.id||null,this.catalog());this.editorOpen.set(false);this.toast.success('Los cambios se guardaron correctamente.');await this.load(this.page().page);}catch(e){this.toast.error(e instanceof Error?e.message:'No se pudo guardar.');}finally{this.saving.set(false);}}
  async remove(){if(!this.canEdit()||!this.selected())return;this.removing.set(true);this.editorError.set('');try{await this.resources.remove(this.definition(),this.selected()!,this.catalog());this.removeOpen.set(false);this.editorOpen.set(false);this.toast.success(this.kind==='destinos'?'Destino desactivado.':'Registro eliminado.');await this.load();}catch(e){this.toast.error(e instanceof Error?e.message:'No se pudo completar la acción.');}finally{this.removing.set(false);}}

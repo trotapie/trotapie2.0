@@ -4,6 +4,7 @@
 :host { min-width:0; max-width:100%; }
 .catalog-panel { min-width:0; max-width:100%; }
 .hotel-status-note{font-size:12px;color:var(--muted);line-height:1.6;margin:0 0 16px}
+.signature-preview-hint{margin-bottom:20px;font-size:12px;color:var(--muted)}
 .hotel-type-pills{display:flex;flex-wrap:wrap;gap:6px;max-width:100%}.hotel-nav-pill{flex:0 0 auto;border:0;border-radius:999px;min-height:44px;padding:12px 18px;background:var(--muted-surface);color:var(--muted);font:inherit;font-size:12px;cursor:pointer;white-space:nowrap;transition:background .15s,color .15s}.hotel-nav-pill:hover{background:var(--brand-soft);color:var(--ink)}.hotel-nav-pill.is-selected{background:var(--ink);color:var(--surface)}.hotel-nav-pill:focus-visible{outline:2px solid var(--brand);outline-offset:3px}.hotel-destination-nav{min-width:0;max-width:100%;padding:4px 0 20px}.hotel-destination-select{display:block;width:320px;max-width:100%;min-width:0}.hotel-destination-empty{display:block;font-size:12px;color:var(--muted);padding:12px 0}
 :host .quote-type-select { width:180px; min-width:160px; }
 @media(max-width:600px){:host .destination-type-select{width:100%;flex-basis:100%;}}
@@ -14,7 +15,6 @@
 .catalog-panel tp-filter-bar { display:flow-root; position:sticky; top:0; z-index:3; background:var(--surface); padding-top:12px; }
 .catalog-panel tp-filter-bar::before { content:''; position:absolute; top:-24px; left:-24px; right:-24px; height:24px; border-radius:24px 24px 0 0; background:var(--surface); pointer-events:none; }
 .catalog-panel .card-grid { max-height:none; overflow:visible; align-content:start; }
-.catalog-panel tp-quote-column-filters { display:block; position:sticky; top:var(--catalog-toolbar-height,0px); z-index:3; background:var(--surface); margin:0; padding:12px 0 24px; }
 .record-card { position:relative; min-width:0; height:100%; }
 .record-card-menu { position:absolute; right:12px; bottom:12px; z-index:1; }
 

@@ -26,7 +26,7 @@
         @if(!hotel.pricing.length){<p class="client-price-pending">Tu asesor confirmará la tarifa y disponibilidad de esta estancia.</p>}
        </div>
       </div>
-       <tp-quote-tariff-list [quote]="hotel"/>
+       <tp-quote-tariff-list [quote]="hotel" [roomTypes]="roomTypes()" [origins]="origins()"/>
      </article>
     }
    </div>
@@ -36,7 +36,7 @@
    <footer class="client-footer"><div><span class="eyebrow">Tu siguiente paso</span><p>{{presentedHotels()[0]?.title}}@if(record().regimen){ · {{record().regimen}}}</p></div><a tpButton icon="people" variant="primary" [href]="contactHref()" target="_blank" rel="noopener noreferrer">Contactar agente</a></footer>
   }
  }@else{
-<tp-page-header [title]="multiple?'Más opciones para tu próximo viaje':'Una propuesta a tu medida'" [description]="record()?.cliente_nombre||record()?.nombre_persona||'Tu propuesta de viaje con Trotapie'" eyebrow="Trotapie / Propuesta de viaje"><a tpButton variant="back" icon="left" [routerLink]="publicView ? '/' : (preview ? '/vista-previa/cotizaciones' : '/admin/cotizaciones')">Regresar</a><button tpButton icon="link" (click)="copy()">Copiar enlace</button><button tpButton icon="download" (click)="print()">Imprimir / PDF</button>@if(canEdit()&&!multiple){<button tpButton icon="edit" variant="primary" (click)="openPriceEditor()">Editar cotización</button>}</tp-page-header>
+<tp-page-header [title]="multiple?'Más opciones para tu próximo viaje':'Una propuesta a tu medida'" [description]="record()?.cliente_nombre||record()?.nombre_persona||'Tu propuesta de viaje con Trotapie'" eyebrow="Trotapie / Propuesta de viaje"><a tpButton variant="back" icon="left" [routerLink]="publicView ? '/' : (preview ? '/vista-previa/cotizaciones' : '/admin/cotizaciones')">Regresar</a><button tpButton icon="link" (click)="copy()">Copiar enlace</button><!-- Pendiente de liberación: <button tpButton icon="download" (click)="print()">Imprimir / PDF</button> -->@if(canEdit()&&!multiple){<button tpButton icon="edit" variant="primary" (click)="openPriceEditor()">Editar cotización</button>}</tp-page-header>
 @if(error()){<div class="error-banner" role="alert">{{error()}}</div>}
 @if(loading()){<tp-state mode="loading"/>}@else if(record()){
 <section class="proposal-facts panel"><div><tp-icon name="calendar"/><span><small>Estancia</small><strong>{{record().fecha_entrada|date:'dd MMM yyyy'}} → {{record().fecha_salida|date:'dd MMM yyyy'}}</strong></span></div><div><tp-icon name="hotel"/><span><small>Duración</small><strong>{{record().noches||'—'}} noches</strong></span></div><div><tp-icon name="people"/><span><small>Asesor</small><strong>{{record().empleado_nombre||'Equipo Trotapie'}}</strong></span></div><tp-badge [label]="record().estatus_nombre||record().estatus_clave||'Pendiente'"/></section>

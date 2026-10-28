@@ -7,13 +7,15 @@ export const employeesDefinition:ResourceDefinition = {
   "icon": "people",
   "permission": "empleados.manage",
   "columns": [
+    {"key":"cargo_label","label":"Cargo"},
+    {"key":"rol_label","label":"Rol"},
     {
       "key": "email",
       "label": "Correo"
     },
     {
-      "key": "telefono",
-      "label": "Teléfono"
+      "key": "acceso_label",
+      "label": "Acceso"
     }
   ],
   "fields": [
@@ -29,13 +31,18 @@ export const employeesDefinition:ResourceDefinition = {
       "ref": "company-roles"
     },
     {
+      "key": "email",
+      "label": "Correo",
+      "type": "email",
+    },
+    {
       "key": "telefono",
       "label": "Teléfono",
       "type": "tel"
     },
     {
       "key": "estatus_id",
-      "label": "Estado de acceso",
+      "label": "Estado del empleado",
       "type": "select",
       "ref": "employee-status",
       "only": "edit"
