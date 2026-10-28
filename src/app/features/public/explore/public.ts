@@ -70,7 +70,7 @@ export class PublicPage implements OnInit, OnDestroy {
   error = signal('');
   page = signal<Page>({ items: [], total: 0, page: 0 });
   cover = signal<any>(null);
-  heroPhotos = signal<Array<{src:string;location:string}>>([]);
+  heroPhotos = signal<Array<{src:string;location:string;homeStyle?:unknown}>>([]);
   detail = signal<any>(null);
   destinationPhotos = computed(() =>
     destinationPhotos(this.detail()?.atracciones_principales || [], this.cover()?.url_imagen || ''),
@@ -300,6 +300,7 @@ export class PublicPage implements OnInit, OnDestroy {
           .map((photo: any) => ({
             src: photo.url_imagen,
             location: photo.nombre_destino || 'Trotapie Travel',
+            homeStyle: photo.presentacion || {},
           }));
         this.heroPhotos.set(shuffleArray(heroList));
       }

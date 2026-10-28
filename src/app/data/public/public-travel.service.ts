@@ -51,7 +51,7 @@ export class PublicTravelService {
         const { data, error } = await this.backend.client
           .from('imagenes_fondo')
           .select(
-            'id,url_imagen,nombre_destino,traducciones:imagenes_fondo_traducciones(nombre_destino,idioma:idioma_id(codigo))',
+            '*,traducciones:imagenes_fondo_traducciones(nombre_destino,idioma:idioma_id(codigo))',
           )
           .eq('activo', true)
           .order('id');

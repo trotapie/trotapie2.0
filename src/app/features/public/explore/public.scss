@@ -93,7 +93,9 @@
 }
 .public-hero-photo {
   position: relative;
-  min-height: 540px;
+  min-height: 0;
+  aspect-ratio: 16/10;
+  align-self: center;
   border-radius: 28px;
   overflow: hidden;
   background: var(--brand-soft);
@@ -252,9 +254,6 @@
   .public-header nav a {
     padding: 10px 16px;
   }
-  .public-hero-photo {
-    min-height: 480px;
-  }
   .detail-copy h1 {
     font-size: 36px;
   }
@@ -301,9 +300,6 @@
   .public-hero-copy h1 {
     font-size: 46px;
     margin: 20px 0;
-  }
-  .public-hero-photo {
-    min-height: 380px;
   }
   .hero-photo-caption strong {
     font-size: 32px;

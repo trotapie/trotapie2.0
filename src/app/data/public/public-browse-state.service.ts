@@ -13,7 +13,7 @@ export interface PublicBrowseState {
   countries: InternationalCountry[];
   page: Page;
   cover: {url_imagen?:string;nombre_destino?:string} | null;
-  heroPhotos: Array<{src:string;location:string}>;
+  heroPhotos: Array<{src:string;location:string;homeStyle?:unknown}>;
   hotelFilters: {search:string;starsMin:number|null;starsMax:number|null;regime:number|null};
   hotelRegimes: Array<{value:number;label:string}>;
   hotelPageSize: number;

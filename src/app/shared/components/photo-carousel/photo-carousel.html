@@ -1,4 +1,5 @@
 <div
+  tpCompositionScale
   class="photo-carousel"
   [class.hero-carousel]="variant() === 'hero'"
   [class.lightbox-carousel]="variant() === 'lightbox'"
@@ -7,10 +8,12 @@
   [attr.aria-label]="label()"
 >
   @if (current(); as photo) {
+    <div class="carousel-artwork">
     @if(variant()==='gallery'){
       <tp-image-composer [previewOnly]="true" [image]="photo.style||{imagen_url:photo.src}" [title]="photo.title||''" [description]="photo.description||''"/>
     }@else{<img
       class="carousel-photo"
+      [ngStyle]="photo.homeStyle ? homeImagePhotoStyle(photo.homeStyle) : null"
       [src]="photo.src"
       [alt]="photo.location || photo.title || label()"
       fetchpriority="high"
@@ -18,8 +21,8 @@
       (error)="imageError($event)"
     />
     }
-    @if (photo.location) {
-      <span class="carousel-location"><tp-icon name="pin" />{{ photo.location }}</span>
+    @if (photo.location && variant()!=='hero') {
+      <span class="carousel-location" [ngStyle]="photo.homeStyle ? homeImageTextStyle(photo.homeStyle) : null"><tp-icon name="pin" />{{ photo.location }}</span>
     }
     @if (variant()==='hero' && (photo.title || photo.description || headline())) {
       <div class="carousel-caption">
@@ -31,6 +34,10 @@
           <p>{{ photo.description }}</p>
         }
       </div>
+    }
+    </div>
+    @if (photo.location && variant()==='hero') {
+      <span class="carousel-location" [ngStyle]="photo.homeStyle ? homeImageTextStyle(photo.homeStyle) : null"><tp-icon name="pin" />{{ photo.location }}</span>
     }
     @if (orderedPhotos().length > 1) {
       <img

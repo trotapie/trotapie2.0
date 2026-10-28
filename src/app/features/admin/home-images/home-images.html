@@ -73,9 +73,13 @@
     @empty{<tp-state title="Agrega tu primera imagen" message="Las imágenes activas se mostrarán en el inicio."/>}
   </section>
 }
-<tp-dialog [open]="editorOpen()" [title]="selected() ? 'Editar imagen del inicio' : 'Agregar imagen del inicio'" [busy]="saving() || translating()" (closed)="closeEditor()">
+<tp-dialog [open]="editorOpen()" [title]="selected() ? 'Editar imagen del inicio' : 'Agregar imagen del inicio'" size="editor" [scrollBody]="false" [busy]="saving() || translating()" (closed)="closeEditor()">
   @if(editorError()){<div class="error-banner" role="alert">{{editorError()}}</div>}
-  <tp-resource-form [fields]="fields()" [value]="value()" [editing]="!!selected()" [busy]="saving() || translating()" [busyLabel]="translating() ? 'Traduciendo…' : 'Guardando…'" [disabled]="!canEdit()" (saved)="save($event)" (cancelled)="closeEditor()" (previewRequested)="previewTranslations()"/>
+  @if(editorOpen()){<tp-home-image-editor [value]="value()" [busy]="saving() || translating() || !canEdit()" (changed)="value.set($event)" (translationsRequested)="previewTranslations()"/>}
+  <div class="dialog-actions">
+    <button tpButton type="button" icon="close" [disabled]="saving() || translating()" (click)="closeEditor()">Cancelar</button>
+    <button tpButton type="button" variant="primary" icon="check" [busy]="saving() || translating()" [disabled]="!canEdit() || saving() || translating()" (click)="save(value())">{{translating() ? 'Traduciendo…' : saving() ? 'Guardando…' : 'Guardar'}}</button>
+  </div>
 </tp-dialog>
 <tp-dialog [open]="!!deleteTarget()" title="Eliminar imagen del inicio" [busy]="deleting()" (closed)="closeDelete()">
   @if(deleteTarget(); as record){

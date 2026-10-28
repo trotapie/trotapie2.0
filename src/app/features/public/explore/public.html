@@ -240,6 +240,7 @@
           <div class="card-grid" tpGridColumns (columnsChanged)="hotelGridSize($event)">
             @for (record of page().items; track record.id) {
               <tp-image-card
+                class="responsive-photo-card"
                 [record]="record"
                 [stars]="mode==='hoteles'&&id ? record.raw['estrellas'] : 0"
                 [country]="type()==='INTERNACIONAL' ? record.raw['pais_nombre'] || '' : ''"

@@ -1,13 +1,14 @@
-import { Component, OnInit, computed, inject, signal, isDevMode, viewChild } from '@angular/core';
+import { Component, OnInit, computed, inject, signal, isDevMode } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { TravelDataService, Row, TravelRecord } from '../../../data/facades/travel-data.service';
-import { FieldDefinition } from '../../../shared/models/resource-definition';
 import { PageHeader } from '../../../shared/components/page-header/page-header';
 import { Button } from '../../../shared/components/button/button';
 import { State } from '../../../shared/components/state/state';
 import { ImageCard } from '../../../shared/components/image-card/image-card';
 import { Dialog } from '../../../shared/components/dialog/dialog';
-import { ResourceForm } from '../../../shared/components/resource-form/resource-form';
+import { HomeImageEditor } from './home-image-editor';
+import { changeSnapshot } from '../../../core/utils/change-snapshot';
+import { normalizeHomeImageStyle } from '../../../shared/models/home-image-style';
 import { TpToastService } from '../../../shared/services/tp-toast.service';
 import { Field } from '../../../shared/components/field/field';
 import { protectUnsavedChanges } from '../../../core/guards/unsaved-changes.guard';
@@ -16,7 +17,7 @@ import { translateHomeImage } from './translate-home-image';
 import { processHomeImages, type HomeImageBulkAction, type HomeImageBulkResult } from './bulk-home-images';
 
 @Component({
-  imports: [PageHeader, Button, State, ImageCard, Dialog, ResourceForm, FormsModule, Field],
+  imports: [PageHeader, Button, State, ImageCard, Dialog, HomeImageEditor, FormsModule, Field],
   selector: 'tp-home-images',
   styleUrl: './home-images.scss',
   templateUrl: './home-images.html',
@@ -56,7 +57,7 @@ export class HomeImages implements OnInit {
       name: language.nombre,
       text: String(this.selected()?.raw['traducciones']?.find((translation: Row) => Number(translation['idioma_id']) === language.id)?.nombre_destino || '').trim(),
     })));
-  private readonly editor = viewChild(ResourceForm);
+  private editorSnapshot = '';
   driveFolder = '';
   readonly importOpen = signal(false);
   readonly importing = signal(false);
@@ -64,15 +65,10 @@ export class HomeImages implements OnInit {
   readonly importResult = signal<DriveImportResult | null>(null);
   readonly importProgress = signal<{completed: number; total: number} | null>(null);
   private readonly pendingImport = protectUnsavedChanges(
-    () => this.editorOpen() && !!this.editor()?.hasChanges(),
+    () => this.editorOpen() && changeSnapshot(this.value()) !== this.editorSnapshot,
     () => this.importing() || this.translating() || this.saving() || this.deleting() || this.bulkBusy(),
   );
   canDeactivate() { return this.pendingImport.confirm(); }
-  readonly fields = computed<FieldDefinition[]>(() => [
-    {key: 'nombre_destino', label: 'Nombre del destino', required: true, textPreview: true},
-    {key: 'url_imagen', label: 'URL de la imagen', type: 'url', required: true, imagePreview: true, hint: 'Pega el enlace público de la fotografía.'},
-    {key: 'activo', label: 'Mostrar en el inicio', type: 'checkbox'},
-  ]);
   canEdit() { return this.data.auth.hasPermission('destinos.edit'); }
   async previewTranslations() {
     if (this.actionsLocked() || !this.editorOpen()) return;
@@ -90,7 +86,7 @@ export class HomeImages implements OnInit {
       const current = {...record, raw: image};
       this.selected.set(current);
       const missing = this.languages().filter(language => language.codigo !== 'es' &&
-        !image.traducciones?.some(translation => Number(translation.idioma_id) === language.id && translation.nombre_destino?.trim()));
+        !image.traducciones?.some((translation: {idioma_id:number;nombre_destino?:string}) => Number(translation.idioma_id) === language.id && translation.nombre_destino?.trim()));
       if (!missing.length) return;
       const prepared = await translateHomeImage({nombre_destino: image.nombre_destino}, missing,
         payload => this.data.legacy.traducirDesdeEspanol(payload), () => true);
@@ -255,9 +251,10 @@ export class HomeImages implements OnInit {
     if (!this.canEdit() || this.actionsLocked() || this.bulkDeletingOpen() || this.deleteTarget()) return;
     this.selected.set(record); this.editorError.set('');
     this.translationsOpen.set(false);
-    const value: Row = record ? {...record.raw} : {activo: true};
+    const value: Row = record ? structuredClone(record.raw) : {activo: true};
+    value['presentacion'] = normalizeHomeImageStyle(value['presentacion']);
     for (const translation of record?.raw['traducciones'] || []) value['translation_'+translation.idioma_id] = translation.nombre_destino;
-    this.value.set(value); this.editorOpen.set(true);
+    this.value.set(value); this.editorSnapshot = changeSnapshot(value); this.editorOpen.set(true);
   }
   closeEditor() {
     if (this.pendingImport.confirm()) this.editorOpen.set(false);
@@ -283,11 +280,16 @@ export class HomeImages implements OnInit {
       // Preserve translations for languages outside the current catalog.
       const translations = new Map<number, string>((this.selected()?.raw['traducciones'] || []).map((translation: Row) => [Number(translation['idioma_id']), String(translation['nombre_destino'] || '')]));
       for (const language of this.languages()) translations.set(language.id, language.codigo === 'es' ? name : String(prepared['translation_'+language.id] || '').trim());
-      await this.data.legacy.guardarImagenFondoAdmin({id: this.selected() ? Number(this.selected()!.id) : null, nombre_destino: name, url_imagen: url, activo: !!value['activo'], traducciones: Array.from(translations, ([idioma_id, nombre_destino]) => ({idioma_id, nombre_destino}))});
+      await this.data.legacy.guardarImagenFondoAdmin({id: this.selected() ? Number(this.selected()!.id) : null, nombre_destino: name, url_imagen: url, activo: !!value['activo'], presentacion: normalizeHomeImageStyle(value['presentacion']), traducciones: Array.from(translations, ([idioma_id, nombre_destino]) => ({idioma_id, nombre_destino}))});
       this.data.invalidate(); this.editorOpen.set(false);
       this.toast.success('La imagen del inicio se guardó correctamente.');
       await this.load();
-    } catch (error) { this.editorError.set(error instanceof Error ? error.message : 'No pudimos guardar la imagen. Intenta nuevamente.'); }
+    } catch (error) {
+      const message = error && typeof error === 'object' && 'message' in error ? String(error.message) : 'No pudimos guardar la imagen. Intenta nuevamente.';
+      this.editorError.set(/presentacion/i.test(message) && /column|schema/i.test(message)
+        ? 'Falta habilitar los ajustes visuales en la base de datos. Ejecuta scripts/imagenes-fondo-presentacion.sql en Supabase y vuelve a guardar.'
+        : message);
+    }
     finally { this.translating.set(false); this.saving.set(false); this.pendingImport.sync(); }
   }
 }

@@ -153,3 +153,38 @@
 .image-card h3.has-stars{margin-bottom:4px}
 
 .image-card-photo>.card-catalog-icon{width:72px;height:72px}
+
+// Public browsing cards keep the same photo frame and vertical layout at every width.
+// Admin cards retain their compact mobile layout.
+:host(.responsive-photo-card) .image-card {
+  flex-direction: column;
+}
+
+:host(.responsive-photo-card) .image-card-photo {
+  width: 100%;
+  height: auto;
+  aspect-ratio: 16 / 9;
+  flex: 0 0 auto;
+}
+
+:host(.responsive-photo-card) .image-card-photo > img {
+  object-fit: cover;
+  object-position: center;
+  padding: 0;
+}
+
+:host(.responsive-photo-card) .card-arrow {
+  display: grid;
+}
+
+:host(.responsive-photo-card) .image-card-kicker,
+:host(.responsive-photo-card) .image-card-bottom,
+:host(.responsive-photo-card) .image-card-country {
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+:host(.responsive-photo-card) .image-card h3 {
+  font-size: 16px;
+  line-height: 1.4;
+}

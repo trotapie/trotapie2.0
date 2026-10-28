@@ -1,4 +1,7 @@
 import {ImageComposer} from '../image-composer/image-composer';
+import {CompositionScaleDirective} from '../../directives/composition-scale.directive';
+import {NgStyle} from '@angular/common';
+import {homeImagePhotoStyle,homeImageTextStyle} from '../../models/home-image-style';
 import {
   Component,
   ElementRef,
@@ -21,7 +24,7 @@ import { gsap } from 'gsap';
 
 @Component({
   selector: 'tp-photo-carousel',
-  imports: [ImageComposer, Button, Icon],
+  imports: [ImageComposer, Button, Icon, NgStyle, CompositionScaleDirective],
   templateUrl: './photo-carousel.html',
   styleUrl: './photo-carousel.scss',
   host: {
@@ -33,6 +36,8 @@ import { gsap } from 'gsap';
   },
 })
 export class PhotoCarousel {
+  readonly homeImagePhotoStyle = homeImagePhotoStyle;
+  readonly homeImageTextStyle = homeImageTextStyle;
   photos = input<CarouselPhoto[]>([]);
   shuffle = input(false);
   label = input('Galería del destino');
@@ -99,6 +104,8 @@ export class PhotoCarousel {
       previousSrc = photo?.src;
       const image = this.element.nativeElement.querySelector<HTMLElement>('.carousel-photo');
       if (!image || this.reducedMotion()) return;
+      // Draft framing/text changes are not slide changes; keep the preview stable while editing.
+      if (outgoingSrc === photo?.src) return;
       if (this.variant() === 'lightbox') {
         const outgoing = outgoingSrc && outgoingSrc !== photo?.src ? image.cloneNode(true) as HTMLImageElement : null;
         if (outgoing) {
@@ -114,6 +121,14 @@ export class PhotoCarousel {
           gsap.killTweensOf(image);
           gsap.set(image, { clearProps: 'opacity,visibility' });
           if (outgoing) { gsap.killTweensOf(outgoing); outgoing.remove(); }
+        });
+        return;
+      }
+      if (photo?.homeStyle) {
+        gsap.fromTo(image, { opacity: 0.62 }, { opacity: 1, duration: 0.7, ease: 'power2.out' });
+        onCleanup(() => {
+          gsap.killTweensOf(image);
+          gsap.set(image, { clearProps: 'opacity' });
         });
         return;
       }
