@@ -70,15 +70,12 @@ export class QuoteEditor implements OnInit {toast=inject(TpToastService);
  next(){this.error.set('');if(this.step()===0&&this.publicRequest&&!this.employees().some(employee=>employee.id===this.employeeId)){this.error.set('Selecciona un asesor para tu solicitud.');return;}if(this.step()===0&&(!this.name.trim()||!this.phone.trim()||!this.nightCount()||!this.roomValidity())){this.error.set('Completa el nombre, teléfono, fechas y las edades de los menores.');return;}if(this.step()===1&&!this.regimesReady()){this.error.set('Revisa el régimen de alojamiento de cada hotel.');return;}if(this.step()===1&&!this.selectedHotels().length){this.error.set('Selecciona al menos un hotel.');return;}this.step.update(s=>Math.min(2,s+1));}
   whatsappUrl = signal('');
   async save(){
-    if(this.busy())return;
+    if(this.busy()||this.success())return;
     this.busy.set(true);
     this.error.set('');
     try{
       const destinationName=this.destinations().find(r=>Number(r.id)===this.destinationId)?.title||this.selectedHotels()[0]?.subtitle||'';
-      const result=await this.workflow.create({name:this.name,treatmentId:this.treatmentId,email:this.email,phone:this.phone,start:this.start,end:this.end,destinationId:this.destinationId||0,destinationName,rooms:this.rooms(),notes:this.notes,multiple:this.multiple,employeeId:this.employeeId,language:this.data.language.language(),hotels:this.selectedHotels().map(h=>({id:Number(h.id),name:h.title,regimeId:this.hotelRegimes[h.id]??null,price:this.hotelPrices[h.id]??null}))},this.publicRequest);
-      this.changes.capture(this.draft());
-      this.busy.set(false);
-      if(this.publicRequest){
+      if(this.publicRequest&&!this.whatsappUrl()){
         const url=quoteWhatsAppUrl({
           name:this.clientDisplayName(),phone:this.phone,email:this.email,destination:destinationName,
           start:this.start,end:this.end,nights:this.nightCount(),rooms:this.rooms(),notes:this.notes,
@@ -89,9 +86,16 @@ export class QuoteEditor implements OnInit {toast=inject(TpToastService);
           })),
         });
         this.whatsappUrl.set(url);
+        // Keep this page alive to save, and open WhatsApp while the click is still active.
+        // The explicit link remains available if the browser blocks the new tab.
+        try{window.open(url,'_blank','noopener,noreferrer');}catch{}
+      }
+      const result=await this.workflow.create({name:this.name,treatmentId:this.treatmentId,email:this.email,phone:this.phone,start:this.start,end:this.end,destinationId:this.destinationId||0,destinationName,rooms:this.rooms(),notes:this.notes,multiple:this.multiple,employeeId:this.employeeId,language:this.data.language.language(),hotels:this.selectedHotels().map(h=>({id:Number(h.id),name:h.title,regimeId:this.hotelRegimes[h.id]??null,price:this.hotelPrices[h.id]??null}))},this.publicRequest);
+      this.changes.capture(this.draft());
+      this.busy.set(false);
+      if(this.publicRequest){
         this.success.set('Tu solicitud quedó guardada. Envía el mensaje en WhatsApp para continuar con tu asesor.');
         this.pendingChanges.sync();
-        window.location.assign(url);
       }else{
         this.pendingChanges.sync();
         this.toast.success('Cotización creada correctamente.');

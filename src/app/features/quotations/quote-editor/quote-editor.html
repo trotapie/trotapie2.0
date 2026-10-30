@@ -1,7 +1,20 @@
 <div class="quote-editor-shell" [class.public-request]="publicRequest">
  @if(publicRequest){<a routerLink="/"><img class="request-brand" src="/brand/trotapie.png" alt="Trotapie Travel"/></a>}
  <tp-page-header [title]="publicRequest?'Tu viaje empieza aquí':multiple?'Nueva comparativa':'Nueva cotización'" [description]="publicRequest?'Cuéntanos cómo quieres viajar. Te ayudaremos a encontrar tu estancia.':'Una propuesta clara, desde el primer detalle.'" eyebrow="Trotapie / Cotizaciones"><a tpButton variant="back" icon="left" [routerLink]="publicRequest ? (hotelId ? '/hotel/'+hotelId : '/') : (preview ? '/vista-previa/cotizaciones' : '/admin/cotizaciones')">Regresar</a></tp-page-header>
- @if(loading()){<tp-state mode="loading"/>}@else if(success()){<section class="panel"><tp-state title="Continúa tu solicitud en WhatsApp" [message]="success()">@if(whatsappUrl()){<a tpButton variant="primary" icon="arrow" [href]="whatsappUrl()">Abrir WhatsApp</a>}<a tpButton icon="globe" routerLink="/destinos">Explorar más destinos</a></tp-state></section>}@else{
+ @if(loading()){<tp-state mode="loading"/>}@else if(publicRequest && whatsappUrl()){
+  <section class="panel" aria-live="polite">
+   @if(busy()){
+    <tp-state mode="loading" title="Guardando tu solicitud" message="Abrimos WhatsApp en otra pestaña. Mantén esta página abierta hasta que termine el guardado."/>
+   }@else if(error()){
+    <div class="error-banner" role="alert">No pudimos guardar tu solicitud: {{error()}} Si ya enviaste el mensaje en WhatsApp, no necesitas enviarlo de nuevo.</div>
+    <button tpButton variant="primary" icon="refresh" type="button" (click)="save()">Reintentar guardado</button>
+   }@else if(success()){
+    <tp-state title="Solicitud guardada" [message]="success()"/>
+   }
+   <a tpButton icon="arrow" [href]="whatsappUrl()" target="_blank" rel="noopener noreferrer">Abrir WhatsApp</a>
+   @if(success()){<a tpButton icon="globe" routerLink="/destinos">Explorar más destinos</a>}
+  </section>
+ }@else{
  @if(preview){<div class="preview-notice">Vista previa del flujo. Inicia sesión para registrar una propuesta.</div>}
  <ol class="quote-stepper" aria-label="Pasos de la cotización">@for(label of ['Cliente y viaje','Destino y hoteles','Revisar propuesta'];track $index;let i=$index){<li [class.is-current]="step()===i" [class.is-complete]="step()>i" [attr.aria-current]="step()===i?'step':null"><span>{{i+1}}</span>{{label}}</li>}</ol>
  @if(error()){<div class="error-banner" role="alert">{{error()}}</div>}
