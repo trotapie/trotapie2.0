@@ -23,9 +23,7 @@
   @if(step()===0){
     <div class="panel-heading"><div><h2>Las personas detrás del viaje</h2><p>Los datos del cliente y su estancia.</p></div><tp-icon name="people"/></div>
     <div class="form-grid">
-      @if(publicRequest || employees().length){
-        <app-tp-select-search class="quote-advisor-field" label="Asesor" name="employeeId" [options]="employeeOptions()" [(ngModel)]="employeeId" placeholder="Selecciona un asesor" searchPlaceholder="Buscar asesor" [showClear]="false" [required]="true" [disabled]="busy()"/>
-      }
+      <app-tp-select-search class="quote-advisor-field" label="Asesor" name="employeeId" [options]="employeeOptions()" [(ngModel)]="employeeId" placeholder="Selecciona un asesor" searchPlaceholder="Buscar asesor" [showClear]="false" [required]="true" [disabled]="busy()"/>
       <div class="quote-client-name">
         <app-tp-select-search label="Prefijo" name="treatmentId" [options]="treatmentOptions()" [ngModel]="treatmentId ?? ''" (ngModelChange)="treatmentId = $event === '' || $event === null ? null : +$event" placeholder="Sin prefijo" [showSearch]="false" [showClear]="false" [disabled]="busy()"/>
         <tp-field label="Nombre completo" forId="quote-name" [required]="true"><input id="quote-name" name="name" [(ngModel)]="name" required autocomplete="name"/></tp-field>

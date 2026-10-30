@@ -25,14 +25,14 @@ export class QuoteEditor implements OnInit {toast=inject(TpToastService);
   clientDisplayName(){return construirNombreClienteVisible({nombreCompleto:this.name,tratamientoAbreviacion:this.treatments().find(treatment=>treatment.id===this.treatmentId)?.abreviacion});}
   advisorName(){return this.employees().find(employee=>employee.id===this.employeeId)?.nombre||'Equipo Trotapie';}
  totalGuests=(n:number,r:Room)=>n+r.adults+r.children;
- async ngOnInit(){try{await this.loadDestinations();this.employeeId=this.publicRequest?null:this.data.auth.identity()?.employeeId||null;
+ async ngOnInit(){try{await this.loadDestinations();this.employeeId=null;
   this.treatments.set(await this.data.legacy.obtenerTratamientosActivos());
-  if(this.publicRequest){
-    const r=await this.data.backend.client.from('empleados').select('id,nombre').or('estatus_id.is.null,estatus_id.eq.1').order('id');
-    if(r.error)throw r.error;
-    this.employees.set(r.data||[]);
-    if(!this.employees().length)throw new Error('No hay asesores disponibles para esta solicitud.');
-  }else if(this.data.auth.identity()?.role==='admin'){const r=await this.data.employees.empleados();if(r.error)throw r.error;this.employees.set(r.data||[]);}
+  const advisors=await this.data.employees.asesoresCotizacion();
+  if(advisors.error)throw advisors.error;
+  this.employees.set(advisors.data||[]);
+  if(!this.employees().length)throw new Error('No hay asesores disponibles para esta solicitud.');
+  const ownId=this.data.auth.identity()?.employeeId;
+  if(!this.publicRequest&&this.employees().some(employee=>employee.id===ownId))this.employeeId=ownId||null;
  if(this.publicRequest&&this.hotelId){const hotel:any=await this.data.hotels.infoHotel(this.hotelId,'es');if(!hotel)throw new Error('No encontramos el hotel.');this.destinationId=hotel.catalogo_destino_id||hotel.catalogoDestino?.id||null;const record:TravelRecord={id:String(this.hotelId),title:hotel.nombre_hotel,subtitle:hotel.catalogoDestino?.nombre||'',image:hotel.fondo||'',status:'',raw:hotel};this.hotels.set([record]);this.selectedHotels.set([record]);this.hotelRegimes[record.id]=hotel.regimen_id||null;await this.loadHotelRegimes(record);}
   }catch(e){this.error.set(e instanceof Error?e.message:'No pudimos cargar las opciones.');}finally{this.changes.capture(this.draft());this.loading.set(false);}}
  async loadDestinations(){
@@ -67,7 +67,7 @@ export class QuoteEditor implements OnInit {toast=inject(TpToastService);
  selected(id:string){return this.selectedHotels().some(r=>r.id===id);}
  updateRoom(index:number,key:'adults'|'children',value:any){this.rooms.update(rooms=>rooms.map((r,i)=>i===index?{...r,[key]:Number(value),childAges:key==='children'?Array.from({length:Number(value)},(_,j)=>r.childAges[j]??null):r.childAges}:r));}
  updateAge(index:number,child:number,age:any){this.rooms.update(rooms=>rooms.map((r,i)=>i===index?{...r,childAges:r.childAges.map((a,j)=>j===child?(age===null?null:Number(age)):a)}:r));}
- next(){this.error.set('');if(this.step()===0&&this.publicRequest&&!this.employees().some(employee=>employee.id===this.employeeId)){this.error.set('Selecciona un asesor para tu solicitud.');return;}if(this.step()===0&&(!this.name.trim()||!this.phone.trim()||!this.nightCount()||!this.roomValidity())){this.error.set('Completa el nombre, teléfono, fechas y las edades de los menores.');return;}if(this.step()===1&&!this.regimesReady()){this.error.set('Revisa el régimen de alojamiento de cada hotel.');return;}if(this.step()===1&&!this.selectedHotels().length){this.error.set('Selecciona al menos un hotel.');return;}this.step.update(s=>Math.min(2,s+1));}
+  next(){this.error.set('');if(this.step()===0&&!this.employees().some(employee=>employee.id===this.employeeId)){this.error.set('Selecciona un asesor para tu solicitud.');return;}if(this.step()===0&&(!this.name.trim()||!this.phone.trim()||!this.nightCount()||!this.roomValidity())){this.error.set('Completa el nombre, teléfono, fechas y las edades de los menores.');return;}if(this.step()===1&&!this.regimesReady()){this.error.set('Revisa el régimen de alojamiento de cada hotel.');return;}if(this.step()===1&&!this.selectedHotels().length){this.error.set('Selecciona al menos un hotel.');return;}this.step.update(s=>Math.min(2,s+1));}
   whatsappUrl = signal('');
   async save(){
     if(this.busy()||this.success())return;

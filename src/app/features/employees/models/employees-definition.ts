@@ -7,6 +7,7 @@ export const employeesDefinition:ResourceDefinition = {
   "icon": "people",
   "permission": "empleados.manage",
   "columns": [
+    {"key":"asesor_cotizacion_label","label":"Asesor de cotizaciones"},
     {"key":"cargo_label","label":"Cargo"},
     {"key":"rol_label","label":"Rol"},
     {
@@ -19,6 +20,12 @@ export const employeesDefinition:ResourceDefinition = {
     }
   ],
   "fields": [
+    {
+      "key": "mostrar_en_cotizaciones",
+      "label": "Mostrar como asesor en cotizaciones",
+      "type": "checkbox",
+      "hint": "Disponible en cotizaciones públicas e internas solo mientras el empleado esté activo. No cambia su acceso al sistema."
+    },
     {
       "key": "nombre",
       "label": "Nombre completo",

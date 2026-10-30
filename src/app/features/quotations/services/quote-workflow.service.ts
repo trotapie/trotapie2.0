@@ -11,8 +11,11 @@ export class QuoteWorkflowService {
    if(configured.length && hotel.regimeId===null)throw new Error(`Selecciona un régimen de alojamiento para ${hotel.name}.`);
    if(hotel.regimeId!==null && !configured.some(regime=>regime.id===hotel.regimeId))throw new Error(`El régimen seleccionado no está configurado para ${hotel.name}. Revisa la selección antes de enviar.`);
  }));
- const employeeId=publicRequest?draft.employeeId:draft.employeeId||this.data.auth.identity()?.employeeId;
- if(!employeeId)throw new Error('Selecciona un asesor para esta solicitud.');
+  const employeeId=draft.employeeId;
+  if(!employeeId)throw new Error('Selecciona un asesor para esta solicitud.');
+  const advisors=await this.data.employees.asesoresCotizacion();
+  if(advisors.error)throw advisors.error;
+  if(!advisors.data?.some((employee:{id:number})=>employee.id===employeeId))throw new Error('El asesor seleccionado ya no está disponible. Selecciona un asesor activo y habilitado para cotizaciones.');
  const client=await this.data.legacy.upsertCliente({nombre:draft.name.trim(),nombre_completo:draft.name.trim(),tratamiento_id:draft.treatmentId??null,email:draft.email.trim()||null,telefono:draft.phone.trim(),recibir_ofertas:false});
  const common={cliente_id:client.id,empleado_id:employeeId,fecha_entrada:draft.start,fecha_salida:draft.end,noches:nights(draft.start,draft.end),habitaciones:roomDescription(draft.rooms),peticiones_especiales:draft.notes.trim()||null};
  let result:any;

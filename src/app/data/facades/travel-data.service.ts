@@ -197,6 +197,7 @@ export class TravelDataService {
         rol_label:roles.error?'Por confirmar':(roles.data||[]).find(role=>Number(role.id)===Number(assignments[row['id']]))?.name||(row['auth_user_id']?'Por confirmar':'Sin rol'),
         estatus_nombre:statuses.find(status=>Number(status.id)===Number(row['estatus_id']))?.nombre||'Sin estatus',
         estatus_clave:statuses.find(status=>Number(status.id)===Number(row['estatus_id']))?.clave?.trim().toLowerCase()||'',
+        asesor_cotizacion_label:row['mostrar_en_cotizaciones']===true&&statuses.some(status=>Number(status.id)===Number(row['estatus_id'])&&status.clave?.trim().toLowerCase()==='activo'&&status.activo)?'Visible':'Oculto',
         acceso_label:employeeAccessLabel(row)
       }));
     });
