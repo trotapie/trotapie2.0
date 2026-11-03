@@ -80,6 +80,9 @@ export interface IActividadPreviewAdmin {
   imagenes?: Array<{
     id: number;
     imagen_url: string;
+    imagen_zoom?: number;
+    imagen_x?: number;
+    imagen_y?: number;
     carpeta_id?: number | null;
     carpeta_nombre?: string | null;
     carpeta?: string | null;

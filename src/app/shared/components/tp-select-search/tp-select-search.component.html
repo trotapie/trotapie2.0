@@ -9,7 +9,7 @@
     <tp-icon [name]="abierto ? 'chevron-up' : 'chevron-down'"></tp-icon>
   </button>
   <ng-template cdkConnectedOverlay [cdkConnectedOverlayOrigin]="trigger" [cdkConnectedOverlayOpen]="abierto"
-    [cdkConnectedOverlayWidth]="'min(max(26rem, ' + triggerButton.offsetWidth + 'px), calc(100vw - 24px))'" [cdkConnectedOverlayMaxWidth]="'calc(100vw - 24px)'" [cdkConnectedOverlayMaxHeight]="'min(30rem, calc(100dvh - 24px))'"
+    [cdkConnectedOverlayWidth]="'min(max(26rem, ' + triggerButton.offsetWidth + 'px), calc(100vw - 24px))'"
     [cdkConnectedOverlayHasBackdrop]="true" cdkConnectedOverlayBackdropClass="cdk-overlay-transparent-backdrop" [cdkConnectedOverlayViewportMargin]="12" [cdkConnectedOverlayPositions]="posiciones" [cdkConnectedOverlayPush]="true"
     [cdkConnectedOverlayFlexibleDimensions]="true" (overlayKeydown)="$event.key==='Escape' && cerrar()" (backdropClick)="cerrar()" (detach)="cerrar()">
     <section #optionsPanel tpMotion="menu" tpPopupKeyboard (dismissed)="cerrar()" class="tp-select-search__panel" role="listbox" [attr.aria-label]="label || placeholder">

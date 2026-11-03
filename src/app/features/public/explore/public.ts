@@ -5,12 +5,11 @@ import {Dialog} from '../../../shared/components/dialog/dialog';
 import {FormsModule} from '@angular/forms';
 import {TpInputComponent} from '../../../shared/components/tp-input/tp-input.component';
 import {TpSelectSearchComponent} from '../../../shared/components/tp-select-search/tp-select-search.component';
-import {GridColumnsDirective} from '../../../shared/directives/grid-columns.directive';
 import { DestinationFacts } from '../../destinations/components/destination-facts/destination-facts';
 import { destinationPhotos } from '../../destinations/utils/destination-photos';
 import { PhotoCarousel } from '../../../shared/components/photo-carousel/photo-carousel';
 import { HotelSuggestions } from '../../hotels/components/hotel-suggestions/hotel-suggestions';
-import { Component, computed, inject, signal, OnInit, OnDestroy, ElementRef, viewChild, afterNextRender, afterRenderEffect } from '@angular/core';
+import { Component, computed, inject, signal, OnInit, OnDestroy, ElementRef, viewChild, afterRenderEffect } from '@angular/core';
 import { gsap } from 'gsap';
 import { Router, RouterLink, ActivatedRoute } from '@angular/router';
 import { PublicTravelService } from '../../../data/public/public-travel.service';
@@ -31,11 +30,12 @@ import { QuickFilters } from '../../../shared/components/quick-filters/quick-fil
 import { HotelInformation } from '../../hotels/components/hotel-information/hotel-information';
 import {InternationalFilters} from '../../../shared/components/international-filters/international-filters';
 import {InternationalCountry} from '../../../data/models/international-geography';
+import {appendHotelPage} from '../../../data/utils/append-hotel-page';
 const normalizeExperience = (value:string)=>value.normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().trim();
 @Component({
   selector: 'tp-public',
   imports: [NavIndicatorDirective,RangeSlider,Dialog,FormsModule,TpInputComponent,TpSelectSearchComponent,
-    GridColumnsDirective,ImagenesCarruselComponent,
+    ImagenesCarruselComponent,
     InternationalFilters,
     HotelInformation,
     QuickFilters,
@@ -62,6 +62,7 @@ export class PublicPage implements OnInit, OnDestroy {
   route = inject(ActivatedRoute);
   router = inject(Router);
   private startAtHome = (this.router.currentNavigation()?.extras.info as {publicSection?:string} | undefined)?.publicSection === 'home';
+  private startAtDestinations = (this.router.currentNavigation()?.extras.info as {publicSection?:string} | undefined)?.publicSection === 'destinations';
   private browseStates = inject(PublicBrowseStateService);
   private browseKey = '/' + this.route.snapshot.pathFromRoot.flatMap(route=>route.url.map(segment=>segment.path)).join('/');
   mode = this.route.snapshot.data['mode'] || 'home';
@@ -79,7 +80,7 @@ export class PublicPage implements OnInit, OnDestroy {
   search = signal('');
   type = signal<'NACIONAL' | 'INTERNACIONAL'>('NACIONAL');
   region=signal<number|null>(null);country=signal<number|null>(null);countries=signal<InternationalCountry[]>([]);
-  experience = signal('');
+  experience = signal(this.mode==='cabanas'?'cabanas':'');
   comingSoon = computed(()=>this.experience()==='cabanas'||this.experience()==='promociones');
   experienceOptions = signal<Array<{id:number;slug:string;nombre:string;label:string}>>([]);
   experienceFilters = computed(()=>{
@@ -88,12 +89,11 @@ export class PublicPage implements OnInit, OnDestroy {
       ...this.experienceOptions()
         .filter(option=>!fixedNames.has(normalizeExperience(option.slug))&&!fixedNames.has(normalizeExperience(option.nombre)))
         .map(option=>({key:String(option.id),label:option.label})),
-      {key:'cabanas',label:this.text('Cabañas','Cabins')},
       {key:'promociones',label:this.text('Promociones','Offers')},
     ];
   });
   experienceConfigured = signal(true);
-  selectedExperience = computed(()=>this.experienceFilters().find(option=>option.key===this.experience())?.label||'');
+  selectedExperience = computed(()=>this.experience()==='cabanas'?this.text('Cabañas','Cabins'):this.experienceFilters().find(option=>option.key===this.experience())?.label||'');
   returnUrl = this.route.snapshot.queryParamMap.get('volver') || '/hoteles';
   hotelFilters=signal<{search:string;starsMin:number|null;starsMax:number|null;regime:number|null}>({search:'',starsMin:null,starsMax:null,regime:null});
   hotelRegimes=signal<{value:number;label:string}[]>([]);
@@ -106,31 +106,53 @@ export class PublicPage implements OnInit, OnDestroy {
   resetHotelDraft(){this.hotelFilterDraft.set({search:'',starsMin:null,starsMax:null,regime:null});}
   applyHotelFilters(){if(!this.hotelStarRangeValid())return;clearTimeout(this.timer);this.hotelFilters.set({...this.hotelFilterDraft(),search:this.hotelFilterDraft().search.trim()});this.hotelFiltersOpen.set(false);void this.load(0);}
   clearHotelFilters(){clearTimeout(this.timer);this.hotelFilters.set({search:'',starsMin:null,starsMax:null,regime:null});void this.load(0);}
-  hotelPageSize=signal(10);
+  hotelPageSize=signal(12);
+  loadingMoreHotels=signal(false);
+  moreHotelsError=signal('');
+  hasMoreHotels=computed(()=>this.page().items.length<this.page().total);
   hotelDestinationName = signal('');
-  hotelGridSize(size:number){if(this.mode!=='hoteles'||!this.id||this.hotelPageSize()===size)return;this.hotelPageSize.set(size);void this.load(0);}
   homeSection=signal<'home'|'destinations'>('home');
-  activeSection=computed(()=>this.mode==='home'?this.homeSection():this.mode==='circuitos'||this.mode==='circuito'?'circuits':'destinations');
-  updateActiveSection(){const root=this.scrollArea()?.nativeElement;if(root)this.lastScrollTop=root.scrollTop;if(this.mode!=='home')return;const section=this.destinationSection()?.nativeElement;if(root&&section)this.homeSection.set(section.getBoundingClientRect().top<=root.getBoundingClientRect().top+root.clientHeight*.3?'destinations':'home');}
+  activeSection=computed(()=>this.mode==='cabanas'?'cabins':this.mode==='home'?this.homeSection():this.mode==='circuitos'||this.mode==='circuito'?'circuits':'destinations');
+  showBackToTop=signal(false);
+  private isDestinationCatalog(){return this.mode==='home'||this.mode==='destinos'||(this.mode==='hoteles'&&!this.id);}
+  updateActiveSection(){
+    const root=this.scrollArea()?.nativeElement;
+    const section=this.destinationSection()?.nativeElement;
+    if(!root)return;
+    this.lastScrollTop=root.scrollTop;
+    const distance=this.isDestinationCatalog()&&section
+      ?root.getBoundingClientRect().top-section.getBoundingClientRect().top
+      :root.scrollTop;
+    this.showBackToTop.set((this.isDestinationCatalog()||this.mode==='hoteles'&&!!this.id)&&distance>=root.clientHeight);
+    if(this.mode==='home'&&section)this.homeSection.set(section.getBoundingClientRect().top<=root.getBoundingClientRect().top+root.clientHeight*.3?'destinations':'home');
+  }
+  backToTop(){
+    this.catalogHeading()?.nativeElement.focus({preventScroll:true});
+    if(this.isDestinationCatalog())this.scrollToDestinations();
+    else this.scrollContent(0);
+  }
   private lastScrollTop = 0;
-  private restoredBrowseState = false;
+  private pendingDestinations = signal(false);
   private pendingScroll = signal<number|null>(null);
   private generation = 0;
   private timer?: ReturnType<typeof setTimeout>;
   private scrollArea = viewChild<ElementRef<HTMLElement>>('scrollArea');
   private destinationSection = viewChild<ElementRef<HTMLElement>>('destinationSection');
+  private catalogHeading = viewChild<ElementRef<HTMLElement>>('catalogHeading');
   constructor() {
-    afterNextRender(() => {
-      if (!this.restoredBrowseState && this.mode === 'home' && this.route.snapshot.fragment === 'destinos') this.scrollToDestinations();
-    });
     afterRenderEffect(()=>{
       const top = this.pendingScroll();
+      const destinations = this.pendingDestinations();
       const area = this.scrollArea()?.nativeElement;
-      if (top===null || this.loading() || !area) return;
+      const section = this.destinationSection()?.nativeElement;
+      if ((!destinations && top===null) || this.loading() || !area || (destinations && !section)) return;
       gsap.killTweensOf(area);
-      area.scrollTop = top;
+      area.scrollTop = destinations
+        ? area.scrollTop + section!.getBoundingClientRect().top - area.getBoundingClientRect().top
+        : top!;
       this.lastScrollTop = area.scrollTop;
       this.pendingScroll.set(null);
+      this.pendingDestinations.set(false);
       this.updateActiveSection();
     });
   }
@@ -138,7 +160,7 @@ export class PublicPage implements OnInit, OnDestroy {
     if (event.button !== 0 || event.ctrlKey || event.metaKey || event.shiftKey || event.altKey) return;
     event.preventDefault();
     if (this.mode === 'home') this.scrollToDestinations();
-    else void this.router.navigate(['/'], { fragment: 'destinos' });
+    else void this.router.navigate(['/'], { fragment: 'destinos', info:{publicSection:'destinations'} });
   }
   navigateHome(event: MouseEvent) {
     if (event.button !== 0 || event.ctrlKey || event.metaKey || event.shiftKey || event.altKey) return;
@@ -161,8 +183,9 @@ export class PublicPage implements OnInit, OnDestroy {
   }
   ngOnInit() {
     const state = this.isBrowsePage() ? this.browseStates.get(this.browseKey) : undefined;
+    // An explicit header click wins over the previously saved homepage scroll.
+    this.pendingDestinations.set(this.mode==='home'&&(this.startAtDestinations||(!state&&this.route.snapshot.fragment==='destinos')));
     if (state) {
-      this.restoredBrowseState = true;
       this.search.set(state.search);
       this.type.set(state.type);
       this.region.set(state.region);
@@ -181,9 +204,11 @@ export class PublicPage implements OnInit, OnDestroy {
       this.loading.set(false);
       this.pendingScroll.set(this.startAtHome ? 0 : state.scrollTop);
     }
-    void this.load(state?.page.page ?? 0, !!state);
+    // Keep every loaded batch when returning from a hotel, not just the last page.
+    if (!(state && this.mode==='hoteles' && this.id))
+      void this.load(state?.page.page ?? 0, !!state);
   }
-  private isBrowsePage() { return ['home','destinos','hoteles','circuitos'].includes(this.mode); }
+  private isBrowsePage() { return ['home','destinos','hoteles','circuitos','cabanas'].includes(this.mode); }
   private saveBrowseState() {
     if (!this.isBrowsePage() || this.error()) return;
     this.browseStates.save(this.browseKey, {
@@ -203,6 +228,8 @@ export class PublicPage implements OnInit, OnDestroy {
   }
   async load(page = 0, retainContent = false) {
     const generation = ++this.generation;
+    this.loadingMoreHotels.set(false);
+    this.moreHotelsError.set('');
     if (!retainContent) this.loading.set(true);
     this.error.set('');
     try {
@@ -266,7 +293,7 @@ export class PublicPage implements OnInit, OnDestroy {
         const experiences = await this.data.experienceOptions(this.type());
         if (generation !== this.generation) return;
         this.experienceOptions.set(experiences);
-        const automaticSelection = !this.experienceFilters().some(option=>option.key===this.experience());
+        const automaticSelection = this.mode!=='cabanas'&&!this.experienceFilters().some(option=>option.key===this.experience());
         if (automaticSelection) {
           const beach = experiences.find(option=>
             ['playa','playas'].includes(normalizeExperience(option.slug)) || ['playa','playas'].includes(normalizeExperience(option.nombre)));
@@ -309,6 +336,22 @@ export class PublicPage implements OnInit, OnDestroy {
         this.error.set(e instanceof Error ? e.message : 'No pudimos cargar esta información.');
     } finally {
       if (generation === this.generation) this.loading.set(false);
+    }
+  }
+  async loadMoreHotels() {
+    if(this.mode!=='hoteles'||!this.id||this.loading()||this.loadingMoreHotels()||!this.hasMoreHotels())return;
+    const generation=++this.generation;
+    this.loadingMoreHotels.set(true);
+    this.moreHotelsError.set('');
+    try {
+      const next=await this.data.hotelPage(this.id,this.page().page+1,this.hotelPageSize(),this.hotelFilters());
+      if(generation!==this.generation)return;
+      this.page.update(current=>appendHotelPage(current,next));
+    } catch(e) {
+      if(generation===this.generation)
+        this.moreHotelsError.set(e instanceof Error?e.message:this.text('No pudimos cargar más hoteles. Inténtalo de nuevo.','We could not load more hotels. Please try again.'));
+    } finally {
+      if(generation===this.generation)this.loadingMoreHotels.set(false);
     }
   }
   changeSearch(text: string) {

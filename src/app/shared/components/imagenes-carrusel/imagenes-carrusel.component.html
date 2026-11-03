@@ -24,13 +24,19 @@
   }
   @if(isOpen()){
     <div class="gallery-viewer"><tp-photo-carousel [photos]="photos()" [startIndex]="initialIndex()" [autoplay]="true" [intervalMs]="3000" variant="lightbox" [label]="hotel?.nombre_hotel||'Galería de imágenes'" [english]="language.language()==='en'"/></div>
+  }
+  </div>
+  <div class="dialog-actions gallery-footer">
+  @if(isOpen()){
+    <div class="gallery-navigation">
     <p class="gallery-count" role="status">{{language.translateText('Imagen ','Photo ')}}{{(viewer()?.index()??0)+1}} {{language.translateText('de ','of ')}}{{photos().length}} · {{allPhotos().length}} {{language.translateText('imágenes en total','photos in total')}}</p>
     <div class="gallery-thumbs compact" [attr.aria-label]="language.translateText('Miniaturas de la galería','Gallery thumbnails')">
       @for(photo of photos();track $index){
         <button type="button" (click)="goTo($index)" [class.selected]="viewer()?.index()===$index" [attr.aria-pressed]="viewer()?.index()===$index" [attr.aria-label]="language.translateText('Seleccionar imagen ','Select image ')+($index+1)"><img [src]="photo.src" [alt]="photo.title||'Imagen'" loading="lazy" (error)="imageError($event)"/></button>
       }
     </div>
+    </div>
   }
+  @if(hotel?.id){<a tpButton class="gallery-quote" variant="primary" icon="quote" [routerLink]="['/solicitar',hotel!.id]" (click)="close()">{{language.translateText('Solicitar cotización','Request a quote')}}</a>}
   </div>
-  @if(hotel?.id){<div class="dialog-actions"><a tpButton variant="primary" icon="quote" [routerLink]="['/solicitar',hotel!.id]" (click)="close()">{{language.translateText('Solicitar cotización','Request a quote')}}</a></div>}
 </tp-dialog>

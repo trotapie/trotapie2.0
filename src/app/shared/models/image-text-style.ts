@@ -1,3 +1,5 @@
+import {normalizeImageFraming, type ImageFraming} from './image-framing';
+
 export type TextoImagen = 'titulo' | 'descripcion';
 
 export interface PresentacionTextoImagen {
@@ -16,7 +18,7 @@ export const PRESENTACION_TEXTO_PREDETERMINADA: Readonly<PresentacionTextoImagen
   blur_px: 0
 };
 
-export interface EstiloTextosImagen {
+export interface EstiloTextosImagen extends ImageFraming {
   titulo_color?: string | null;
   descripcion_color?: string | null;
   titulo_posicion?: string | null;
@@ -67,6 +69,7 @@ export function normalizarEstiloTextosImagen(imagen: EstiloTextosImagen & {
     };
   };
   return {
+    ...normalizeImageFraming(imagen),
     titulo_color: color(imagen.titulo_color),
     descripcion_color: color(imagen.descripcion_color),
     titulo_posicion: posicion(imagen.titulo_posicion),
@@ -82,5 +85,4 @@ export function normalizarEstiloTextosImagen(imagen: EstiloTextosImagen & {
       ?? (Boolean(imagen.oscurecer_fondo) || imagen.efecto_destino === 'texto' || imagen.efecto_destino === 'ambos')
   };
 }
-
 

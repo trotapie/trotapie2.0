@@ -25,6 +25,7 @@
   gap: 24px;
   min-height: 96px;
 }
+.hotel-load-more{display:flex;flex-direction:column;align-items:center;gap:12px;padding:24px 0;border-top:1px solid var(--line);margin-top:24px}.hotel-load-more p{margin:0;font-size:12px;color:var(--muted)}.hotel-load-more button{min-width:180px}
 .public-header > a img {
   width: 150px;
   height: 46px;
@@ -291,6 +292,7 @@
     flex: 1;
     text-align: center;
     font-size: 11px;
+    padding: 10px 8px;
   }
   .public-hero {
     grid-template-columns: 1fr;
@@ -329,7 +331,9 @@
 }
 
 /* Only main scrolls; the header and footer occupy their own rows. */
-.public-shell > main {
+.public-scroll-region{position:relative;display:flex;flex-direction:column;flex:1 1 auto;min-height:0}
+.back-to-top{position:absolute;right:16px;bottom:16px;z-index:5;min-height:44px;background:var(--surface);color:var(--ink);border:1px solid var(--line);box-shadow:0 4px 16px #00000014;font-size:12px}
+.public-scroll-region > main {
   min-height: 0;
   flex: 1 1 auto;
   overflow: auto;
@@ -337,18 +341,19 @@
   scrollbar-gutter: stable;
   padding-right: 8px;
 }
-.public-shell > main::-webkit-scrollbar {
+.public-scroll-region > main.catalog-scroll-area{padding-bottom:76px}
+.public-scroll-region > main::-webkit-scrollbar {
   width: 7px;
 }
-.public-shell > main::-webkit-scrollbar-thumb {
+.public-scroll-region > main::-webkit-scrollbar-thumb {
   background: var(--line);
   border-radius: 999px;
 }
-.public-shell > main::-webkit-scrollbar-track {
+.public-scroll-region > main::-webkit-scrollbar-track {
   background: transparent;
 }
 @media (max-width: 700px) {
-  .public-shell > main {
+  .public-scroll-region > main {
     padding-right: 4px;
   }
 }
@@ -364,7 +369,8 @@
     margin: 0;
     box-shadow: none;
   }
-  .public-shell > main {
+  .back-to-top{display:none}
+  .public-scroll-region > main {
     overflow: visible;
     padding: 0;
   }

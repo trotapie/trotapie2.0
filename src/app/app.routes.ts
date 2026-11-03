@@ -32,6 +32,7 @@ export const routes:Routes=[
  {path:'hoteles/:id',loadComponent:publicPage,data:{mode:'hoteles'}},
  {path:'hotel/:id',loadComponent:publicPage,data:{mode:'hotel'}},
  {path:'circuitos',loadComponent:publicPage,data:{mode:'circuitos'}},
+ {path:'cabanas',loadComponent:publicPage,data:{mode:'cabanas'}},
  {path:'solicitar/:hotelId',loadComponent:()=>import('./features/quotations/quote-editor/quote-editor').then(m=>m.QuoteEditor),data:{public:true},canDeactivate:[unsavedChangesGuard]},
  {path:'cotizacion/:id',loadComponent:()=>import('./features/quotations/quote-detail/quote-detail').then(m=>m.QuoteDetail),data:{public:true}},
  {path:'comparativa/:id',loadComponent:()=>import('./features/quotations/quote-detail/quote-detail').then(m=>m.QuoteDetail),data:{public:true,multiple:true}},

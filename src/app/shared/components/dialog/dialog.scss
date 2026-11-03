@@ -45,7 +45,7 @@
   }
 }
 
-:host .dialog.dialog-editor{width:75vw;max-width:none;height:75dvh;max-height:calc(100dvh - 32px);padding:28px;}
+:host .dialog.dialog-editor{box-sizing:border-box;width:calc(100vw - 64px);max-width:none;height:calc(100dvh - 56px);max-height:calc(100dvh - 32px);padding:28px;}
 :host .dialog.dialog-editor>header{position:sticky;top:-28px;background:var(--surface);z-index:4;padding:12px 0;}
 @media(max-width:900px){:host .dialog.dialog-editor{width:calc(100vw - 32px);height:calc(100dvh - 32px);}}
 @media(max-width:600px){:host .dialog.dialog-editor{padding:18px;}:host .dialog.dialog-editor>header{top:-18px;}}
