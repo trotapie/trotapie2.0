@@ -2,7 +2,6 @@ import {parseQuoteRoute,quoteAdminSegment} from '../models/quote-route';
 import {DestroyRef} from '@angular/core';
 import {NavigationEnd} from '@angular/router';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
-import {BannerComponent} from '../../../shared/components/banner/banner.component';
 import {QuoteTariffEditor} from './quote-tariff-editor';
 import {QuoteTariffList} from './quote-tariff-list';
 import {QUOTE_TARIFFS,QuoteData,quoteTariffRooms,quoteTariffPayload,quoteTariffValidation} from '../models/quote-tariffs';
@@ -14,7 +13,7 @@ import {quotePrices,quotePhotos,quoteRoomText,quoteDate} from '../models/quote-p
 import {DateRangeFilterComponent} from '../../../shared/components/date-range-filter/date-range-filter.component';
 import {TpToastService} from '../../../shared/services/tp-toast.service';
 import {Component,inject,signal,computed,OnInit} from '@angular/core';import {ActivatedRoute,Router,RouterLink} from '@angular/router';import {FormsModule} from '@angular/forms';import {DatePipe} from '@angular/common';import {TravelDataService} from '../../../data/facades/travel-data.service';import {Button} from '../../../shared/components/button/button';import {Icon} from '../../../shared/components/icon/icon';import {Badge} from '../../../shared/components/badge/badge';import {Field} from '../../../shared/components/field/field';import {State} from '../../../shared/components/state/state';import {Dialog} from '../../../shared/components/dialog/dialog';import {PageHeader} from '../../../shared/components/page-header/page-header';
-@Component({selector:'tp-quote-detail',imports:[QuoteTariffEditor,QuoteTariffList,TpSelectSearchComponent,BannerComponent,ImagenesCarruselComponent,DateRangeFilterComponent,FormsModule,RouterLink,DatePipe,Button,Icon,Badge,Field,State,Dialog,PageHeader],templateUrl:'./quote-detail.html',styleUrl:'./quote-detail.scss'})
+@Component({selector:'tp-quote-detail',imports:[QuoteTariffEditor,QuoteTariffList,TpSelectSearchComponent,ImagenesCarruselComponent,DateRangeFilterComponent,FormsModule,RouterLink,DatePipe,Button,Icon,Badge,Field,State,Dialog,PageHeader],templateUrl:'./quote-detail.html',styleUrl:'./quote-detail.scss'})
 export class QuoteDetail implements OnInit {toast=inject(TpToastService);
  data=inject(TravelDataService);route=inject(ActivatedRoute);router=inject(Router);publicView=!!this.route.snapshot.data['public'];preview=!!this.route.snapshot.data['preview'];multiple=this.route.snapshot.data['multiple']||this.route.snapshot.queryParamMap.get('tipo')==='comparativa';
  private routeSegment=this.route.snapshot.paramMap.get('id')||'';
