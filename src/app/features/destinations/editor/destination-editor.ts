@@ -1,4 +1,6 @@
 import {spanishImageText,imageTranslationKey,needsImageTranslation} from '../utils/image-translation';
+import {Router} from '@angular/router';
+import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {applyPhotoBulkAction,type PhotoBulkAction} from '../utils/photo-bulk-action';
 import {ChangeTracker} from '../../../core/utils/change-snapshot';
 import {protectUnsavedChanges} from '../../../core/guards/unsaved-changes.guard';
@@ -13,6 +15,22 @@ import {Component,inject,signal,OnInit} from '@angular/core';import {RouterLink,
 @Component({selector:'tp-destination-editor',imports:[AttractionsWorkspace,LanguageMenu,LocationEditor,TpSelectSearchComponent,RouterLink,FormsModule,PageHeader,Button,Field,State,Dialog,ImageComposer,Icon],templateUrl:'./destination-editor.html',styleUrl:'./destination-editor.scss'})
 export class DestinationEditor implements OnInit {toast=inject(TpToastService);service=inject(DestinationEditorService);route=inject(ActivatedRoute);id=Number(this.route.snapshot.paramMap.get('id'));loading=signal(true);error=signal('');saving=signal(false);model=signal<IPreviewDestinoAdmin|null>(null);tab=signal('text');language=signal(1);activity=signal<IActividadPreviewAdmin|null>(null);image=signal<Record<string,any>|null>(null);imageDialog=signal(false);newImage='';driveFolder='';translatingImage=signal(false);private originalImage:Record<string,any>|null=null;private translatedKeys=new WeakMap<object,string>();private editorTranslationKey:string|undefined;private dragIndex:number|null=null;
   private changes=new ChangeTracker<IPreviewDestinoAdmin>();
+  private router=inject(Router);
+  constructor(){
+    this.route.queryParamMap.pipe(takeUntilDestroyed()).subscribe(params=>{
+      const section=params.get('section');
+      this.tab.set(section&&['text','location','facts','activities'].includes(section)?section:'text');
+    });
+  }
+  selectTab(section:string){
+    if(!['text','location','facts','activities'].includes(section))return;
+    void this.router.navigate([],{
+      relativeTo:this.route,
+      queryParams:{section},
+      queryParamsHandling:'merge',
+      replaceUrl:true,
+    });
+  }
   setLocation(value:string){this.model.update(model=>model?{...model,ubicacion:value}:model);}
   readonly importingImages=signal(false);
   bulkImages(a:IActividadPreviewAdmin,images:Record<string,any>[],action:PhotoBulkAction){
