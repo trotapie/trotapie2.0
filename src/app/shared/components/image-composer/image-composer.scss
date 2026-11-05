@@ -9,7 +9,7 @@ tp-input,tp-textarea,tp-color-picker,tp-switch{display:block;min-width:0}.editor
 :host.contained-editor{display:block;height:100%;min-height:0}
 :host.contained-editor .composer{height:100%;min-height:0;overflow:hidden}
 :host.contained-editor .preview-panel{position:relative;align-self:stretch;display:flex;flex-direction:column;min-height:0;height:100%}
-:host.contained-editor .preview-tools,:host.contained-editor .hint{flex:none}
+:host.contained-editor .preview-tools{flex:none}
 :host.contained-editor .preview-image-area{flex:1;min-height:0;container-type:size;display:grid;place-items:center}
 :host.contained-editor .composition-frame{width:min(100%,160cqh);flex:none}
 :host.contained-editor .editor-controls{min-height:0;overflow:auto;overscroll-behavior:contain;padding-right:10px;scrollbar-gutter:stable}
@@ -19,3 +19,5 @@ tp-input,tp-textarea,tp-color-picker,tp-switch{display:block;min-width:0}.editor
 :host.contained-editor .editor-controls>.tabs{position:sticky;top:0;z-index:3;background:var(--surface);padding:0 0 12px;box-shadow:0 1px 0 var(--line);}
 
 .editor-controls>.section-heading{position:relative;z-index:1;isolation:isolate;}
+.photo-draggable{cursor:grab;touch-action:none}.photo-draggable:active{cursor:grabbing}
+.preview-heading{display:inline-flex;align-items:center;gap:6px;white-space:nowrap}.preview-help{position:relative;display:inline-flex}.preview-tools .preview-help-button{display:grid;place-items:center;min-height:32px;width:32px;padding:0;border:0;border-radius:50%;background:transparent;color:var(--muted);cursor:help}.preview-help-button:hover,.preview-help-button:focus-visible{background:var(--brand-soft);color:var(--ink)}.preview-help-button:focus-visible{outline:2px solid var(--brand);outline-offset:2px}.preview-help-tooltip{position:absolute;top:100%;left:-90px;z-index:5;width:260px;max-width:calc(100vw - 64px);padding:12px 14px;border:1px solid var(--line);border-radius:12px;background:var(--surface);color:var(--muted);box-shadow:0 8px 24px rgb(15 23 42 / 14%);font-size:12px;line-height:1.6;white-space:normal}.preview-tools{position:relative;z-index:2;flex-wrap:wrap}

@@ -36,7 +36,6 @@ export const destinationsDefinition:ResourceDefinition = {
       "key": "prioridad",
       "label": "Prioridad",
       "type": "select",
-      "only": "edit",
       "options": [
         {
           "value": 1,
@@ -53,43 +52,13 @@ export const destinationsDefinition:ResourceDefinition = {
       "label": "División de área",
       "type": "select",
       "ref": "areas",
-      "only": "edit"
+      "required": true
     },
     {
       "key": "tipo_turistico_id",
       "label": "Tipo de experiencia",
       "type": "select",
-      "ref": "tour-types",
-      "only": "edit"
-    },
-    {
-      "key": "tipo_desino_id",
-      "label": "Tipo de destino",
-      "type": "select",
-      "only": "create",
-      "options": [
-        {
-          "value": 1,
-          "label": "Nacional"
-        },
-        {
-          "value": 2,
-          "label": "Internacional"
-        }
-      ]
-    },
-    {
-      "key": "destino_padre_id",
-      "label": "Destino padre",
-      "type": "number",
-      "only": "create"
-    },
-    {
-      "key": "continente_id",
-      "label": "Continente",
-      "type": "select",
-      "ref": "continents",
-      "only": "create"
+      "ref": "tour-types"
     },
     {
       "key": "activo",

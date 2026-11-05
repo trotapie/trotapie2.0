@@ -1,4 +1,5 @@
 import {imageStylePayload} from '../../shared/models/image-style-payload';
+import {normalizeHomeImageStyle, type HomeImageStyle} from '../../shared/models/home-image-style';
 // Query contracts reused from Trotapie; all screens are newly implemented.
 import { inject, Injectable, isDevMode } from '@angular/core';
 import { ClientService } from '../../core/services/client.service';
@@ -79,6 +80,9 @@ export interface IActividadPreviewAdmin {
   imagenes?: Array<{
     id: number;
     imagen_url: string;
+    imagen_zoom?: number;
+    imagen_x?: number;
+    imagen_y?: number;
     carpeta_id?: number | null;
     carpeta_nombre?: string | null;
     carpeta?: string | null;
@@ -3641,10 +3645,7 @@ export class SupabaseService {
     const { data, error } = await this.client
       .from('imagenes_fondo')
       .select(`
-        id,
-        url_imagen,
-        nombre_destino,
-        activo,
+        *,
         traducciones:imagenes_fondo_traducciones (
           idioma_id,
           nombre_destino,
@@ -3684,12 +3685,14 @@ export class SupabaseService {
     url_imagen: string;
     activo: boolean;
     nombre_destino: string;
+    presentacion?: HomeImageStyle;
     traducciones: Array<{ idioma_id: number; nombre_destino: string }>;
   }) {
     const imagenPayload = {
       url_imagen: payload.url_imagen,
       activo: payload.activo,
-      nombre_destino: payload.nombre_destino
+      nombre_destino: payload.nombre_destino,
+      ...(payload.presentacion ? {presentacion:normalizeHomeImageStyle(payload.presentacion)} : {})
     };
 
     let imagenId: number;

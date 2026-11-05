@@ -1,7 +1,25 @@
 <section class="photographs"><div class="gallery-heading"><div><h4>Fotografías</h4><p>{{images().length||0}} imágenes de esta atracción</p></div><tp-badge [label]="active()?'Activa':'Inactiva'"/></div>
+          @if(images().length){
+            <div class="photo-bulk-controls">
+              <label class="photo-select-all"><input type="checkbox" [checked]="allSelected()" [indeterminate]="selection().size>0&&!allSelected()" [disabled]="busy()" (change)="selectAll($any($event.target).checked)"/>Seleccionar todas</label>
+              <span role="status">{{selection().size}} seleccionadas</span>
+              @if(selection().size){
+                <div class="photo-bulk-actions">
+                  <button tpButton type="button" [disabled]="busy()" (click)="apply('activate')">Activar</button>
+                  <button tpButton type="button" [disabled]="busy()" (click)="apply('deactivate')">Inactivar</button>
+                  <button tpButton type="button" class="photo-delete" [disabled]="busy()" (click)="apply('delete')">Eliminar</button>
+                  <button tpButton type="button" [disabled]="busy()" (click)="selectAll(false)">Limpiar selección</button>
+                </div>
+                <small>Los cambios se conservan al guardar el contenido del destino.</small>
+              }
+            </div>
+          }
           <div class="photos-grid">
             @for(img of images();track img;let i=$index){
-              <article class="photo-card"><button class="photo-preview" type="button" [disabled]="busy()" [attr.aria-label]="'Editar diseño de fotografía '+(i+1)" (click)="edited.emit(img)"><img [src]="img.imagen_url" [alt]="img.nombre||'Fotografía de '+title()" loading="lazy" (error)="$any($event.target).style.visibility='hidden'"/><span class="photo-eye"><tp-icon name="edit"/></span></button><div class="photo-caption"><div><strong>{{img.nombre||'Fotografía '+(i+1)}}</strong><small>{{img.carpeta_nombre||img.carpeta||'General'}}</small></div><button tpButton type="button" icon="edit" variant="icon" [disabled]="busy()" [attr.aria-label]="'Editar diseño de fotografía '+(i+1)" (click)="edited.emit(img)"></button></div><div class="photo-status"><app-custom-switch [label]="img.activa ? 'Activa' : 'Inactiva'" [ngModel]="img.activa" [disabled]="busy()" (ngModelChange)="toggled.emit({image:img,active:$event})"/></div></article>
+              <article class="photo-card" [class.photo-selected]="selection().has(img)">
+                <label class="photo-select"><input type="checkbox" [checked]="selection().has(img)" [disabled]="busy()" [attr.aria-label]="'Seleccionar fotografía '+(i+1)+': '+(img.nombre||title())" (change)="select(img,$any($event.target).checked)"/></label>
+                <button class="photo-preview" type="button" [disabled]="busy()" [attr.aria-label]="'Editar diseño de fotografía '+(i+1)" (click)="edited.emit(img)"><img [src]="img.imagen_url" [alt]="img.nombre||'Fotografía de '+title()" loading="lazy" (error)="$any($event.target).style.visibility='hidden'"/><span class="photo-eye"><tp-icon name="edit"/></span></button><div class="photo-caption"><div><strong>{{img.nombre||'Fotografía '+(i+1)}}</strong><small>{{img.carpeta_nombre||img.carpeta||'General'}}</small></div><button tpButton type="button" icon="edit" variant="icon" [disabled]="busy()" [attr.aria-label]="'Editar diseño de fotografía '+(i+1)" (click)="edited.emit(img)"></button></div><div class="photo-status"><app-custom-switch [label]="img.activa ? 'Activa' : 'Inactiva'" [ngModel]="img.activa" [disabled]="busy()" (ngModelChange)="toggled.emit({image:img,active:$event})"/></div>
+              </article>
             }@empty{<div class="gallery-empty"><tp-icon name="landscape"/><strong>Aún no hay fotografías</strong><p>Agrega una imagen o importa una carpeta para comenzar.</p></div>}
           </div>
         </section>

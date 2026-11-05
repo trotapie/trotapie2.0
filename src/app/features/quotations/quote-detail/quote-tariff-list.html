@@ -2,7 +2,7 @@
   @for(tariff of tariffs;track tariff.type){
     @if(total(tariff.priceKey)!==null){
       <section><header><h3>{{tariff.label}}</h3><div><small>Total MXN</small><strong>{{total(tariff.priceKey)|currency:'MXN':'symbol-narrow':'1.2-2'}}</strong></div></header>
-        <div class="tariff-table-wrap"><table><thead><tr><th scope="col">Habitación</th><th scope="col">Origen</th><th scope="col">Tipo</th><th scope="col">Precio</th>@if(tariff.percentKey){<th scope="col">% apartado</th>}</tr></thead><tbody>
+        <div class="tariff-table-wrap"><table><thead><tr><th scope="col">Habitación</th><th scope="col">Origen</th><th scope="col">Tipo de habitación</th><th scope="col">Precio</th>@if(tariff.percentKey){<th scope="col">% apartado</th>}</tr></thead><tbody>
           @for(room of rooms();track $index;let i=$index){
             @if(room[tariff.priceKey]!==null){<tr><th scope="row">Habitación {{i+1}}<small>{{room.detalle}}</small></th><td>{{originName(room,tariff.originKey)}}</td><td>{{roomName(room,tariff.roomKey)}}</td><td class="money">{{room[tariff.priceKey]|currency:'MXN':'symbol-narrow':'1.2-2'}}</td>@if(tariff.percentKey){<td>{{room[tariff.percentKey]}}%</td>}</tr>}
           }

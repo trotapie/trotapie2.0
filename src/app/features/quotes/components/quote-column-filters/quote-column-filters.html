@@ -1,11 +1,10 @@
-<section class="column-filters" aria-label="Filtros por columna">
-  <div class="filter-title"><strong>Filtros por columna</strong><button tpButton variant="quiet" type="button" icon="close" (click)="cleared.emit()">Limpiar filtros</button></div>
+<section class="column-filters" aria-label="Filtros de cotizaciones">
   <div class="filter-grid">
     <app-tp-input label="Cliente / pasajero" placeholder="Nombre del cliente" [ngModel]="value().client" (ngModelChange)="set('client',$event)" />
     <app-tp-input label="Hotel" placeholder="Nombre del hotel" [disabled]="multiple()" [ngModel]="value().hotel" (ngModelChange)="set('hotel',$event)" />
-    <app-tp-input label="Asesor" placeholder="Nombre del asesor" [ngModel]="value().adviser" (ngModelChange)="set('adviser',$event)" />
-    <app-date-range-filter label="Fecha de creación" [ngModel]="{start:value().start,end:value().end}" (ngModelChange)="dates($event)" />
-    <app-tp-select-search label="Estado" [options]="statusOptions" [ngModel]="status()" (ngModelChange)="statusChanged.emit($event)" [showClear]="false" [showSearch]="false"/>
+    <app-tp-input class="adviser-filter" label="Asesor" placeholder="Nombre del asesor" [ngModel]="value().adviser" (ngModelChange)="set('adviser',$event)" />
+    <app-date-range-filter class="date-filter" label="Fecha de creación" [ngModel]="{start:value().start,end:value().end}" (ngModelChange)="dates($event)" />
+    <app-tp-select-search class="status-filter" label="Estado" [options]="statusOptions" [ngModel]="status()" (ngModelChange)="statusChanged.emit($event)" [showClear]="false" [showSearch]="false"/>
   </div>
   @if(multiple()){<p>Las comparativas reúnen varios hoteles; el filtro por hotel aplica a cotizaciones individuales.</p>}
 </section>

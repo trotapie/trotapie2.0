@@ -1,20 +1,75 @@
-<!-- <section class="statistics" aria-labelledby="statistics-title">
-  <div class="statistics-heading"><div><span class="eyebrow">Tu agencia en números</span><h2 id="statistics-title">Estadísticas de la operación</h2></div><span class="scope">Resumen actual</span></div>
-  <div class="statistics-grid">
-    <article class="stat-panel" tpMotion="card">
-      <h3>Estado de las solicitudes</h3><p>Distribución del total registrado.</p>
-      @if(snapshot().total!==null) {
-        <div [attr.aria-label]="summary()"><tp-donut-chart [data]="distribution()" title="Solicitudes" [height]="250" /></div>
-        @if(snapshot().total===0){<p class="empty-note">Todavía no hay solicitudes registradas.</p>}
-      } @else {<div class="empty-chart"><span class="empty-ring"></span><strong>Estadísticas privadas</strong><p>Los totales se muestran cuando tu cuenta tiene acceso al resumen de la agencia.</p></div>}
+<section class="statistics" aria-labelledby="statistics-title">
+  <header class="statistics-heading">
+    <div><span class="eyebrow">Tu agencia en números</span><h2 id="statistics-title">Cada viaje deja una historia.</h2></div>
+    <span class="scope">{{ auth.identity()?.role === 'admin' ? 'Vista general de la agencia' : 'Tu actividad' }}</span>
+  </header>
+
+  @if (available()) {
+    <article class="stat-panel trend-panel">
+      <header class="chart-heading">
+        <div><h3>El ritmo de las solicitudes</h3><p>Actividad diaria por fecha de creación.</p></div>
+        <div class="periods" role="group" aria-label="Período de la tendencia">
+          @for (period of [30, 90]; track period) {
+            <button type="button" [attr.aria-pressed]="days() === period" (click)="days.set(period); selectedDate.set('')">{{ period }} días</button>
+          }
+        </div>
+      </header>
+      <div class="trend-summary"><strong>{{ periodTotal() }}</strong><span>solicitudes en {{ days() }} días</span><span class="daily-average">{{ (periodTotal() / days()).toFixed(1) }} por día</span></div>
+      <div class="trend-plot">
+        <div class="y-axis" aria-hidden="true">@for (tick of axis(); track tick) {<span>{{ tick }}</span>}</div>
+        <svg viewBox="0 0 900 200" preserveAspectRatio="none" role="img" [attr.aria-label]="'Tendencia de los últimos ' + days() + ' días: ' + periodTotal() + ' solicitudes. Consulta el detalle diario debajo.'">
+          @for (tick of axis(); track tick) {<line x1="24" x2="876" [attr.y1]="174 - tick / peak() * 144" [attr.y2]="174 - tick / peak() * 144" class="grid-line" />}
+          <path [attr.d]="area()" class="trend-area" />
+          <path [attr.d]="line()" class="trend-line" />
+          @if (selectedDay(); as selected) {
+            @for (point of points(); track point.date) {
+              @if (point.date === selected.date) {<circle [attr.cx]="point.x" [attr.cy]="point.y" r="4" class="trend-point" />}
+            }
+          }
+        </svg>
+      </div>
+      <div class="x-axis" aria-hidden="true">@for (tick of ticks(); track tick.date) {<span>{{ tick.label }}</span>}</div>
+      <div class="trend-detail">
+        <label>Detalle del día <select [value]="selectedDate()" (change)="selectedDate.set($any($event.target).value)"><option value="">Seleccionar fecha</option>@for (day of series(); track day.date) {<option [value]="day.date">{{ day.label }} · {{ day.value }} solicitudes</option>}</select></label>
+        <span role="status">@if (selectedDay(); as day) {{{ day.label }}: <strong>{{ day.value }}</strong> solicitudes} @else {Consulta cualquier día del período.}</span>
+      </div>
+      @if (!periodTotal()) {<p class="empty-note">No se registraron solicitudes en este período.</p>}
     </article>
-    <article class="stat-panel" tpMotion="card">
-      <h3>Hoteles en solicitudes recientes</h3><p>Basado en las últimas {{snapshot().recent.length}} solicitudes disponibles.</p>
-      @if(hotels().length) {
-        <tp-bar-chart [data]="hotelBars()" [height]="220" />
-        <ul class="hotel-legend">@for(hotel of hotels();track hotel.label){<li><span>{{$index+1}} · {{hotel.label}}</span><strong>{{hotel.value}}</strong></li>}</ul>
-      } @else {<div class="empty-chart"><span class="empty-bars" aria-hidden="true"><i></i><i></i><i></i></span><strong>Tu actividad aparecerá aquí</strong><p>Las solicitudes recientes permitirán comparar los hoteles consultados.</p></div>}
-      <p class="footnote">Cada solicitud cuenta una vez. Esta gráfica representa actividad reciente, no ventas.</p>
-    </article>
-  </div>
-</section> -->
+
+    <div class="statistics-grid">
+      @for (chart of breakdowns(); track chart.title) {
+        <article class="stat-panel">
+          <h3>{{ chart.title }}</h3><p>{{ chart.subtitle }}</p>
+          <div class="breakdown">
+            <div class="donut" [style.background]="gradient(chart.items)" aria-hidden="true"><div><strong>{{ snapshot().total }}</strong><span>solicitudes</span></div></div>
+            <ul class="chart-legend" [attr.aria-label]="chart.title">
+              @for (item of chart.items; track item.label) {
+                <li><span class="legend-dot" [style.background]="item.color"></span>
+                  @if (chart.filterable && item.label !== 'Sin estado') {<a routerLink="/admin/cotizaciones" [queryParams]="{estado:item.label}">{{ item.label }}</a>} @else {<span class="legend-name">{{ item.label }}</span>}
+                  <strong>{{ item.value }}</strong><small>{{ percentage(item.value) }}%</small>
+                </li>
+              } @empty {<li class="empty-note">Aún no hay solicitudes registradas.</li>}
+            </ul>
+          </div>
+          <p class="footnote">Historial completo disponible para tu cuenta.</p>
+        </article>
+      }
+    </div>
+
+    <div class="ranking-grid">
+      @for (ranking of rankings(); track ranking.title) {
+        <article class="stat-panel ranking-panel" [style.--ranking-color]="ranking.color">
+          <span class="ranking-kicker">Los 5 con más actividad</span><h3>{{ ranking.title }}</h3><p>{{ ranking.subtitle }}</p>
+          <ol class="ranking-list">
+            @for (item of ranking.items; track item.label) {
+              <li><span class="rank">{{ $index + 1 }}</span><div class="rank-content"><div class="rank-label"><span>{{ item.label }}</span><strong>{{ item.value }}</strong></div><div class="rank-track" aria-hidden="true"><span [style.width.%]="item.value / ranking.items[0].value * 100"></span></div></div></li>
+            } @empty {<li class="empty-note">La actividad de tus solicitudes aparecerá aquí.</li>}
+          </ol>
+        </article>
+      }
+    </div>
+    <p class="statistics-note">Los desgloses y rankings consideran todo el historial de solicitudes individuales de tu cuenta, no ventas ni ingresos. Los registros sin fecha válida no se incluyen en la tendencia.</p>
+  } @else {
+    <article class="stat-panel private-state"><span class="empty-ring" aria-hidden="true"></span><h3>Tu actividad, en perspectiva.</h3><p>Inicia sesión con una cuenta autorizada para consultar las estadísticas reales de tu operación.</p></article>
+  }
+</section>

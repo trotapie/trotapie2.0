@@ -1,4 +1,5 @@
 import {AttractionPhotos} from '../attraction-photos/attraction-photos';
+import type {PhotoBulkAction} from '../../utils/photo-bulk-action';
 import {selectedIndexAfterMove} from '../../utils/attraction-selection';
 import {Component,input,output,signal,computed} from '@angular/core';
 import {FormsModule} from '@angular/forms';
@@ -21,6 +22,7 @@ export class AttractionsWorkspace {
   toggled=output<{activity:IActividadPreviewAdmin;active:boolean}>();
   imageEdited=output<{activity:IActividadPreviewAdmin;image:Record<string,any>}>();
   imageToggled=output<{activity:IActividadPreviewAdmin;image:Record<string,any>;active:boolean}>();
+  imagesBulkAction=output<{activity:IActividadPreviewAdmin;images:Record<string,any>[];action:PhotoBulkAction}>();
   imageAdded=output<{activity:IActividadPreviewAdmin;url:string}>();
   driveImported=output<{activity:IActividadPreviewAdmin;url:string}>();
   index=signal(0);

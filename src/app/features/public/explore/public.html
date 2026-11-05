@@ -7,13 +7,15 @@
       <a routerLink="/" [class.active]="activeSection()==='home'" [attr.aria-current]="activeSection()==='home'?'page':null" (click)="navigateHome($event)">{{ text('Inicio', 'Home') }}</a
       ><a href="/#destinos" [class.active]="activeSection()==='destinations'" [attr.aria-current]="activeSection()==='destinations'?'page':null" (click)="navigateDestinations($event)">{{ text('Destinos', 'Destinations') }}</a
       ><a routerLink="/circuitos" [class.active]="activeSection()==='circuits'" [attr.aria-current]="activeSection()==='circuits'?'page':null">{{ text('Circuitos', 'Tours') }}</a>
+      <a routerLink="/cabanas" [class.active]="activeSection()==='cabins'" [attr.aria-current]="activeSection()==='cabins'?'page':null">{{ text('Cabañas', 'Cabins') }}</a>
     </nav>
     <div class="public-tools">
       <tp-theme-toggle [english]="data.language.language() === 'en'" />
       <tp-language-menu [english]="data.language.language() === 'en'" (changed)="load()" />
     </div>
   </header>
-  <main #scrollArea id="main-content" (scroll)="updateActiveSection()">
+  <div class="public-scroll-region">
+  <main #scrollArea id="main-content" [class.catalog-scroll-area]="mode==='home'||mode==='destinos'||mode==='hoteles'" (scroll)="updateActiveSection()">
     @if (mode !== 'home' && mode !== 'destino' && mode !== 'hotel') {
       <tp-back-button [label]="text('Regresar', 'Back')" />
     }
@@ -120,7 +122,7 @@
         }
         @if (mode === 'hotel' && detail().imagenes?.length) {
           <section class="hotel-photo-gallery" aria-label="Galería del hotel">
-            <app-imagenes-carrusel [imagenesCargadas]="detail().imagenes" [hotel]="detail()" layout="grid"/>
+            <app-imagenes-carrusel [imagenesCargadas]="detail().imagenes" [hotel]="detail()" [soloClasificadas]="true" layout="grid"/>
           </section>
         }
         @if (mode === 'destino' && detail().detalle?.descripcion_larga) {
@@ -144,6 +146,7 @@
       } @else {
         <tp-destination-facts
           [facts]="detail()?.datos_rapidos || []"
+          [location]="detail()?.ubicacion || null"
           [english]="data.language.language() === 'en'"
         />
         <tp-hotel-suggestions
@@ -161,11 +164,15 @@
             <span class="eyebrow">{{
               text('Escapadas que inspiran', 'Getaways that inspire')
             }}</span>
-            <h2>
+            <h2 #catalogHeading tabindex="-1" [class.hotel-destination-title]="mode === 'hoteles' && id && hotelDestinationName()">
               {{
-                mode === 'destino' || (mode === 'hoteles' && id)
+                mode === 'hoteles' && id && hotelDestinationName()
+                  ? hotelDestinationName()
+                  : mode === 'destino' || (mode === 'hoteles' && id)
                   ? text('Encuentra tu estancia', 'Find your stay')
-                  : mode === 'circuitos'
+                   : mode === 'cabanas'
+                     ? text('Cabañas', 'Cabins')
+                   : mode === 'circuitos'
                     ? text('Viajes para descubrir más', 'Journeys to discover more')
                     : mode === 'hoteles'
                       ? text('¿A dónde quieres ir?', 'Where would you like to go?')
@@ -174,7 +181,9 @@
             </h2>
             <p>
               {{
-                text(
+                mode === 'hoteles' && id
+                  ? text('Encuentra tu estancia en este destino.', 'Find your stay in this destination.')
+                  : text(
                   'Elige un lugar. Lo demás lo planeamos contigo.',
                   'Choose a place. We will plan the rest with you.'
                 )
@@ -183,7 +192,7 @@
           </div>
           <span class="result-count">{{ page().total }} {{ text('opciones', 'options') }}</span>
         </div>
-        @if (mode !== 'destino' && mode !== 'circuitos' && !id) {
+        @if (mode !== 'destino' && mode !== 'circuitos' && mode !== 'cabanas' && !id) {
           <tp-quick-filters
             [title]="text('Selecciona experiencia', 'Choose an experience')"
             [options]="experienceFilters()"
@@ -191,6 +200,7 @@
             (changed)="changeExperience($event)"
           />
           @if(!comingSoon() || !experienceOptions().length){<tp-filter-bar
+            [showSearch]="false"
             [search]="search()"
             [placeholder]="text('Busca un destino…', 'Find a destination…')"
             (searchChanged)="changeSearch($event)"
@@ -232,9 +242,10 @@
             "
           />
         } @else {
-          <div class="card-grid" tpGridColumns (columnsChanged)="hotelGridSize($event)">
+          <div class="card-grid" id="public-catalog-results" [attr.aria-busy]="loadingMoreHotels()">
             @for (record of page().items; track record.id) {
               <tp-image-card
+                class="responsive-photo-card"
                 [record]="record"
                 [stars]="mode==='hoteles'&&id ? record.raw['estrellas'] : 0"
                 [country]="type()==='INTERNACIONAL' ? record.raw['pais_nombre'] || '' : ''"
@@ -253,6 +264,15 @@
               />
             }
           </div>
+          @if(mode==='hoteles'&&id){
+            <div class="hotel-load-more">
+              <p role="status" aria-live="polite">{{text('Mostrando','Showing')}} {{page().items.length}} {{text('de','of')}} {{page().total}} {{text('hoteles','hotels')}}</p>
+              @if(moreHotelsError()){<p class="range-error" role="alert">{{moreHotelsError()}}</p>}
+              @if(hasMoreHotels()){
+                <button tpButton type="button" variant="primary" aria-controls="public-catalog-results" [busy]="loadingMoreHotels()" (click)="loadMoreHotels()">{{loadingMoreHotels()?text('Cargando hoteles…','Loading hotels…'):moreHotelsError()?text('Reintentar','Try again'):text('Ver más hoteles','Show more hotels')}}</button>
+              }
+            </div>
+          } @else {
           <div class="pagination">
             <span>{{ page().total }} {{ text('registros', 'results') }}</span>
             <div class="pagination-actions">
@@ -266,13 +286,14 @@
               ><button
                 tpButton
                 icon="right"
-                [disabled]="(page().page + 1) * (mode==='hoteles'&&id ? hotelPageSize() : 24) >= page().total"
+                [disabled]="(page().page + 1) * 24 >= page().total"
                 (click)="load(page().page + 1)"
               >
                 {{ text('Siguiente', 'Next') }}
               </button>
             </div>
           </div>
+          }
         }
       </section>
     } @else if (mode === 'hotel' && loading()) {
@@ -281,6 +302,10 @@
       <tp-state mode="error" [message]="error()" (retry)="load()" />
     }
   </main>
+  @if(showBackToTop()){
+    <button tpButton type="button" class="back-to-top" icon="chevron-up" aria-controls="main-content" (click)="backToTop()">{{text('Volver arriba','Back to top')}}</button>
+  }
+  </div>
   <tp-public-footer [english]="data.language.language() === 'en'" />
 </div>
 <tp-location-map

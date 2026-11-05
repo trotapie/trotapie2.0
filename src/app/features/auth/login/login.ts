@@ -1,6 +1,5 @@
 import {Component,inject,signal} from '@angular/core';import {FormsModule} from '@angular/forms';import {Router,RouterLink,ActivatedRoute} from '@angular/router';import {AuthService} from '../../../core/services/auth.service';import {ClientService} from '../../../core/services/client.service';import {Button} from '../../../shared/components/button/button';import {Field} from '../../../shared/components/field/field';
-import {BackButton} from '../../../shared/components/back-button/back-button';
-@Component({selector:'tp-login',imports:[BackButton,FormsModule,RouterLink,Button,Field],templateUrl:'./login.html',styleUrl:'./login.scss'})
+@Component({selector:'tp-login',imports:[FormsModule,RouterLink,Button,Field],templateUrl:'./login.html',styleUrl:'./login.scss'})
 export class Login {
  auth=inject(AuthService);client=inject(ClientService);router=inject(Router);route=inject(ActivatedRoute);mode=this.route.snapshot.data['mode']||'login';email='';password='';confirmation='';busy=signal(false);error=signal('');success=signal('');showPassword=signal(false);
  async submit(){if(this.busy())return;this.busy.set(true);this.error.set('');try{

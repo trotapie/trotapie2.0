@@ -559,6 +559,22 @@ export class CotizacionesService {
     return Number.isFinite(hotelId) && hotelId > 0 ? hotelId : null;
   }
 
+  async obtenerTiposHabitacionPorIds(ids: number[]) {
+    if (!ids.length) return [];
+    const { data, error } = await this.client.from('tipos_habitacion')
+      .select('id, nombre_habitacion').in('id', ids);
+    if (error) throw error;
+    return data ?? [];
+  }
+
+  async obtenerOrigenesReservacionPorIds(ids: number[]) {
+    if (!ids.length) return [];
+    const { data, error } = await this.client.from('origen_reservacion')
+      .select('id, clave, nombre_cotizador').in('id', ids);
+    if (error) throw error;
+    return data ?? [];
+  }
+
   async tiposHabitacionPorHotel(hotelId: number) {
     const id = Number(hotelId);
     if (!Number.isFinite(id) || id <= 0) return [];

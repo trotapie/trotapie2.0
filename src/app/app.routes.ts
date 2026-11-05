@@ -10,16 +10,18 @@ const catalogRoutes=(preview=false):Routes=>[
  {path:'',pathMatch:'full',redirectTo:'dashboard'},
   {path:'dashboard',loadComponent:dashboard,data:{preview}},
   {path:'imagenes-inicio',loadComponent:()=>import('./features/admin/home-images/home-images').then(m=>m.HomeImages),data:{permission:'destinos.edit'},canActivate:[authGuard],canDeactivate:[unsavedChangesGuard]},
- {path:'empleados/:id/acceso',loadComponent:()=>import('./features/employees/access/employee-access').then(m=>m.EmployeeAccess),data:{permission:'empleados.manage'},canActivate:[authGuard]},
+ // Entrega posterior: gestión de acceso, roles y permisos.
+ // {path:'empleados/:id/acceso',loadComponent:()=>import('./features/employees/access/employee-access').then(m=>m.EmployeeAccess),data:{permission:'empleados.manage'},canActivate:[authGuard]},
  {path:'circuitos/:id/flyer',loadComponent:()=>import('./features/circuits/flyer/flyer-editor').then(m=>m.FlyerEditor),data:{permission:'circuitos.edit'},canActivate:[authGuard]},
- {path:'roles/:id',loadComponent:()=>import('./features/configuration/role-editor/role-editor').then(m=>m.RoleEditor),data:{permission:'empleados.manage'},canActivate:[authGuard]},
+ // {path:'roles/:id',loadComponent:()=>import('./features/configuration/role-editor/role-editor').then(m=>m.RoleEditor),data:{permission:'empleados.manage'},canActivate:[authGuard]},
  {path:'catalogos',loadComponent:catalogOverview,data:{preview},canActivate:preview?[]:[authGuard]},
  {path:'catalogos/:catalog',loadComponent:catalog,data:{kind:'catalogos',preview,permission:'destinos.edit'},canActivate:preview?[reusedRouteChangesGuard]:[authGuard,reusedRouteChangesGuard],canDeactivate:[unsavedChangesGuard]},
- {path:'destinos/:id/contenido',loadComponent:()=>import('./features/destinations/editor/destination-editor').then(m=>m.DestinationEditor),data:{permission:'destinos.edit'},canActivate:[authGuard],canDeactivate:[unsavedChangesGuard]},
+  {path:'destinos/:id/contenido',loadComponent:()=>import('./features/destinations/editor/destination-editor').then(m=>m.DestinationEditor),data:{permission:'destinos.edit'},canActivate:[authGuard],canDeactivate:[unsavedChangesGuard]},
+  {path:'hoteles/:id/editar',loadComponent:()=>import('./features/hotels/editor/hotel-editor').then(m=>m.HotelEditor),data:{permission:'hoteles.edit'},canActivate:[authGuard],canDeactivate:[unsavedChangesGuard]},
  {path:'destinos/:destinationId/hoteles',loadComponent:catalog,data:{kind:'hoteles',preview,permission:'hoteles.view'},canActivate:preview?[]:[authGuard],canDeactivate:[unsavedChangesGuard]},
  {path:'cotizaciones/nueva',loadComponent:()=>import('./features/quotations/quote-editor/quote-editor').then(m=>m.QuoteEditor),data:{permission:'cotizaciones.create',preview},canActivate:preview?[]:[authGuard],canDeactivate:[unsavedChangesGuard]},
  {path:'cotizaciones/:id',loadComponent:()=>import('./features/quotations/quote-detail/quote-detail').then(m=>m.QuoteDetail),data:{permission:'cotizaciones.view',preview},canActivate:preview?[]:[authGuard]},
- ...['cotizaciones','destinos','hoteles','atracciones','clientes','empleados','catalogos','circuitos','configuracion'].map(kind=>({path:kind,loadComponent:catalog,data:{kind,preview,permission:kind==='configuracion'||kind==='empleados'?'empleados.manage':kind==='clientes'?'cotizaciones.view':kind==='catalogos'?'destinos.edit':kind==='atracciones'?'destinos.view':kind+'.view'},canActivate:preview?[]:[authGuard],canDeactivate:kind==='circuitos'?[]:[unsavedChangesGuard]}))
+ ...['cotizaciones','destinos','hoteles','atracciones','clientes','empleados','catalogos','circuitos'/* ,'configuracion': entrega posterior */].map(kind=>({path:kind,loadComponent:catalog,data:{kind,preview,permission:kind==='configuracion'||kind==='empleados'?'empleados.manage':kind==='clientes'?'cotizaciones.view':kind==='catalogos'?'destinos.edit':kind==='atracciones'?'destinos.view':kind+'.view'},canActivate:preview?[]:[authGuard],canDeactivate:kind==='circuitos'?[]:[unsavedChangesGuard]}))
 ];
 export const routes:Routes=[
  {path:'',pathMatch:'full',loadComponent:publicPage,data:{mode:'home'}},
@@ -30,6 +32,7 @@ export const routes:Routes=[
  {path:'hoteles/:id',loadComponent:publicPage,data:{mode:'hoteles'}},
  {path:'hotel/:id',loadComponent:publicPage,data:{mode:'hotel'}},
  {path:'circuitos',loadComponent:publicPage,data:{mode:'circuitos'}},
+ {path:'cabanas',loadComponent:publicPage,data:{mode:'cabanas'}},
  {path:'solicitar/:hotelId',loadComponent:()=>import('./features/quotations/quote-editor/quote-editor').then(m=>m.QuoteEditor),data:{public:true},canDeactivate:[unsavedChangesGuard]},
  {path:'cotizacion/:id',loadComponent:()=>import('./features/quotations/quote-detail/quote-detail').then(m=>m.QuoteDetail),data:{public:true}},
  {path:'comparativa/:id',loadComponent:()=>import('./features/quotations/quote-detail/quote-detail').then(m=>m.QuoteDetail),data:{public:true,multiple:true}},

@@ -6,9 +6,9 @@
 .date-trigger:hover:not(:disabled),.date-trigger[aria-expanded='true']{border-color:var(--brand)}
 .date-trigger:disabled{opacity:.58;cursor:not-allowed}
 .date-trigger tp-icon{width:18px;height:18px;color:var(--muted)}
-.date-range-fields{display:grid;grid-template-columns:1fr 1fr;border:1px solid var(--line);border-radius:16px;overflow:hidden;background:var(--surface)}
+.date-range-fields{display:grid;grid-template-columns:var(--date-range-columns,1fr 1fr);border:1px solid var(--line);border-radius:16px;overflow:hidden;background:var(--surface)}
 .date-range-fields button{position:relative;padding:12px 42px 12px 14px;border:0;background:transparent;color:var(--ink);text-align:left;font-size:13px;cursor:pointer}
-.date-range-fields button+button{border-left:1px solid var(--line)}
+.date-range-fields button+button{border-left:var(--date-range-divider-left,1px) solid var(--line);border-top:var(--date-range-divider-top,0) solid var(--line)}
 .date-range-fields small{display:block;color:var(--muted);font-size:10px;margin-bottom:4px}
 .date-range-fields tp-icon{position:absolute;right:14px;top:50%;transform:translateY(-50%);width:17px;height:17px;color:var(--muted)}
 .range-panel{box-sizing:border-box;width:min(660px,calc(100vw - 24px));max-height:calc(100dvh - 32px);overflow:auto;padding:20px;background:var(--surface);color:var(--ink);border:1px solid var(--line);border-radius:22px;box-shadow:0 18px 48px #0002}

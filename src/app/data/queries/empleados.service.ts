@@ -1,6 +1,7 @@
 // Query contracts reused from Trotapie; all screens are newly implemented.
 import { inject, Injectable } from '@angular/core';
 import { SupabaseService } from './supabase.service';
+import {employeeContactEmail} from '../../features/employees/models/employee-management';
 
 @Injectable({
   providedIn: 'root',
@@ -10,6 +11,11 @@ export class EmpleadosService {
 
   private get client() {
     return this.supabase.getClient();
+  }
+
+  asesoresCotizacion() {
+    // Public contract: expose only the ID and name of explicitly enabled, active advisors.
+    return this.client.rpc('obtener_asesores_cotizacion');
   }
 
   empleados(options?: { incluirInhabilitados?: boolean }) {
@@ -27,6 +33,7 @@ export class EmpleadosService {
         ),
         telefono,
         estatus_id,
+        mostrar_en_cotizaciones,
         email,
         auth_user_id,
         primera_vez_login
@@ -136,15 +143,16 @@ export class EmpleadosService {
     return data;
   }
 
-  async crearEmpleadoAdmin(payload: { nombre: string; cargo_id?: number | null; telefono?: string }): Promise<any> {
+  async crearEmpleadoAdmin(payload: { nombre: string; cargo_id?: number | null; telefono?: string; email?: string | null; mostrar_en_cotizaciones?: boolean }): Promise<any> {
     const nombre = String(payload.nombre ?? '').trim();
     const cargoId = Number(payload.cargo_id);
     const cargo_id = Number.isFinite(cargoId) && cargoId > 0 ? cargoId : null;
     const telefono = String(payload.telefono ?? '').trim() || null;
+    const email = payload.email === undefined ? {} : {email:employeeContactEmail(payload.email)};
     const estatusActivoId = await this.obtenerEstatusEmpleadoPorClave('activo');
     const { data, error } = await this.client
       .from('empleados')
-      .insert({ nombre, cargo_id, telefono, estatus_id: estatusActivoId })
+      .insert({ nombre, cargo_id, telefono, ...email, estatus_id: estatusActivoId, mostrar_en_cotizaciones: payload.mostrar_en_cotizaciones === true })
       .select(`
         id,
         nombre,
@@ -157,6 +165,7 @@ export class EmpleadosService {
         ),
         telefono,
         estatus_id,
+        mostrar_en_cotizaciones,
         email,
         auth_user_id,
         primera_vez_login
@@ -167,14 +176,14 @@ export class EmpleadosService {
     return data;
   }
 
-  async actualizarEmpleadoAdmin(id: number, payload: { nombre: string; cargo_id?: number | null; telefono?: string }): Promise<any> {
+  async actualizarEmpleadoAdmin(id: number, payload: { nombre: string; cargo_id?: number | null; telefono?: string; email?: string | null; mostrar_en_cotizaciones?: boolean }): Promise<any> {
     const nombre = String(payload.nombre ?? '').trim();
     const cargoId = Number(payload.cargo_id);
     const cargo_id = Number.isFinite(cargoId) && cargoId > 0 ? cargoId : null;
     const telefono = String(payload.telefono ?? '').trim() || null;
     const { data, error } = await this.client
       .from('empleados')
-      .update({ nombre, cargo_id, telefono })
+      .update({ nombre, cargo_id, telefono, ...(payload.email === undefined ? {} : {email:employeeContactEmail(payload.email)}), ...(payload.mostrar_en_cotizaciones === undefined ? {} : {mostrar_en_cotizaciones: payload.mostrar_en_cotizaciones === true}) })
       .eq('id', id)
       .select(`
         id,
@@ -188,6 +197,7 @@ export class EmpleadosService {
         ),
         telefono,
         estatus_id,
+        mostrar_en_cotizaciones,
         email,
         auth_user_id,
         primera_vez_login
@@ -215,6 +225,7 @@ export class EmpleadosService {
         ),
         telefono,
         estatus_id,
+        mostrar_en_cotizaciones,
         email,
         auth_user_id,
         primera_vez_login

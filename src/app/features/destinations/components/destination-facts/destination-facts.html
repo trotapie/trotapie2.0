@@ -1,8 +1,14 @@
-@if (facts().length) {
+@if (facts().length || temperature() !== null) {
   <dl
     class="destination-facts"
     [attr.aria-label]="english() ? 'Destination facts' : 'Datos del destino'"
   >
+    @if (temperature() !== null) {
+      <div>
+        <dt>{{ english() ? 'Temperature' : 'Temperatura' }}</dt>
+        <dd>{{ temperature() }} °C</dd>
+      </div>
+    }
     @for (fact of facts(); track $index) {
       <div>
         <dt>{{ fact.label }}</dt>

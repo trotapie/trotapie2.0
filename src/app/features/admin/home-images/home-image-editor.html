@@ -1,0 +1,39 @@
+<div class="home-composer" [attr.aria-busy]="busy()">
+  <section class="preview-panel">
+    <div class="preview-tools"><span>Vista previa del inicio</span><div role="group" aria-label="Dispositivo de vista previa">
+      @for(d of [{id:'desktop',label:'Escritorio'},{id:'tablet',label:'Tablet'},{id:'mobile',label:'Móvil'}];track d.id){<button tpButton type="button" [variant]="device()===d.id?'primary':'secondary'" [attr.aria-pressed]="device()===d.id" (click)="device.set(d.id)">{{d.label}}</button>}
+    </div></div>
+    <div class="preview-area"><div class="preview-frame" [class.tablet]="device()==='tablet'" [class.mobile]="device()==='mobile'" (pointerdown)="start($event)" (pointermove)="drag($event)" (pointerup)="end()" (pointercancel)="end()" (lostpointercapture)="end()">
+      <tp-photo-carousel variant="hero" [photos]="photos()" [autoplay]="false" eyebrow="Tu próxima historia" headline="Un destino. Mil recuerdos." label="Vista previa de la imagen del inicio"/>
+    </div></div>
+    <p class="hint">Arrastra la fotografía para ajustar el encuadre. El nombre se muestra como una etiqueta, igual que en el diseño actual del inicio.</p>
+  </section>
+  <section class="editor-controls"><fieldset [disabled]="busy()">
+    <nav class="tabs" aria-label="Ajustes de la imagen del inicio">
+      @for(t of [{id:'content',label:'Contenido'},{id:'frame',label:'Encuadre'},{id:'type',label:'Tipografía'}];track t.id){<button tpButton type="button" [variant]="tab()===t.id?'primary':'secondary'" [attr.aria-pressed]="tab()===t.id" (click)="tab.set(t.id)">{{t.label}}</button>}
+    </nav>
+    @if(tab()==='content'){
+      <h3>Datos de la imagen</h3>
+      <tp-input label="URL de la imagen" type="url" [required]="true" [ngModel]="value()['url_imagen']" (ngModelChange)="set('url_imagen',$event)" placeholder="https://…"/>
+      <p class="hint">Usa una URL pública HTTP o HTTPS.</p>
+      <tp-input label="Nombre en español" [required]="true" [ngModel]="value()['nombre_destino']" (ngModelChange)="set('nombre_destino',$event)"/>
+      <tp-switch label="Mostrar en el inicio" [ngModel]="value()['activo']" (ngModelChange)="set('activo',$event)"/>
+      <p class="hint">Las imágenes inactivas se conservan. El nombre se traduce automáticamente al guardar; español se utiliza como respaldo.</p>
+      <button tpButton type="button" icon="globe" (click)="translationsRequested.emit()">Ver traducciones guardadas</button>
+    }
+    @if(tab()==='frame'){
+      <h3>Zoom y encuadre</h3>
+      <label>Zoom: {{(style().zoom*100).toFixed(0)}} %<input type="range" min="0.5" max="3" step="0.05" [ngModel]="style().zoom" (ngModelChange)="setStyle('zoom',$event)"/></label>
+      <p class="hint">Puedes alejar la fotografía hasta el 50 %. Por debajo del 100 % pueden quedar márgenes visibles dentro del marco.</p>
+      <tp-input label="Horizontal (%)" type="number" [min]="0" [max]="100" [ngModel]="style().x" (ngModelChange)="setStyle('x',$event)"/>
+      <tp-input label="Vertical (%)" type="number" [min]="0" [max]="100" [ngModel]="style().y" (ngModelChange)="setStyle('y',$event)"/>
+      <button tpButton type="button" icon="refresh" (click)="resetFrame()">Restablecer encuadre</button>
+    }
+    @if(tab()==='type'){
+      <h3>Etiqueta del destino</h3>
+      <tp-color-picker label="Color del nombre" [ngModel]="style().textColor" (ngModelChange)="setStyle('textColor',$event)"/>
+      <tp-color-picker label="Fondo de la etiqueta" [ngModel]="style().textBackground" (ngModelChange)="setStyle('textBackground',$event)"/>
+    }
+    <button tpButton type="button" icon="refresh" class="reset-design" (click)="resetDesign()">Restablecer diseño</button>
+  </fieldset></section>
+</div>

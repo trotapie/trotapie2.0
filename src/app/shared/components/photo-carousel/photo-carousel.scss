@@ -26,6 +26,19 @@
   opacity: 0;
   pointer-events: none;
 }
+.carousel-artwork { display:contents; }
+/* One 800 × 500 composition: scale the photo and all its text together. */
+.hero-carousel .carousel-artwork {
+  display:block;
+  position:absolute;
+  top:0;
+  left:0;
+  width:800px;
+  height:500px;
+  overflow:hidden;
+  transform:scale(var(--composition-scale,1));
+  transform-origin:top left;
+}
 .lightbox-carousel{background:#111a17}
 .lightbox-carousel .carousel-photo{object-fit:contain}
 .lightbox-carousel .carousel-photo:not(.carousel-outgoing){z-index:1}
@@ -43,7 +56,7 @@
   font-size: clamp(20px, 2.3vw, 28px);
   line-height: 1.2;
 }
-.carousel-location { position:absolute;top:24px;left:24px;display:flex;align-items:center;gap:8px;padding:10px 14px;border-radius:999px;background:#fff;color:#30392e;font-size:11px; }
+.carousel-location { position:absolute;top:24px;left:24px;display:flex;align-items:center;gap:8px;padding:10px 14px;border-radius:999px;background:#fff;color:#30392e;font-size:11px;max-width:calc(100% - 48px);overflow-wrap:anywhere;z-index:1; }
 .carousel-location tp-icon { width:16px;height:16px; }
 .carousel-eyebrow { display:block;margin-bottom:12px;font-size:11px; }
 .hero-carousel .carousel-caption { padding:70px 32px 84px; }
@@ -102,9 +115,7 @@
   height: 18px;
 }
 @media (max-width: 600px) {
-  .hero-carousel .carousel-caption { padding:52px 24px 80px; }
-  .hero-carousel .carousel-caption h2 { font-size:32px; }
-  .carousel-location { top:18px;left:18px; }
+  .photo-carousel:not(.hero-carousel) .carousel-location { top:18px;left:18px; }
   .carousel-caption {
     padding: 40px 18px 78px;
   }
@@ -151,4 +162,4 @@
   }
 }
 
-.photo-carousel:not(.hero-carousel):not(.lightbox-carousel){height:auto;aspect-ratio:16/10;display:block}.photo-carousel>tp-image-composer{display:block;width:100%}
+.photo-carousel:not(.hero-carousel):not(.lightbox-carousel){height:auto;aspect-ratio:16/10;display:block}.photo-carousel tp-image-composer{display:block;width:100%}

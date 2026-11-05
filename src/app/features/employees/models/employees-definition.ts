@@ -7,16 +7,25 @@ export const employeesDefinition:ResourceDefinition = {
   "icon": "people",
   "permission": "empleados.manage",
   "columns": [
+    {"key":"asesor_cotizacion_label","label":"Asesor de cotizaciones"},
+    {"key":"cargo_label","label":"Cargo"},
+    {"key":"rol_label","label":"Rol"},
     {
       "key": "email",
       "label": "Correo"
     },
     {
-      "key": "telefono",
-      "label": "Teléfono"
+      "key": "acceso_label",
+      "label": "Acceso"
     }
   ],
   "fields": [
+    {
+      "key": "mostrar_en_cotizaciones",
+      "label": "Mostrar como asesor en cotizaciones",
+      "type": "checkbox",
+      "hint": "Disponible en cotizaciones públicas e internas solo mientras el empleado esté activo. No cambia su acceso al sistema."
+    },
     {
       "key": "nombre",
       "label": "Nombre completo",
@@ -29,13 +38,18 @@ export const employeesDefinition:ResourceDefinition = {
       "ref": "company-roles"
     },
     {
+      "key": "email",
+      "label": "Correo",
+      "type": "email",
+    },
+    {
       "key": "telefono",
       "label": "Teléfono",
       "type": "tel"
     },
     {
       "key": "estatus_id",
-      "label": "Estado de acceso",
+      "label": "Estado del empleado",
       "type": "select",
       "ref": "employee-status",
       "only": "edit"
