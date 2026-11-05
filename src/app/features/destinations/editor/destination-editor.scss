@@ -3,3 +3,58 @@
 .quick-facts-heading { flex-wrap: wrap; gap: 16px; }
 .quick-facts-note { color: var(--muted); font-size: 13px; line-height: 1.7; margin: 0 0 20px; }
 .quick-fact-form { display: grid; gap: 20px; }
+
+:host {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  column-gap: 24px;
+  align-items: start;
+}
+
+:host > * {
+  grid-column: 1 / -1;
+}
+
+:host > tp-page-header {
+  grid-column: 1;
+  grid-row: 1;
+}
+
+.destination-editor-actions {
+  grid-column: 2;
+  grid-row: 1;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  position: sticky;
+  top: 0;
+  z-index: 30;
+  background: transparent;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-radius: 999px;
+  padding: 10px 16px;
+  margin-inline: -16px;
+  margin-top: -8px;
+}
+
+@media (max-width: 1100px) {
+  :host {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .destination-editor-actions {
+    grid-column: 1;
+    grid-row: 2;
+    justify-content: flex-start;
+    margin-bottom: 20px;
+  }
+}
+
+@media print {
+  .destination-editor-actions {
+    position: static;
+  }
+}

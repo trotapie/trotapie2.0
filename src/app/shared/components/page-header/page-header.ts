@@ -6,6 +6,7 @@ export class PageHeader {
  customTitle=input(false);
  title=input('');description=input('');eyebrow=input('Trotapie / Administración');
  backTo=input('');
+ showBack=input(true);
  private actions=contentChildren(Button,{descendants:true});
  hasBack=computed(()=>this.actions().some(action=>action.icon()==='left'));
 }
