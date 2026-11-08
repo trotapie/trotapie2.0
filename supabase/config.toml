@@ -1,0 +1,7 @@
+project_id = "trotapie2-0"
+
+[db]
+major_version = 17
+
+[db.seed]
+enabled = false

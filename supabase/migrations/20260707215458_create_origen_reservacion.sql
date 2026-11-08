@@ -1,0 +1,2 @@
+-- Supabase registró esta versión sin sentencias SQL.
+-- La siguiente versión contiene el SQL de origen_reservacion.
