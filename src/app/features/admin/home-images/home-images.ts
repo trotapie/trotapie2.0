@@ -287,7 +287,7 @@ export class HomeImages implements OnInit {
     } catch (error) {
       const message = error && typeof error === 'object' && 'message' in error ? String(error.message) : 'No pudimos guardar la imagen. Intenta nuevamente.';
       this.editorError.set(/presentacion/i.test(message) && /column|schema/i.test(message)
-        ? 'Falta habilitar los ajustes visuales en la base de datos. Ejecuta scripts/imagenes-fondo-presentacion.sql en Supabase y vuelve a guardar.'
+        ? 'Falta aplicar la migración imagenes_fondo_presentacion en Supabase. Después de aplicarla, vuelve a guardar.'
         : message);
     }
     finally { this.translating.set(false); this.saving.set(false); this.pendingImport.sync(); }

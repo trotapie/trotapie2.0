@@ -48,7 +48,11 @@ export class ImagenesCarruselComponent implements OnInit {
       const id=Number(item?.tipo_imagen_id??item?.tipo?.id)||-1;
       types.set(id,{...item?.tipo,id});
     }
-    return [...types.values()];
+    return [...types.values()].sort((a,b)=>{
+      const labelA=this.getTipoLabel(a);
+      const labelB=this.getTipoLabel(b);
+      return labelA.replace(/\s/g,'').length-labelB.replace(/\s/g,'').length;
+    });
   });
   allPhotos=computed(()=>this.visibleRecords().map(item=>({src:typeof item==='string'?item:item.url_imagen||item.imagen_url||item.url||'',title:typeof item==='string'?'':item.nombre||this.getTipoLabel(item.tipo||{id:Number(item.tipo_imagen_id)||-1}),typeId:Number(item?.tipo_imagen_id??item?.tipo?.id)||-1})).filter(photo=>!!photo.src));
   photos=computed(()=>this.allPhotos().filter(photo=>!this.selectedTipoId()||photo.typeId===this.selectedTipoId()));
