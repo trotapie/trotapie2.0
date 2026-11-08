@@ -1,6 +1,7 @@
 // Query contracts reused from Trotapie; all screens are newly implemented.
 import { inject, Injectable } from '@angular/core';
 import { SupabaseService } from './supabase.service';
+import { origenReservacionPayload } from './origen-reservacion-payload';
 
 const ES_ID = 1;
 
@@ -711,6 +712,7 @@ export class CatalogosAdminService {
         return data;
       }
       case 'origen_reservacion': {
+        const origen = origenReservacionPayload(payload);
         const { data: ultimoRegistro, error: ultimoError } = await this.client
           .from('origen_reservacion')
           .select('orden')
@@ -725,8 +727,7 @@ export class CatalogosAdminService {
         const { data, error } = await this.client
           .from('origen_reservacion')
           .insert({
-            clave: payload.clave ?? null,
-            nombre_cotizador: payload.nombre_cotizador ?? null,
+            ...origen,
             estatus: payload.estatus ?? true,
             orden: siguienteOrden
           })
@@ -1243,11 +1244,11 @@ export class CatalogosAdminService {
         return data;
       }
       case 'origen_reservacion': {
+        const origen = origenReservacionPayload(payload);
         const { data, error } = await this.client
           .from('origen_reservacion')
           .update({
-            clave: payload.clave ?? null,
-            nombre_cotizador: payload.nombre_cotizador ?? null,
+            ...origen,
             estatus: payload.estatus ?? null
           })
           .eq('id', id)
