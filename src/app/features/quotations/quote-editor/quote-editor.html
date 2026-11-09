@@ -33,7 +33,10 @@
       <tp-field [label]="text('Teléfono')" forId="quote-phone" [required]="true"><input id="quote-phone" name="phone" type="tel" [(ngModel)]="phone" required autocomplete="tel"/></tp-field>
       <tp-field [label]="text('Correo electrónico')" forId="quote-email"><input id="quote-email" name="email" type="email" [(ngModel)]="email" email autocomplete="email"/></tp-field>
       <app-date-range-filter [single]="true" [label]="text('Fecha de entrada')" inputId="quote-start" name="start" [min]="today" [(ngModel)]="start" [required]="true"/>
-      <app-date-range-filter [single]="true" [label]="text('Fecha de salida')" inputId="quote-end" name="end" [(ngModel)]="end" [min]="start || today" [required]="true"/>
+       <app-date-range-filter [single]="true" [label]="text('Fecha de salida')" inputId="quote-end" name="end" [(ngModel)]="end" [min]="start || today" [required]="true"/>
+       @if(start && end && nightCount()>0){
+         <tp-field class="quote-nights-field" [label]="text('Noches')" forId="quote-nights" aria-live="polite"><input id="quote-nights" [value]="text(nightCount()===1?'{count} noche':'{count} noches',{count:nightCount()})" readonly/></tp-field>
+       }
     </div>
     <div class="room-section"><h2>{{text('¿Quiénes viajan?')}}</h2><p>{{text('Indica la distribución y la edad de cada menor al viajar.')}}</p><tp-room-picker [rooms]="rooms()" [roomTypes]="roomTypes()" [showConfigurationHints]="!publicRequest" (roomsChange)="rooms.set($event)"/></div>
   }
