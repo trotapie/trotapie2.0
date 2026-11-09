@@ -46,4 +46,8 @@ export class LanguageService {
 
     return en || es;
   }
+
+  formatText(es:string,params:Record<string,string|number>={}):string {
+    return this.translateText(es).replace(/\{(\w+)\}/g,(match,key)=>String(params[key]??match));
+  }
 }

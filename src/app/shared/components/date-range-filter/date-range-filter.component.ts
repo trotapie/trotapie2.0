@@ -1,4 +1,6 @@
 import {PopupKeyboardDirective} from '../../directives/popup-keyboard.directive';
+import {inject,computed} from '@angular/core';
+import {LanguageService} from '../../../core/services/language.service';
 import {OverlayModule,ConnectedPosition} from '@angular/cdk/overlay';
 import {Button} from '../button/button';
 import {Icon} from '../icon/icon';
@@ -27,6 +29,8 @@ interface CalendarDay {
   }, { provide: NG_VALIDATORS, useExisting: forwardRef(() => DateRangeFilterComponent), multi: true }],
 })
 export class DateRangeFilterComponent implements ControlValueAccessor, Validator, OnChanges {
+  private language=inject(LanguageService);
+  text(es:string,params:Record<string,string|number>={}){return this.language.formatText(es,params);}
   private static nextId = 0;
 
   @Input() label = 'Rango de fechas';
@@ -41,7 +45,10 @@ export class DateRangeFilterComponent implements ControlValueAccessor, Validator
   @ViewChild('calendarPanel') private calendarPanel?: ElementRef<HTMLElement>;
 
   readonly labelId = `date-range-filter-label-${DateRangeFilterComponent.nextId++}`;
-  readonly weekdays = ['DOM', 'LUN', 'MAR', 'MIE', 'JUE', 'VIE', 'SAB'];
+  readonly weekdays=computed(()=>{
+    const formatter=new Intl.DateTimeFormat(this.language.language(),{weekday:'short'});
+    return Array.from({length:7},(_,day)=>formatter.format(new Date(2026,10,1+day)));
+  });
   visibleMonth = this.startOfMonth(new Date());
   value: DateRangeFilterValue = { ...EMPTY_DATE_RANGE };
   pendingValue: DateRangeFilterValue = { ...EMPTY_DATE_RANGE };
@@ -79,14 +86,14 @@ export class DateRangeFilterComponent implements ControlValueAccessor, Validator
 
     const range = `${this.formatDate(this.value.start)} - ${this.formatDate(this.value.end)}`;
     const nights = this.nights(this.value);
-    return this.mostrarEstadia ? `${range} (${nights} ${nights === 1 ? 'noche' : 'noches'})` : range;
+    return this.mostrarEstadia ? `${range} (${this.text(nights===1?'{count} noche':'{count} noches',{count:nights})})` : range;
   }
 
   get estadiaLabel(): string {
-    if (!this.pendingValue.start || !this.pendingValue.end) return 'Selecciona inicio y fin';
+    if (!this.pendingValue.start || !this.pendingValue.end) return this.text('Selecciona inicio y fin');
 
     const nights = this.nights(this.pendingValue);
-    return `Estadía de ${nights} ${nights === 1 ? 'noche' : 'noches'}`;
+    return this.text(nights===1?'Estadía de {count} noche':'Estadía de {count} noches',{count:nights});
   }
 
   writeValue(value: DateRangeFilterValue | string | null): void {
@@ -227,12 +234,11 @@ export class DateRangeFilterComponent implements ControlValueAccessor, Validator
   private boundKey(bound: Date | string | null): string | null { return typeof bound==='string' ? bound || null : bound ? this.keyFromDate(bound) : null; }
 
   monthLabel(month: Date): string {
-    return new Intl.DateTimeFormat('es-MX', { month: 'long', year: 'numeric' }).format(month);
+    return new Intl.DateTimeFormat(this.language.language(), { month: 'long', year: 'numeric' }).format(month);
   }
 
   formatDate(key: string): string {
-    const [year, month, day] = key.split('-');
-    return `${day}/${month}/${year}`;
+    return new Intl.DateTimeFormat(this.language.language(),{day:'2-digit',month:'2-digit',year:'numeric'}).format(this.dateFromKey(key));
   }
 
   nights(range: DateRangeFilterValue): number {

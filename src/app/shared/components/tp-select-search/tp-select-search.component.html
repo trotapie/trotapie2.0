@@ -1,9 +1,9 @@
   <div class="tp-select-search" [class.tp-select-search--booking]="bookingStyle" [class.tp-select-search--disabled]="isDisabled" [class.tp-select-search--open]="abierto" [class.tp-select-search--no-hover-highlight]="!hoverHighlight">
   @if (label) {
-    <label class="tp-select-search__label" [class.tp-select-search__label--required]="required">{{ label }}</label>
+    <label class="tp-select-search__label" [class.tp-select-search__label--required]="required">{{ text(label) }}</label>
   }
   <button #triggerButton type="button" class="tp-select-search__trigger" [disabled]="isDisabled" [attr.aria-expanded]="abierto"
-    aria-haspopup="listbox" [attr.aria-label]="label || placeholder" (click)="abierto ? cerrar() : abrir()"
+    aria-haspopup="listbox" [attr.aria-label]="text(label || placeholder)" (click)="abierto ? cerrar() : abrir()"
     cdkOverlayOrigin #trigger="cdkOverlayOrigin">
     <span class="tp-select-search__value" [class.tp-select-search__value--placeholder]="valorSeleccionado === null">{{ textoSeleccion }}</span>
     <tp-icon [name]="abierto ? 'chevron-up' : 'chevron-down'"></tp-icon>
@@ -12,16 +12,16 @@
     [cdkConnectedOverlayWidth]="'min(max(26rem, ' + triggerButton.offsetWidth + 'px), calc(100vw - 24px))'"
     [cdkConnectedOverlayHasBackdrop]="true" cdkConnectedOverlayBackdropClass="cdk-overlay-transparent-backdrop" [cdkConnectedOverlayViewportMargin]="12" [cdkConnectedOverlayPositions]="posiciones" [cdkConnectedOverlayPush]="true"
     [cdkConnectedOverlayFlexibleDimensions]="true" (overlayKeydown)="$event.key==='Escape' && cerrar()" (backdropClick)="cerrar()" (detach)="cerrar()">
-    <section #optionsPanel tpMotion="menu" tpPopupKeyboard (dismissed)="cerrar()" class="tp-select-search__panel" role="listbox" [attr.aria-label]="label || placeholder">
+    <section #optionsPanel tpMotion="menu" tpPopupKeyboard (dismissed)="cerrar()" class="tp-select-search__panel" role="listbox" [attr.aria-label]="text(label || placeholder)">
       @if(showSearch){
       <div class="tp-select-search__search">
         <tp-icon [name]="'search'"></tp-icon>
-        <input #searchInput type="search" [placeholder]="searchPlaceholder" [value]="busqueda"
-          (input)="buscar($any($event.target).value)" aria-label="Filtrar opciones" />
+        <input #searchInput type="search" [placeholder]="text(searchPlaceholder)" [value]="busqueda"
+          (input)="buscar($any($event.target).value)" [attr.aria-label]="text('Filtrar opciones')" />
       </div>
       }
       <div class="tp-select-search__options" [attr.aria-busy]="loading">
-        @if(loading){<p class="tp-select-search__empty" role="status">Buscando opciones…</p>}
+        @if(loading){<p class="tp-select-search__empty" role="status">{{text('Buscando opciones…')}}</p>}
         @if (opcionesFiltradas.length) {
           @for (option of opcionesFiltradas; track trackByValue($index, option)) {
             @if (option.group && ($first || option.group !== opcionesFiltradas[$index - 1]?.group)) {
@@ -33,10 +33,10 @@
               @if (sameValue(option.value, valorSeleccionado)) { <tp-icon [name]="'check'"></tp-icon> }
             </button>
           }
-        } @else if(!loading) { <p class="tp-select-search__empty" role="status">{{ emptyMessage }}</p> }
+        } @else if(!loading) { <p class="tp-select-search__empty" role="status">{{ text(emptyMessage) }}</p> }
       </div>
       @if (showClear && valorSeleccionado !== null) {
-        <button type="button" class="tp-select-search__clear" (click)="limpiar()">Limpiar selección</button>
+        <button type="button" class="tp-select-search__clear" (click)="limpiar()">{{text('Limpiar selección')}}</button>
       }
     </section>
   </ng-template>

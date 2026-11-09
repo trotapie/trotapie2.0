@@ -1052,8 +1052,8 @@ export const UI_TRANSLATIONS: Record<string, Record<string, string>> = {
   },
   "Ver más hoteles": {
     "en": "See more hotels",
-    "fr": "Voir plus d'hôtels",
-    "de": "Mehr Hotels anzeigen",
+    "fr": "Voir plus d’hôtels",
+    "de": "Weitere Hotels anzeigen",
     "pt": "Ver mais hotéis"
   },
   "Descubrir destino": {
@@ -1445,5 +1445,857 @@ export const UI_TRANSLATIONS: Record<string, Record<string, string>> = {
     "fr": "Le document est temporairement indisponible. Veuillez réessayer plus tard.",
     "de": "Das Dokument ist vorübergehend nicht verfügbar. Bitte versuchen Sie es später noch einmal.",
     "pt": "O documento não está disponível no momento. Tente novamente mais tarde."
+  },
+  "Un momento, estamos preparando todo.": {
+    "en": "One moment, we are getting everything ready.",
+    "fr": "Un instant, nous préparons tout.",
+    "de": "Einen Moment, wir bereiten alles vor.",
+    "pt": "Um momento, estamos preparando tudo."
+  },
+  "Rango de fechas": {
+    "en": "Date range",
+    "fr": "Période",
+    "de": "Zeitraum",
+    "pt": "Período"
+  },
+  "No pudimos cargar habitaciones y camas. Verifica que se haya aplicado el script tipos-habitacion-camas.sql.": {
+    "en": "We could not load room and bed options. Please try again later.",
+    "fr": "Impossible de charger les options de chambres et de lits. Veuillez réessayer plus tard.",
+    "de": "Zimmer- und Bettenoptionen konnten nicht geladen werden. Bitte versuchen Sie es später erneut.",
+    "pt": "Não foi possível carregar as opções de quartos e camas. Tente novamente mais tarde."
+  },
+  "Trotapie / Cotizaciones": {
+    "en": "Trotapie / Quotes",
+    "fr": "Trotapie / Devis",
+    "de": "Trotapie / Reiseangebote",
+    "pt": "Trotapie / Cotações"
+  },
+  "Tu viaje empieza aquí": {
+    "en": "Your journey starts here",
+    "fr": "Votre voyage commence ici",
+    "de": "Ihre Reise beginnt hier",
+    "pt": "Sua viagem começa aqui"
+  },
+  "Nueva comparativa": {
+    "en": "New comparison",
+    "fr": "Nouvelle comparaison",
+    "de": "Neuer Vergleich",
+    "pt": "Nova comparação"
+  },
+  "Nueva cotización": {
+    "en": "New quote",
+    "fr": "Nouveau devis",
+    "de": "Neues Reiseangebot",
+    "pt": "Nova cotação"
+  },
+  "Cuéntanos cómo quieres viajar. Te ayudaremos a encontrar tu estancia.": {
+    "en": "Tell us how you want to travel. We will help you find your stay.",
+    "fr": "Dites-nous comment vous souhaitez voyager. Nous vous aiderons à trouver votre hébergement.",
+    "de": "Erzählen Sie uns von Ihren Reisewünschen. Wir helfen Ihnen, die passende Unterkunft zu finden.",
+    "pt": "Conte-nos como deseja viajar. Ajudaremos você a encontrar sua hospedagem."
+  },
+  "Una propuesta clara, desde el primer detalle.": {
+    "en": "A clear proposal, from the very first detail.",
+    "fr": "Une proposition claire, dès le premier détail.",
+    "de": "Ein klares Angebot, vom ersten Detail an.",
+    "pt": "Uma proposta clara, desde o primeiro detalhe."
+  },
+  "Cliente y viaje": {
+    "en": "Guest and trip",
+    "fr": "Voyageur et séjour",
+    "de": "Reisende und Reise",
+    "pt": "Cliente e viagem"
+  },
+  "Destino y hoteles": {
+    "en": "Destination and hotels",
+    "fr": "Destination et hôtels",
+    "de": "Reiseziel und Hotels",
+    "pt": "Destino e hotéis"
+  },
+  "Revisar propuesta": {
+    "en": "Review proposal",
+    "fr": "Vérifier la proposition",
+    "de": "Angebot prüfen",
+    "pt": "Revisar proposta"
+  },
+  "Pasos de la cotización": {
+    "en": "Quote steps",
+    "fr": "Étapes du devis",
+    "de": "Schritte zum Reiseangebot",
+    "pt": "Etapas da cotação"
+  },
+  "Las personas detrás del viaje": {
+    "en": "The people behind the journey",
+    "fr": "Les voyageurs au cœur du séjour",
+    "de": "Die Menschen hinter der Reise",
+    "pt": "As pessoas por trás da viagem"
+  },
+  "Los datos del cliente y su estancia.": {
+    "en": "Guest and stay details.",
+    "fr": "Les coordonnées du voyageur et les détails du séjour.",
+    "de": "Angaben zum Gast und zum Aufenthalt.",
+    "pt": "Os dados do cliente e da estadia."
+  },
+  "Asesor": {
+    "en": "Travel advisor",
+    "fr": "Conseiller",
+    "de": "Reiseberater",
+    "pt": "Consultor"
+  },
+  "Selecciona un asesor": {
+    "en": "Choose an advisor",
+    "fr": "Choisissez un conseiller",
+    "de": "Wählen Sie einen Reiseberater",
+    "pt": "Selecione um consultor"
+  },
+  "Buscar asesor": {
+    "en": "Search advisors",
+    "fr": "Rechercher un conseiller",
+    "de": "Reiseberater suchen",
+    "pt": "Buscar consultor"
+  },
+  "Prefijo": {
+    "en": "Title",
+    "fr": "Civilité",
+    "de": "Anrede",
+    "pt": "Tratamento"
+  },
+  "Sin prefijo": {
+    "en": "No title",
+    "fr": "Sans civilité",
+    "de": "Keine Anrede",
+    "pt": "Sem tratamento"
+  },
+  "Nombre completo": {
+    "en": "Full name",
+    "fr": "Nom complet",
+    "de": "Vollständiger Name",
+    "pt": "Nome completo"
+  },
+  "Teléfono": {
+    "en": "Phone",
+    "fr": "Téléphone",
+    "de": "Telefon",
+    "pt": "Telefone"
+  },
+  "Correo electrónico": {
+    "en": "Email",
+    "fr": "Adresse e-mail",
+    "de": "E-Mail-Adresse",
+    "pt": "E-mail"
+  },
+  "Fecha de entrada": {
+    "en": "Check-in date",
+    "fr": "Date d’arrivée",
+    "de": "Anreisedatum",
+    "pt": "Data de entrada"
+  },
+  "Fecha de salida": {
+    "en": "Check-out date",
+    "fr": "Date de départ",
+    "de": "Abreisedatum",
+    "pt": "Data de saída"
+  },
+  "¿Quiénes viajan?": {
+    "en": "Who is travelling?",
+    "fr": "Qui voyage ?",
+    "de": "Wer reist mit?",
+    "pt": "Quem vai viajar?"
+  },
+  "Indica la distribución y la edad de cada menor al viajar.": {
+    "en": "Specify the room allocation and each child’s age at the time of travel.",
+    "fr": "Indiquez la répartition des voyageurs et l’âge de chaque enfant au moment du voyage.",
+    "de": "Geben Sie die Zimmeraufteilung und das Alter jedes Kindes zum Reisezeitpunkt an.",
+    "pt": "Informe a distribuição e a idade de cada criança na data da viagem."
+  },
+  "Habitación {number}": {
+    "en": "Room {number}",
+    "fr": "Chambre {number}",
+    "de": "Zimmer {number}",
+    "pt": "Quarto {number}"
+  },
+  "Quitar habitación {number}": {
+    "en": "Remove room {number}",
+    "fr": "Supprimer la chambre {number}",
+    "de": "Zimmer {number} entfernen",
+    "pt": "Remover quarto {number}"
+  },
+  "Adultos": {
+    "en": "Adults",
+    "fr": "Adultes",
+    "de": "Erwachsene",
+    "pt": "Adultos"
+  },
+  "Menores": {
+    "en": "Children",
+    "fr": "Enfants",
+    "de": "Kinder",
+    "pt": "Crianças"
+  },
+  "{count} adulto": {
+    "en": "{count} adult",
+    "fr": "{count} adulte",
+    "de": "{count} Erwachsener",
+    "pt": "{count} adulto"
+  },
+  "{count} adultos": {
+    "en": "{count} adults",
+    "fr": "{count} adultes",
+    "de": "{count} Erwachsene",
+    "pt": "{count} adultos"
+  },
+  "{count} menor": {
+    "en": "{count} child",
+    "fr": "{count} enfant",
+    "de": "{count} Kind",
+    "pt": "{count} criança"
+  },
+  "{count} menores": {
+    "en": "{count} children",
+    "fr": "{count} enfants",
+    "de": "{count} Kinder",
+    "pt": "{count} crianças"
+  },
+  "{count} año": {
+    "en": "{count} year",
+    "fr": "{count} an",
+    "de": "{count} Jahr",
+    "pt": "{count} ano"
+  },
+  "{count} años": {
+    "en": "{count} years",
+    "fr": "{count} ans",
+    "de": "{count} Jahre",
+    "pt": "{count} anos"
+  },
+  "Edad del menor {number}": {
+    "en": "Age of child {number}",
+    "fr": "Âge de l’enfant {number}",
+    "de": "Alter von Kind {number}",
+    "pt": "Idade da criança {number}"
+  },
+  "Tipo de habitación": {
+    "en": "Room type",
+    "fr": "Type de chambre",
+    "de": "Zimmertyp",
+    "pt": "Tipo de quarto"
+  },
+  "Seleccionar habitación": {
+    "en": "Choose a room",
+    "fr": "Choisir une chambre",
+    "de": "Zimmer auswählen",
+    "pt": "Selecionar quarto"
+  },
+  "Camas (opcional)": {
+    "en": "Beds (optional)",
+    "fr": "Lits (facultatif)",
+    "de": "Betten (optional)",
+    "pt": "Camas (opcional)"
+  },
+  "Seleccionar camas": {
+    "en": "Choose beds",
+    "fr": "Choisir les lits",
+    "de": "Betten auswählen",
+    "pt": "Selecionar camas"
+  },
+  "Selecciona una habitación primero": {
+    "en": "Choose a room first",
+    "fr": "Choisissez d’abord une chambre",
+    "de": "Wählen Sie zuerst ein Zimmer",
+    "pt": "Selecione um quarto primeiro"
+  },
+  "Sin opciones disponibles": {
+    "en": "No options available",
+    "fr": "Aucune option disponible",
+    "de": "Keine Optionen verfügbar",
+    "pt": "Nenhuma opção disponível"
+  },
+  "Agregar habitación": {
+    "en": "Add room",
+    "fr": "Ajouter une chambre",
+    "de": "Zimmer hinzufügen",
+    "pt": "Adicionar quarto"
+  },
+  "No hay habitaciones con capacidad suficiente.": {
+    "en": "No rooms have sufficient capacity.",
+    "fr": "Aucune chambre n’a une capacité suffisante.",
+    "de": "Keine Zimmer mit ausreichender Kapazität verfügbar.",
+    "pt": "Não há quartos com capacidade suficiente."
+  },
+  "No hay tipos de habitación con capacidad para {count} personas.": {
+    "en": "No room types can accommodate {count} guests.",
+    "fr": "Aucun type de chambre ne peut accueillir {count} personnes.",
+    "de": "Kein Zimmertyp bietet Platz für {count} Personen.",
+    "pt": "Nenhum tipo de quarto pode acomodar {count} pessoas."
+  },
+  "Este tipo de habitación no tiene camas asociadas. Configúralas en el catálogo de tipos de habitación.": {
+    "en": "This room type has no associated beds. Configure them in the room type catalog.",
+    "fr": "Aucun lit n’est associé à ce type de chambre. Configurez-les dans le catalogue des types de chambre.",
+    "de": "Diesem Zimmertyp sind keine Betten zugeordnet. Konfigurieren Sie diese im Zimmertypenkatalog.",
+    "pt": "Este tipo de quarto não tem camas associadas. Configure-as no catálogo de tipos de quarto."
+  },
+  "Tu propuesta": {
+    "en": "Your proposal",
+    "fr": "Votre proposition",
+    "de": "Ihr Angebot",
+    "pt": "Sua proposta"
+  },
+  "Un viaje a su medida.": {
+    "en": "A trip tailored to you.",
+    "fr": "Un voyage sur mesure.",
+    "de": "Eine Reise nach Ihren Wünschen.",
+    "pt": "Uma viagem sob medida."
+  },
+  "Más opciones. Mejores decisiones.": {
+    "en": "More options. Better decisions.",
+    "fr": "Plus d’options. De meilleurs choix.",
+    "de": "Mehr Optionen. Bessere Entscheidungen.",
+    "pt": "Mais opções. Melhores decisões."
+  },
+  "{count} noche": {
+    "en": "{count} night",
+    "fr": "{count} nuit",
+    "de": "{count} Nacht",
+    "pt": "{count} noite"
+  },
+  "{count} noches": {
+    "en": "{count} nights",
+    "fr": "{count} nuits",
+    "de": "{count} Nächte",
+    "pt": "{count} noites"
+  },
+  "{count} persona": {
+    "en": "{count} guest",
+    "fr": "{count} personne",
+    "de": "{count} Person",
+    "pt": "{count} pessoa"
+  },
+  "{count} personas": {
+    "en": "{count} guests",
+    "fr": "{count} personnes",
+    "de": "{count} Personen",
+    "pt": "{count} pessoas"
+  },
+  "{count} hotel seleccionado": {
+    "en": "{count} selected hotel",
+    "fr": "{count} hôtel sélectionné",
+    "de": "{count} ausgewähltes Hotel",
+    "pt": "{count} hotel selecionado"
+  },
+  "{count} hoteles seleccionados": {
+    "en": "{count} selected hotels",
+    "fr": "{count} hôtels sélectionnés",
+    "de": "{count} ausgewählte Hotels",
+    "pt": "{count} hotéis selecionados"
+  },
+  "{count} habitación": {
+    "en": "{count} room",
+    "fr": "{count} chambre",
+    "de": "{count} Zimmer",
+    "pt": "{count} quarto"
+  },
+  "{count} habitaciones": {
+    "en": "{count} rooms",
+    "fr": "{count} chambres",
+    "de": "{count} Zimmer",
+    "pt": "{count} quartos"
+  },
+  "Hotel seleccionado": {
+    "en": "Selected hotel",
+    "fr": "Hôtel sélectionné",
+    "de": "Ausgewähltes Hotel",
+    "pt": "Hotel selecionado"
+  },
+  "Las cotizaciones son propuestas. Los precios se confirman con tu asesor.": {
+    "en": "Quotes are proposals. Prices are confirmed with your advisor.",
+    "fr": "Les devis sont des propositions. Les prix sont à confirmer avec votre conseiller.",
+    "de": "Reiseangebote sind Vorschläge. Die Preise werden mit Ihrem Reiseberater bestätigt.",
+    "pt": "As cotações são propostas. Os preços são confirmados com seu consultor."
+  },
+  "Opciones para comparar": {
+    "en": "Options to compare",
+    "fr": "Options à comparer",
+    "de": "Optionen zum Vergleichen",
+    "pt": "Opções para comparar"
+  },
+  "Encuentra la estancia ideal": {
+    "en": "Find your ideal stay",
+    "fr": "Trouvez le séjour idéal",
+    "de": "Finden Sie den idealen Aufenthalt",
+    "pt": "Encontre a estadia ideal"
+  },
+  "Selecciona dos o más hoteles para ofrecer alternativas.": {
+    "en": "Select two or more hotels to offer alternatives.",
+    "fr": "Sélectionnez au moins deux hôtels pour proposer des alternatives.",
+    "de": "Wählen Sie mindestens zwei Hotels als Alternativen aus.",
+    "pt": "Selecione dois ou mais hotéis para oferecer alternativas."
+  },
+  "Elige un destino, hotel y régimen.": {
+    "en": "Choose a destination, hotel and meal plan.",
+    "fr": "Choisissez une destination, un hôtel et une formule.",
+    "de": "Wählen Sie ein Reiseziel, ein Hotel und eine Verpflegungsart.",
+    "pt": "Escolha um destino, hotel e regime."
+  },
+  "Destino": {
+    "en": "Destination",
+    "fr": "Destination",
+    "de": "Reiseziel",
+    "pt": "Destino"
+  },
+  "Seleccionar destino": {
+    "en": "Choose a destination",
+    "fr": "Choisir une destination",
+    "de": "Reiseziel auswählen",
+    "pt": "Selecionar destino"
+  },
+  "Buscar destino": {
+    "en": "Search destinations",
+    "fr": "Rechercher une destination",
+    "de": "Reiseziel suchen",
+    "pt": "Buscar destino"
+  },
+  "No encontramos destinos con ese nombre.": {
+    "en": "No destinations found with that name.",
+    "fr": "Aucune destination trouvée avec ce nom.",
+    "de": "Keine Reiseziele mit diesem Namen gefunden.",
+    "pt": "Nenhum destino encontrado com esse nome."
+  },
+  "Régimen de alojamiento": {
+    "en": "Meal plan",
+    "fr": "Formule de séjour",
+    "de": "Verpflegungsart",
+    "pt": "Regime de hospedagem"
+  },
+  "Cargando regímenes…": {
+    "en": "Loading meal plans…",
+    "fr": "Chargement des formules…",
+    "de": "Verpflegungsarten werden geladen…",
+    "pt": "Carregando regimes…"
+  },
+  "No disponible": {
+    "en": "Unavailable",
+    "fr": "Indisponible",
+    "de": "Nicht verfügbar",
+    "pt": "Indisponível"
+  },
+  "Seleccionar régimen": {
+    "en": "Choose a meal plan",
+    "fr": "Choisir une formule",
+    "de": "Verpflegung auswählen",
+    "pt": "Selecionar regime"
+  },
+  "Sin regímenes configurados": {
+    "en": "No meal plans configured",
+    "fr": "Aucune formule configurée",
+    "de": "Keine Verpflegung konfiguriert",
+    "pt": "Nenhum regime configurado"
+  },
+  "Este hotel no tiene regímenes configurados. Tu asesor confirmará las opciones.": {
+    "en": "This hotel has no meal plans configured. Your advisor will confirm the options.",
+    "fr": "Aucune formule n’est configurée pour cet hôtel. Votre conseiller confirmera les options.",
+    "de": "Für dieses Hotel sind keine Verpflegungsarten konfiguriert. Ihr Reiseberater bestätigt die Optionen.",
+    "pt": "Este hotel não tem regimes configurados. Seu consultor confirmará as opções."
+  },
+  "Precio de la opción (MXN)": {
+    "en": "Option price (MXN)",
+    "fr": "Prix de l’option (MXN)",
+    "de": "Preis der Option (MXN)",
+    "pt": "Preço da opção (MXN)"
+  },
+  "Elige un destino para ver sus hoteles": {
+    "en": "Choose a destination to see its hotels",
+    "fr": "Choisissez une destination pour voir ses hôtels",
+    "de": "Wählen Sie ein Reiseziel, um Hotels zu sehen",
+    "pt": "Escolha um destino para ver seus hotéis"
+  },
+  "Tu selección se conserva mientras preparas la propuesta.": {
+    "en": "Your selection is kept while you prepare the proposal.",
+    "fr": "Votre sélection est conservée pendant la préparation de la proposition.",
+    "de": "Ihre Auswahl bleibt während der Angebotserstellung erhalten.",
+    "pt": "Sua seleção é mantida enquanto prepara a proposta."
+  },
+  "Todo listo para el siguiente paso": {
+    "en": "Ready for the next step",
+    "fr": "Tout est prêt pour la prochaine étape",
+    "de": "Bereit für den nächsten Schritt",
+    "pt": "Tudo pronto para a próxima etapa"
+  },
+  "Revisa la información antes de registrar la solicitud.": {
+    "en": "Review the information before submitting your request.",
+    "fr": "Vérifiez les informations avant d’envoyer votre demande.",
+    "de": "Prüfen Sie die Angaben, bevor Sie Ihre Anfrage absenden.",
+    "pt": "Revise as informações antes de enviar a solicitação."
+  },
+  "Cliente": {
+    "en": "Guest",
+    "fr": "Voyageur",
+    "de": "Gast",
+    "pt": "Cliente"
+  },
+  "Contacto": {
+    "en": "Contact",
+    "fr": "Coordonnées",
+    "de": "Kontakt",
+    "pt": "Contato"
+  },
+  "Estancia": {
+    "en": "Stay",
+    "fr": "Séjour",
+    "de": "Aufenthalt",
+    "pt": "Estadia"
+  },
+  "Distribución": {
+    "en": "Room allocation",
+    "fr": "Répartition",
+    "de": "Zimmeraufteilung",
+    "pt": "Distribuição"
+  },
+  "Precio por confirmar": {
+    "en": "Price to be confirmed",
+    "fr": "Prix à confirmer",
+    "de": "Preis wird bestätigt",
+    "pt": "Preço a confirmar"
+  },
+  "Peticiones especiales": {
+    "en": "Special requests",
+    "fr": "Demandes particulières",
+    "de": "Besondere Wünsche",
+    "pt": "Pedidos especiais"
+  },
+  "Comparte necesidades de accesibilidad o detalles que debamos considerar.": {
+    "en": "Tell us about accessibility needs or any details we should consider.",
+    "fr": "Indiquez vos besoins d’accessibilité ou tout détail à prendre en compte.",
+    "de": "Teilen Sie uns Anforderungen zur Barrierefreiheit oder andere wichtige Details mit.",
+    "pt": "Informe necessidades de acessibilidade ou detalhes que devemos considerar."
+  },
+  "Continuar": {
+    "en": "Continue",
+    "fr": "Continuer",
+    "de": "Weiter",
+    "pt": "Continuar"
+  },
+  "Registrando…": {
+    "en": "Submitting…",
+    "fr": "Envoi en cours…",
+    "de": "Wird gesendet…",
+    "pt": "Enviando…"
+  },
+  "Continuar en WhatsApp": {
+    "en": "Continue on WhatsApp",
+    "fr": "Continuer sur WhatsApp",
+    "de": "Auf WhatsApp fortfahren",
+    "pt": "Continuar no WhatsApp"
+  },
+  "Crear propuesta": {
+    "en": "Create proposal",
+    "fr": "Créer la proposition",
+    "de": "Angebot erstellen",
+    "pt": "Criar proposta"
+  },
+  "Vista previa del flujo. Inicia sesión para registrar una propuesta.": {
+    "en": "Workflow preview. Sign in to submit a proposal.",
+    "fr": "Aperçu du parcours. Connectez-vous pour enregistrer une proposition.",
+    "de": "Vorschau des Ablaufs. Melden Sie sich an, um ein Angebot zu erstellen.",
+    "pt": "Prévia do fluxo. Entre para registrar uma proposta."
+  },
+  "Guardando tu solicitud": {
+    "en": "Saving your request",
+    "fr": "Enregistrement de votre demande",
+    "de": "Ihre Anfrage wird gespeichert",
+    "pt": "Salvando sua solicitação"
+  },
+  "Abrimos WhatsApp en otra pestaña. Mantén esta página abierta hasta que termine el guardado.": {
+    "en": "We opened WhatsApp in another tab. Keep this page open until saving is complete.",
+    "fr": "WhatsApp s’est ouvert dans un autre onglet. Gardez cette page ouverte jusqu’à la fin de l’enregistrement.",
+    "de": "WhatsApp wurde in einem anderen Tab geöffnet. Lassen Sie diese Seite bis zum Abschluss des Speicherns geöffnet.",
+    "pt": "Abrimos o WhatsApp em outra aba. Mantenha esta página aberta até concluir o salvamento."
+  },
+  "No pudimos guardar tu solicitud:": {
+    "en": "We could not save your request:",
+    "fr": "Nous n’avons pas pu enregistrer votre demande :",
+    "de": "Ihre Anfrage konnte nicht gespeichert werden:",
+    "pt": "Não foi possível salvar sua solicitação:"
+  },
+  "Si ya enviaste el mensaje en WhatsApp, no necesitas enviarlo de nuevo.": {
+    "en": "If you already sent the WhatsApp message, you do not need to send it again.",
+    "fr": "Si vous avez déjà envoyé le message sur WhatsApp, inutile de le renvoyer.",
+    "de": "Falls Sie die WhatsApp-Nachricht bereits gesendet haben, müssen Sie sie nicht erneut senden.",
+    "pt": "Se já enviou a mensagem no WhatsApp, não precisa enviá-la novamente."
+  },
+  "Reintentar guardado": {
+    "en": "Retry saving",
+    "fr": "Réessayer l’enregistrement",
+    "de": "Erneut speichern",
+    "pt": "Tentar salvar novamente"
+  },
+  "Solicitud guardada": {
+    "en": "Request saved",
+    "fr": "Demande enregistrée",
+    "de": "Anfrage gespeichert",
+    "pt": "Solicitação salva"
+  },
+  "Tu solicitud quedó guardada. Envía el mensaje en WhatsApp para continuar con tu asesor.": {
+    "en": "Your request has been saved. Send the WhatsApp message to continue with your advisor.",
+    "fr": "Votre demande a été enregistrée. Envoyez le message sur WhatsApp pour continuer avec votre conseiller.",
+    "de": "Ihre Anfrage wurde gespeichert. Senden Sie die WhatsApp-Nachricht, um mit Ihrem Reiseberater fortzufahren.",
+    "pt": "Sua solicitação foi salva. Envie a mensagem no WhatsApp para continuar com seu consultor."
+  },
+  "Abrir WhatsApp": {
+    "en": "Open WhatsApp",
+    "fr": "Ouvrir WhatsApp",
+    "de": "WhatsApp öffnen",
+    "pt": "Abrir WhatsApp"
+  },
+  "Explorar más destinos": {
+    "en": "Explore more destinations",
+    "fr": "Explorer d’autres destinations",
+    "de": "Weitere Reiseziele entdecken",
+    "pt": "Explorar mais destinos"
+  },
+  "Selecciona un asesor para tu solicitud.": {
+    "en": "Select an advisor for your request.",
+    "fr": "Sélectionnez un conseiller pour votre demande.",
+    "de": "Wählen Sie einen Reiseberater für Ihre Anfrage.",
+    "pt": "Selecione um consultor para sua solicitação."
+  },
+  "Completa el nombre, teléfono, fechas y las edades de los menores.": {
+    "en": "Enter the name, phone number, dates and children’s ages.",
+    "fr": "Renseignez le nom, le téléphone, les dates et l’âge des enfants.",
+    "de": "Geben Sie Name, Telefonnummer, Reisedaten und das Alter der Kinder an.",
+    "pt": "Preencha nome, telefone, datas e idades das crianças."
+  },
+  "Selecciona un tipo de habitación válido y revisa las camas elegidas, si las indicaste.": {
+    "en": "Select a valid room type and check any beds you selected.",
+    "fr": "Sélectionnez un type de chambre valide et vérifiez les lits choisis, le cas échéant.",
+    "de": "Wählen Sie einen gültigen Zimmertyp und prüfen Sie gegebenenfalls die ausgewählten Betten.",
+    "pt": "Selecione um tipo de quarto válido e confira as camas escolhidas, se houver."
+  },
+  "Revisa el régimen de alojamiento de cada hotel.": {
+    "en": "Check the meal plan for each hotel.",
+    "fr": "Vérifiez la formule de séjour de chaque hôtel.",
+    "de": "Prüfen Sie die Verpflegungsart jedes Hotels.",
+    "pt": "Confira o regime de hospedagem de cada hotel."
+  },
+  "Selecciona al menos un hotel.": {
+    "en": "Select at least one hotel.",
+    "fr": "Sélectionnez au moins un hôtel.",
+    "de": "Wählen Sie mindestens ein Hotel.",
+    "pt": "Selecione pelo menos um hotel."
+  },
+  "No hay asesores disponibles para esta solicitud.": {
+    "en": "No advisors are available for this request.",
+    "fr": "Aucun conseiller n’est disponible pour cette demande.",
+    "de": "Für diese Anfrage sind keine Reiseberater verfügbar.",
+    "pt": "Não há consultores disponíveis para esta solicitação."
+  },
+  "No encontramos el hotel.": {
+    "en": "We could not find the hotel.",
+    "fr": "Nous n’avons pas trouvé l’hôtel.",
+    "de": "Das Hotel wurde nicht gefunden.",
+    "pt": "Não encontramos o hotel."
+  },
+  "No pudimos cargar las opciones.": {
+    "en": "We could not load the options.",
+    "fr": "Impossible de charger les options.",
+    "de": "Die Optionen konnten nicht geladen werden.",
+    "pt": "Não foi possível carregar as opções."
+  },
+  "No pudimos cargar los hoteles de ese destino.": {
+    "en": "We could not load hotels for that destination.",
+    "fr": "Impossible de charger les hôtels de cette destination.",
+    "de": "Die Hotels für dieses Reiseziel konnten nicht geladen werden.",
+    "pt": "Não foi possível carregar os hotéis desse destino."
+  },
+  "No pudimos cargar los regímenes de este hotel.": {
+    "en": "We could not load this hotel’s meal plans.",
+    "fr": "Impossible de charger les formules de cet hôtel.",
+    "de": "Die Verpflegungsarten dieses Hotels konnten nicht geladen werden.",
+    "pt": "Não foi possível carregar os regimes deste hotel."
+  },
+  "No pudimos guardar la solicitud.": {
+    "en": "We could not save the request.",
+    "fr": "Impossible d’enregistrer la demande.",
+    "de": "Die Anfrage konnte nicht gespeichert werden.",
+    "pt": "Não foi possível salvar a solicitação."
+  },
+  "Revisa los datos del cliente, las fechas, las habitaciones y el hotel.": {
+    "en": "Check guest details, dates, rooms and hotel.",
+    "fr": "Vérifiez les coordonnées du voyageur, les dates, les chambres et l’hôtel.",
+    "de": "Prüfen Sie Gastdaten, Reisedaten, Zimmer und Hotel.",
+    "pt": "Confira os dados do cliente, as datas, os quartos e o hotel."
+  },
+  "Selecciona un tipo de habitación con capacidad suficiente y revisa las camas elegidas, si las indicaste.": {
+    "en": "Choose a room type with sufficient capacity and check any selected beds.",
+    "fr": "Choisissez un type de chambre d’une capacité suffisante et vérifiez les lits éventuellement sélectionnés.",
+    "de": "Wählen Sie einen Zimmertyp mit ausreichender Kapazität und prüfen Sie die gegebenenfalls ausgewählten Betten.",
+    "pt": "Escolha um tipo de quarto com capacidade suficiente e confira as camas selecionadas, se houver."
+  },
+  "El asesor seleccionado ya no está disponible. Selecciona un asesor activo y habilitado para cotizaciones.": {
+    "en": "The selected advisor is no longer available. Choose an active advisor who handles quotes.",
+    "fr": "Le conseiller sélectionné n’est plus disponible. Choisissez un conseiller actif habilité à traiter les devis.",
+    "de": "Der gewählte Reiseberater ist nicht mehr verfügbar. Wählen Sie einen aktiven, für Angebote freigeschalteten Reiseberater.",
+    "pt": "O consultor selecionado não está mais disponível. Escolha um consultor ativo e habilitado para cotações."
+  },
+  "La solicitud se registró, pero no pudimos recuperar su enlace. Consulta el listado antes de volver a crearla.": {
+    "en": "The request was saved, but its link could not be retrieved. Check the list before submitting again.",
+    "fr": "La demande a été enregistrée, mais son lien n’a pas pu être récupéré. Consultez la liste avant de la recréer.",
+    "de": "Die Anfrage wurde gespeichert, aber der Link konnte nicht abgerufen werden. Prüfen Sie die Liste vor dem erneuten Absenden.",
+    "pt": "A solicitação foi registrada, mas não foi possível recuperar o link. Consulte a lista antes de criá-la novamente."
+  },
+  "Preparando tu siguiente paso…": {
+    "en": "Preparing your next step…",
+    "fr": "Préparation de la prochaine étape…",
+    "de": "Ihr nächster Schritt wird vorbereitet…",
+    "pt": "Preparando sua próxima etapa…"
+  },
+  "Seleccionar": {
+    "en": "Select",
+    "fr": "Sélectionner",
+    "de": "Auswählen",
+    "pt": "Selecionar"
+  },
+  "Buscar opciones": {
+    "en": "Search options",
+    "fr": "Rechercher des options",
+    "de": "Optionen suchen",
+    "pt": "Buscar opções"
+  },
+  "Filtrar opciones": {
+    "en": "Filter options",
+    "fr": "Filtrer les options",
+    "de": "Optionen filtern",
+    "pt": "Filtrar opções"
+  },
+  "No hay opciones que coincidan.": {
+    "en": "No matching options.",
+    "fr": "Aucune option correspondante.",
+    "de": "Keine passenden Optionen.",
+    "pt": "Nenhuma opção correspondente."
+  },
+  "Buscando opciones…": {
+    "en": "Searching options…",
+    "fr": "Recherche d’options…",
+    "de": "Optionen werden gesucht…",
+    "pt": "Buscando opções…"
+  },
+  "Limpiar selección": {
+    "en": "Clear selection",
+    "fr": "Effacer la sélection",
+    "de": "Auswahl löschen",
+    "pt": "Limpar seleção"
+  },
+  "Seleccionar fecha": {
+    "en": "Select date",
+    "fr": "Sélectionner une date",
+    "de": "Datum auswählen",
+    "pt": "Selecionar data"
+  },
+  "Seleccionar rango de fechas": {
+    "en": "Select date range",
+    "fr": "Sélectionner une période",
+    "de": "Zeitraum auswählen",
+    "pt": "Selecionar período"
+  },
+  "Fecha de inicio": {
+    "en": "Start date",
+    "fr": "Date de début",
+    "de": "Startdatum",
+    "pt": "Data de início"
+  },
+  "Fecha de fin": {
+    "en": "End date",
+    "fr": "Date de fin",
+    "de": "Enddatum",
+    "pt": "Data de término"
+  },
+  "Inicio del período": {
+    "en": "Start",
+    "fr": "Début",
+    "de": "Beginn",
+    "pt": "Início"
+  },
+  "Fin": {
+    "en": "End",
+    "fr": "Fin",
+    "de": "Ende",
+    "pt": "Fim"
+  },
+  "dd/mm/aaaa": {
+    "en": "mm/dd/yyyy",
+    "fr": "jj/mm/aaaa",
+    "de": "TT.MM.JJJJ",
+    "pt": "dd/mm/aaaa"
+  },
+  "Mes anterior": {
+    "en": "Previous month",
+    "fr": "Mois précédent",
+    "de": "Vorheriger Monat",
+    "pt": "Mês anterior"
+  },
+  "Mes siguiente": {
+    "en": "Next month",
+    "fr": "Mois suivant",
+    "de": "Nächster Monat",
+    "pt": "Próximo mês"
+  },
+  "Selecciona una fecha": {
+    "en": "Choose a date",
+    "fr": "Choisissez une date",
+    "de": "Wählen Sie ein Datum",
+    "pt": "Escolha uma data"
+  },
+  "Selecciona fecha de inicio": {
+    "en": "Choose a start date",
+    "fr": "Choisissez une date de début",
+    "de": "Wählen Sie ein Startdatum",
+    "pt": "Escolha a data de início"
+  },
+  "Selecciona fecha de fin": {
+    "en": "Choose an end date",
+    "fr": "Choisissez une date de fin",
+    "de": "Wählen Sie ein Enddatum",
+    "pt": "Escolha a data de término"
+  },
+  "Selecciona inicio y fin": {
+    "en": "Choose start and end dates",
+    "fr": "Choisissez les dates de début et de fin",
+    "de": "Wählen Sie Start- und Enddatum",
+    "pt": "Escolha início e fim"
+  },
+  "Estadía de {count} noche": {
+    "en": "Stay of {count} night",
+    "fr": "Séjour de {count} nuit",
+    "de": "Aufenthalt von {count} Nacht",
+    "pt": "Estadia de {count} noite"
+  },
+  "Estadía de {count} noches": {
+    "en": "Stay of {count} nights",
+    "fr": "Séjour de {count} nuits",
+    "de": "Aufenthalt von {count} Nächten",
+    "pt": "Estadia de {count} noites"
+  },
+  "Hoy": {
+    "en": "Today",
+    "fr": "Aujourd’hui",
+    "de": "Heute",
+    "pt": "Hoje"
+  },
+  "Borrar": {
+    "en": "Clear",
+    "fr": "Effacer",
+    "de": "Löschen",
+    "pt": "Limpar"
+  },
+  "Aplicar": {
+    "en": "Apply",
+    "fr": "Appliquer",
+    "de": "Anwenden",
+    "pt": "Aplicar"
+  },
+  "Reintentar": {
+    "en": "Retry",
+    "fr": "Réessayer",
+    "de": "Erneut versuchen",
+    "pt": "Tentar novamente"
   }
 };

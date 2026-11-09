@@ -1,4 +1,5 @@
 import fs from 'node:fs';
+import {quoteUiTranslations} from './quote-ui-translations.mjs';
 
 const es = JSON.parse(fs.readFileSync('public/i18n/es.json', 'utf8'));
 const en = JSON.parse(fs.readFileSync('public/i18n/en.json', 'utf8'));
@@ -512,6 +513,8 @@ const ui = {
     pt: 'O documento não está disponível no momento. Tente novamente mais tarde.',
   },
 };
+
+Object.assign(ui, quoteUiTranslations);
 
 const output = `export const TRANSLOCO_BUNDLES: Record<string, Record<string, string>> = ${JSON.stringify({ es, en, fr, de, pt }, null, 2)};\n
 export const UI_TRANSLATIONS: Record<string, Record<string, string>> = ${JSON.stringify(ui, null, 2)};\n`;

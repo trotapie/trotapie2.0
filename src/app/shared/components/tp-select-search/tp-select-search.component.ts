@@ -1,4 +1,6 @@
 import {PopupKeyboardDirective} from '../../directives/popup-keyboard.directive';
+import {inject} from '@angular/core';
+import {LanguageService} from '../../../core/services/language.service';
 import {Icon} from '../icon/icon';
 import {MotionDirective} from '../../directives/motion.directive';
 import { CommonModule } from '@angular/common';
@@ -22,6 +24,8 @@ export interface TpSelectSearchOption {
   providers: [{ provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => TpSelectSearchComponent), multi: true }]
 })
 export class TpSelectSearchComponent implements ControlValueAccessor {
+  private language=inject(LanguageService);
+  text(es:string){return this.language.translateText(es);}
   @Input() label = '';
   @Input() placeholder = 'Seleccionar';
   @Input() searchPlaceholder = 'Buscar opciones';
@@ -61,7 +65,7 @@ export class TpSelectSearchComponent implements ControlValueAccessor {
   }
 
   get textoSeleccion(): string {
-    return this.options.find((option) => this.sameValue(option.value, this.valorSeleccionado))?.label ?? this.placeholder;
+    return this.options.find((option) => this.sameValue(option.value, this.valorSeleccionado))?.label ?? this.text(this.placeholder);
   }
 
   get isDisabled(): boolean { return this.disabled || this.controlDisabled; }
