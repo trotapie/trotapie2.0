@@ -1,4 +1,36 @@
+import {Component,model,input,inject,computed} from '@angular/core';
+import {LanguageService} from '../../../../core/services/language.service';
+import {FormsModule} from '@angular/forms';
 import {TpSelectSearchComponent} from '../../../../shared/components/tp-select-search/tp-select-search.component';
-import {Component,model,input} from '@angular/core';import {FormsModule} from '@angular/forms';import {Room} from '../../models/room';import {Button} from '../../../../shared/components/button/button';
+import {Button} from '../../../../shared/components/button/button';
+import {Room} from '../../models/room';
+import {RoomType,availableRoomTypes,reconcileRoom,selectRoomType} from '../../models/room-configuration';
+
 @Component({selector:'tp-room-picker',imports:[FormsModule,TpSelectSearchComponent,Button],templateUrl:'./room-picker.html',styleUrl:'./room-picker.scss'})
-export class RoomPicker {rooms=model<Room[]>([{adults:2,children:0,childAges:[]}]);maxRooms=input(8);ages=Array.from({length:18},(_,i)=>i);adults=[1,2,3,4,5,6];children=[0,1,2,3,4,5];adultOptions=this.adults.map(value=>({value,label:`${value} ${value===1?'adulto':'adultos'}`}));childOptions=this.children.map(value=>({value,label:`${value} ${value===1?'menor':'menores'}`}));ageOptions=this.ages.map(value=>({value,label:`${value} ${value===1?'año':'años'}`}));update(i:number,key:'adults'|'children',value:number){this.rooms.update(rows=>rows.map((r,j)=>i===j?{...r,[key]:Number(value),childAges:key==='children'?Array.from({length:Number(value)},(_,k)=>r.childAges[k]??null):r.childAges}:r));}age(i:number,c:number,value:number|null){this.rooms.update(rows=>rows.map((r,j)=>i===j?{...r,childAges:r.childAges.map((a,k)=>k===c?value:a)}:r));}add(){if(this.rooms().length<this.maxRooms())this.rooms.update(rows=>[...rows,{adults:2,children:0,childAges:[]}]);}remove(i:number){if(this.rooms().length>1)this.rooms.update(rows=>rows.filter((_,j)=>i!==j));}}
+export class RoomPicker {
+  private language=inject(LanguageService);
+  text(es:string,params:Record<string,string|number>={}){return this.language.formatText(es,params);}
+  rooms=model<Room[]>([{adults:2,children:0,childAges:[]}]);
+  roomTypes=input<RoomType[]>([]);
+  showConfigurationHints=input(false);
+  maxRooms=input(8);
+  adultOptions=computed(()=>[1,2,3,4,5,6].map(value=>({value,label:this.text(value===1?'{count} adulto':'{count} adultos',{count:value})})));
+  childOptions=computed(()=>[0,1,2,3,4,5].map(value=>({value,label:this.text(value===1?'{count} menor':'{count} menores',{count:value})})));
+  ageOptions=computed(()=>Array.from({length:18},(_,value)=>({value,label:this.text(value===1?'{count} año':'{count} años',{count:value})})));
+  typeOptions(room:Room){return availableRoomTypes(room,this.roomTypes()).map(type=>({value:type.id,label:type.nombre_habitacion}));}
+  bedOptions(room:Room){return (this.roomTypes().find(type=>type.id===room.roomTypeId)?.camas??[]).map(bed=>({value:bed.id,label:bed.nombre}));}
+  update(i:number,key:'adults'|'children',value:number){
+    this.rooms.update(rows=>rows.map((room,j)=>i===j?reconcileRoom({...room,[key]:Number(value),childAges:key==='children'?Array.from({length:Number(value)},(_,k)=>room.childAges[k]??null):room.childAges},this.roomTypes()):room));
+  }
+  selectType(i:number,value:number|null){this.rooms.update(rows=>rows.map((room,j)=>i===j?selectRoomType(room,value===null?null:Number(value),this.roomTypes()):room));}
+  selectBed(i:number,value:number|null){
+    this.rooms.update(rows=>rows.map((room,j)=>{
+      if(i!==j)return room;
+      const bed=this.bedOptions(room).find(bed=>bed.value===Number(value));
+      return {...room,bedTypeId:bed?.value??null,bedTypeName:bed?.label??''};
+    }));
+  }
+  age(i:number,c:number,value:number|null){this.rooms.update(rows=>rows.map((room,j)=>i===j?{...room,childAges:room.childAges.map((age,k)=>k===c?value:age)}:room));}
+  add(){if(this.rooms().length<this.maxRooms())this.rooms.update(rows=>[...rows,{adults:2,children:0,childAges:[]}]);}
+  remove(i:number){if(this.rooms().length>1)this.rooms.update(rows=>rows.filter((_,j)=>i!==j));}
+}

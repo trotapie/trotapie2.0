@@ -9,6 +9,8 @@
       }@else if(field.ref==='hotel-destinations'){
         <tp-hotel-destination-select [label]="field.label" [value]="model()[field.key]" [required]="!!field.required" [disabled]="disabled()||busy()" (changed)="set(field.key,$event)"/>
         <input type="hidden" [name]="field.key" [ngModel]="model()[field.key]" [required]="!!field.required" [disabled]="disabled()||busy()"/>
+      }@else if(field.type==='multiselect'){
+        <app-tp-multiselect [label]="field.label" [name]="field.key" [options]="$any(field.options||[])" [ngModel]="model()[field.key]||[]" [required]="!!field.required" [disabled]="disabled()||busy()" (ngModelChange)="set(field.key,$event)"/>
       }@else if(field.type==='select'){
         <app-tp-select-search [label]="field.label" [name]="field.key" [options]="$any(field.options||[])" [ngModel]="model()[field.key]" [required]="!!field.required" [disabled]="disabled()||busy()" (ngModelChange)="set(field.key,$event)" />
       }@else if(field.type==='textarea'){

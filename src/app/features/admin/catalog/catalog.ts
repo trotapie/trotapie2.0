@@ -21,7 +21,9 @@ import {employeeActions,isProtectedEmployee} from '../../employees/models/employ
 @Component({selector:'tp-catalog',imports:[BannerComponent,CatalogPicker,DecimalPipe,CatalogScrollDirective,TpSelectSearchComponent,TpActionsMenuComponent,QuoteColumnFilters,RouterLink,FormsModule,PageHeader,Button,Icon,State,FilterBar,DataTable,ImageCard,Dialog,ResourceForm],templateUrl:'./catalog.html',styleUrl:'./catalog.scss'})
 export class Catalog implements OnInit,OnDestroy {toast=inject(TpToastService);
  imageTranslations=computed(()=>imageTypeTranslations(this.value()['traducciones_preview']));
- private editorForm=viewChild<ResourceForm>('editorForm');
+  private editorForm=viewChild<ResourceForm>('editorForm');
+  catalogTranslations=signal<any[]|null>(null);
+  showCatalogTranslations(){this.catalogTranslations.set(this.selected()?.raw['traducciones']??[]);}
  private pendingChanges=protectUnsavedChanges(()=>this.kind!=='circuitos'&&this.editorOpen()&&!this.editorLoading()&&!!this.editorForm()?.hasChanges(),()=>this.kind!=='circuitos'&&(this.saving()||this.removing()));
  canDeactivate(){return this.pendingChanges.confirm();}
  closeEditor(){if(this.canDeactivate())this.editorOpen.set(false);}

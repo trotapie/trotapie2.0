@@ -21,4 +21,13 @@ export const catalogOverviewKeys=['amenidades','atracciones','codigos_pais','con
 catalogFields['origen_reservacion']=reservationOriginFields;
 catalogFields['tipo_imagen']=[{key:'descripcion',label:'Nombre',required:true}];
 export function catalogKey(key:string){return catalogAliases[key]||key;}
-export function catalogDefinition(key:string,attractions=false):ResourceDefinition{const resolved=catalogKey(key);return{kind:attractions?'atracciones':'catalogos',title:attractions?'Atracciones y experiencias':catalogLabels[key]||'Catálogos',description:attractions?'Administra las experiencias que se muestran en los destinos.':'Administra la información que tu agencia utiliza para construir viajes.',singular:resolved==='meses_disponibles'?'plazo':'registro',icon:'grid',permission:'destinos.edit',fields:resolved==='meses_disponibles'?monthTermFields:resolved==='codigos_pais'?countryCodeFields:catalogFields[resolved]||[name],columns:[]};}
+catalogFields['tipos_habitacion']=[
+  {key:'nombre_habitacion',label:'Nombre en español',required:true,textPreview:true,hint:'El nombre y la descripción se traducen automáticamente al guardar.'},
+  {key:'capacidad_maxima',label:'Capacidad máxima',type:'number',min:1,required:true},
+  {key:'cama_ids',label:'Tipos de cama disponibles',type:'multiselect',ref:'bed-types',hint:'Opcional. Opciones que se mostrarán al seleccionar este tipo de habitación en una cotización.'},
+  {...desc,label:'Descripción en español'},
+];
+catalogFields['tipos_cama']=[{...name,label:'Nombre en español',textPreview:true,hint:'El nombre y la descripción se traducen automáticamente al guardar.'},{...desc,label:'Descripción en español'},active];
+catalogLabels['tipos_cama']='Tipos de cama';
+catalogOverviewKeys.push('tipos_cama');
+export function catalogDefinition(key:string,attractions=false):ResourceDefinition{const resolved=catalogKey(key);return{kind:attractions?'atracciones':'catalogos',title:attractions?'Atracciones y experiencias':catalogLabels[key]||'Catálogos',description:attractions?'Administra las experiencias que se muestran en los destinos.':'Administra la información que tu agencia utiliza para construir viajes.',singular:resolved==='meses_disponibles'?'plazo':'registro',icon:'grid',permission:'destinos.edit',fields:resolved==='meses_disponibles'?monthTermFields:resolved==='codigos_pais'?countryCodeFields:catalogFields[resolved]||[name],columns:resolved==='tipos_habitacion'?[{key:'camas_configuradas',label:'Camas configuradas',detailsKey:'camas_detalle'}]:[]};}

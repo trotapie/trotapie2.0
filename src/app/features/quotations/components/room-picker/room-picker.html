@@ -1,17 +1,21 @@
 <div class="rooms">
   @for(room of rooms();track $index;let i=$index){
     <section class="room">
-      <header><h3>Habitación {{i+1}}</h3>@if(rooms().length>1){<button tpButton variant="icon" icon="trash" type="button" [attr.aria-label]="'Quitar habitación '+(i+1)" (click)="remove(i)"></button>}</header>
+      <header><h3>{{text('Habitación {number}',{number:i+1})}}</h3>@if(rooms().length>1){<button tpButton variant="icon" icon="trash" type="button" [attr.aria-label]="text('Quitar habitación {number}',{number:i+1})" (click)="remove(i)"></button>}</header>
       <div class="form-grid">
-        <app-tp-select-search label="Adultos" [name]="'adults-'+i" [options]="adultOptions" [ngModel]="room.adults" (ngModelChange)="update(i,'adults',$event)" [showClear]="false" [showSearch]="false"/>
-        <app-tp-select-search label="Menores" [name]="'children-'+i" [options]="childOptions" [ngModel]="room.children" (ngModelChange)="update(i,'children',$event)" [showClear]="false" [showSearch]="false"/>
+        <app-tp-select-search [label]="text('Adultos')" [name]="'adults-'+i" [options]="adultOptions()" [ngModel]="room.adults" (ngModelChange)="update(i,'adults',$event)" [showClear]="false" [showSearch]="false"/>
+        <app-tp-select-search [label]="text('Menores')" [name]="'children-'+i" [options]="childOptions()" [ngModel]="room.children" (ngModelChange)="update(i,'children',$event)" [showClear]="false" [showSearch]="false"/>
+        <app-tp-select-search [label]="text('Tipo de habitación')" [name]="'room-type-'+i" [options]="typeOptions(room)" [ngModel]="room.roomTypeId" (ngModelChange)="selectType(i,$event)" [required]="true" [placeholder]="text('Seleccionar habitación')" [emptyMessage]="text('No hay habitaciones con capacidad suficiente.')"/>
+        <app-tp-select-search [label]="text('Camas (opcional)')" [name]="'bed-type-'+i" [options]="bedOptions(room)" [ngModel]="room.bedTypeId" (ngModelChange)="selectBed(i,$event)" [disabled]="!room.roomTypeId||!bedOptions(room).length" [placeholder]="text(!room.roomTypeId?'Selecciona una habitación primero':bedOptions(room).length?'Seleccionar camas':'Sin opciones disponibles')"/>
       </div>
+      @if(!typeOptions(room).length){<p class="configuration-note" role="status">{{text('No hay tipos de habitación con capacidad para {count} personas.',{count:room.adults+room.children})}}</p>}
+      @else if(showConfigurationHints()&&room.roomTypeId&&!bedOptions(room).length){<p class="configuration-note" role="status">{{text('Este tipo de habitación no tiene camas asociadas. Configúralas en el catálogo de tipos de habitación.')}}</p>}
       @if(room.children){<div class="child-ages">
         @for(value of room.childAges;track $index;let child=$index){
-          <app-tp-select-search [label]="'Edad del menor '+(child+1)" [name]="'age-'+i+'-'+child" [options]="ageOptions" [ngModel]="value" (ngModelChange)="age(i,child,$event)" [required]="true" [showClear]="false" [showSearch]="false"/>
+          <app-tp-select-search [label]="text('Edad del menor {number}',{number:child+1})" [name]="'age-'+i+'-'+child" [options]="ageOptions()" [ngModel]="value" (ngModelChange)="age(i,child,$event)" [required]="true" [showClear]="false" [showSearch]="false"/>
         }
       </div>}
     </section>
   }
-  <button tpButton icon="plus" type="button" [disabled]="rooms().length>=maxRooms()" (click)="add()">Agregar habitación</button>
+  <button tpButton icon="plus" type="button" [disabled]="rooms().length>=maxRooms()" (click)="add()">{{text('Agregar habitación')}}</button>
 </div>

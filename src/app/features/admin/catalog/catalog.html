@@ -295,6 +295,7 @@
       [busy]="saving()"
       [disabled]="preview || !canEdit()"
       (saved)="save($event)"
+      (previewRequested)="showCatalogTranslations()"
       (cancelled)="closeEditor()"
     />
     @if (kind === 'catalogos' && catalog() === 'tipo_imagen') {
@@ -320,6 +321,15 @@
       </div>
     }
   }
+</tp-dialog>
+<tp-dialog [open]="catalogTranslations()!==null" title="Traducciones del catálogo" (closed)="catalogTranslations.set(null)">
+  @for(translation of catalogTranslations();track $index){
+    <section class="catalog-translation">
+      <h3>{{translation.idioma?.nombre||translation.idioma?.codigo}}</h3>
+      <p>{{translation.nombre}}</p>
+      @if(translation.descripcion){<p>{{translation.descripcion}}</p>}
+    </section>
+  }@empty{<p>Las traducciones se generan automáticamente al guardar el registro.</p>}
 </tp-dialog>
 <tp-dialog
   [open]="removeOpen()"

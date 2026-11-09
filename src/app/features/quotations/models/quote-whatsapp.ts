@@ -26,7 +26,7 @@ export function quoteWhatsAppUrl(quote: WhatsAppQuote): string {
     const children = room.children
       ? ` · ${room.children} ${room.children === 1 ? 'niño' : 'niños'} · edades: ${room.childAges.join(', ')} ${room.children === 1 ? 'año' : 'años'}`
       : '';
-    return `Habitación ${index + 1}: ${adults}${children}`;
+    return `Habitación ${index + 1}: ${adults}${children}${room.roomTypeName?' · Tipo: '+room.roomTypeName:''}${room.bedTypeName?' · Camas: '+room.bedTypeName:''}`;
   }).join('\n');
   const message = [
     `Hola, soy ${quote.name.trim()} y me interesa una cotización en el hotel ${quote.hotels.map(hotel => hotel.name).join(', ')} en ${quote.destination}.`,

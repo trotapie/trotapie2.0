@@ -7,9 +7,10 @@ import {hotelEditorDraft,hotelDetailPayload,hotelDraftValidation} from '../../..
 @Injectable({providedIn:'root'})
 export class ResourceService {
  data=inject(TravelDataService);
- async options(fields:FieldDefinition[]){return Promise.all(fields.map(async f=>{if(!f.ref)return f;const rows=await this.data.cached('options:'+f.ref,async()=>{
+  async options(fields:FieldDefinition[]){return Promise.all(fields.map(async f=>{if(!f.ref)return f;const rows=await this.data.cached('options:'+f.ref,async()=>{
+  if(f.ref==='bed-types')return this.data.catalogs.obtenerCatalogoAdmin('tipos_cama');
   switch(f.ref){case 'hotel-destinations':return [];case 'destinations':{const r=await this.data.backend.client.from('catalogo_destinos').select('id,nombre').eq('activo',true).order('nombre');if(r.error)throw r.error;return r.data||[];}case 'areas':return this.data.destinations.obtenerConfiguracionGeografica('divisiones-area');case 'tour-types':return this.data.destinations.obtenerTiposTuristicosCatalogo(true);case 'continents':return this.data.destinations.continentes().then(r=>{if(r.error)throw r.error;return r.data||[];});case 'regimes':return this.data.legacy.obtenerRegimenesAdmin();case 'company-roles':return this.data.employees.rolesEmpresaAdmin().then(r=>{if(r.error)throw r.error;return r.data||[];});case 'employee-status':return this.data.employees.obtenerEstatusEmpleadoAdmin();case 'treatments':return this.data.legacy.obtenerTratamientosActivos();case 'activities':return this.data.catalogs.obtenerCatalogoAdmin('actividades');case 'room-types':return this.data.catalogs.obtenerCatalogoAdmin('tipos_habitacion');default:return [];}
- },300_000);return{...f,options:rows.map((r:any)=>({value:r.id,label:r.nombre||r.descripcion||r.rol||r.nombre_habitacion||String(r.id)}))};}));}
+  },300_000);return{...f,options:rows.map((r:any)=>({value:r.id,label:r.nombre||r.descripcion||r.rol||r.nombre_habitacion||String(r.id)}))};}));}
  async detail(kind:string,record:TravelRecord):Promise<Row>{
  if(kind==='destinos')return await this.data.destinations.obtenerCatalogoDestinoAdmin(Number(record.id))||record.raw;
  if(kind==='hoteles'){const d:any=await this.data.hotels.infoHotel(Number(record.id),'es');if(!d)throw new Error('No encontramos este hotel.');return hotelEditorDraft({...d,catalogo_destino_id:d.catalogo_destino_id||record.raw['catalogo_destino_id_resuelto']});}

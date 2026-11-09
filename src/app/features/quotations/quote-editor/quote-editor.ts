@@ -1,4 +1,5 @@
 import {quoteAdminSegment} from '../models/quote-route';
+import {RoomType,validRoomConfiguration} from '../models/room-configuration';
 import {quoteWhatsAppUrl} from '../models/quote-whatsapp';
 import {construirNombreClienteVisible} from '../../../data/utils/cliente-nombre.util';
 import {ChangeTracker} from '../../../core/utils/change-snapshot';
@@ -9,6 +10,7 @@ import {TpToastService} from '../../../shared/services/tp-toast.service';
 import {Component,inject,signal,computed,OnInit} from '@angular/core';import {Router,RouterLink,ActivatedRoute} from '@angular/router';import {FormsModule} from '@angular/forms';import {TravelDataService,TravelRecord} from '../../../data/facades/travel-data.service';import {QuoteWorkflowService} from '../services/quote-workflow.service';import {Room,nights,validRooms} from '../models/room';import {PageHeader} from '../../../shared/components/page-header/page-header';import {Field} from '../../../shared/components/field/field';import {Button} from '../../../shared/components/button/button';import {Icon} from '../../../shared/components/icon/icon';import {RoomPicker} from '../components/room-picker/room-picker';import {State} from '../../../shared/components/state/state';
 @Component({selector:'tp-quote-editor',imports:[TpSelectSearchComponent,DateRangeFilterComponent,RouterLink,FormsModule,PageHeader,Field,Button,Icon,State,RoomPicker],templateUrl:'./quote-editor.html',styleUrl:'./quote-editor.scss'})
 export class QuoteEditor implements OnInit {toast=inject(TpToastService);
+ text(es:string,params:Record<string,string|number>={}){return this.data.language.formatText(es,params);}
  private changes=new ChangeTracker();
  private draft(){return {name:this.name,treatmentId:this.treatmentId,email:this.email,phone:this.phone,start:this.start,end:this.end,notes:this.notes,destinationId:this.destinationId,employeeId:this.employeeId,rooms:this.rooms(),hotels:this.selectedHotels().map(h=>h.id),regimes:this.hotelRegimes,prices:this.hotelPrices};}
  private pendingChanges=protectUnsavedChanges(()=>!this.success()&&this.changes.hasChanges(this.draft()),()=>this.busy());
@@ -17,15 +19,18 @@ export class QuoteEditor implements OnInit {toast=inject(TpToastService);
  destinationOptions=computed<TpSelectSearchOption[]>(()=>this.destinations().map(destination=>({value:Number(destination.id),label:destination.title})));
   employeeOptions=computed<TpSelectSearchOption[]>(()=>this.employees().map(employee=>({value:employee.id,label:employee.nombre})));
   treatmentId:number|null=null;
+  roomTypes=signal<RoomType[]>([]);
+  roomConfigurationValidity=computed(()=>this.rooms().every(room=>validRoomConfiguration(room,this.roomTypes())));
   treatments=signal<Array<{id:number;nombre:string;abreviacion:string}>>([]);
   treatmentOptions=computed<TpSelectSearchOption[]>(()=>[
-    {value:'',label:'Sin prefijo'},
+    {value:'',label:this.text('Sin prefijo')},
     ...this.treatments().map(treatment=>({value:treatment.id,label:`${treatment.abreviacion} — ${treatment.nombre}`})),
   ]);
   clientDisplayName(){return construirNombreClienteVisible({nombreCompleto:this.name,tratamientoAbreviacion:this.treatments().find(treatment=>treatment.id===this.treatmentId)?.abreviacion});}
   advisorName(){return this.employees().find(employee=>employee.id===this.employeeId)?.nombre||'Equipo Trotapie';}
  totalGuests=(n:number,r:Room)=>n+r.adults+r.children;
  async ngOnInit(){try{await this.loadDestinations();this.employeeId=null;
+  this.roomTypes.set(await this.data.catalogs.obtenerTiposHabitacionCamas(this.data.language.language()));
   this.treatments.set(await this.data.legacy.obtenerTratamientosActivos());
   const advisors=await this.data.employees.asesoresCotizacion();
   if(advisors.error)throw advisors.error;
@@ -52,7 +57,7 @@ export class QuoteEditor implements OnInit {toast=inject(TpToastService);
   this.regimeLoading.update(rows=>({...rows,[record.id]:true}));
   this.regimeErrors.update(rows=>({...rows,[record.id]:''}));
   try{
-   const configured=await this.data.cached('quote-hotel-regimes:'+record.id,()=>this.data.hotels.obtenerRegimenesCotizacionHotel(Number(record.id),this.data.language.language()));
+   const configured=await this.data.cached('quote-hotel-regimes:'+this.data.language.language()+':'+record.id,()=>this.data.hotels.obtenerRegimenesCotizacionHotel(Number(record.id),this.data.language.language()));
    this.regimeOptions.update(rows=>({...rows,[record.id]:configured.map(regime=>({value:regime.id,label:regime.descripcion}))}));
    if(!configured.some(regime=>regime.id===this.hotelRegimes[record.id])){
     this.hotelRegimes[record.id]=configured.find(regime=>regime.principal)?.id??(configured.length===1?configured[0].id:null);
@@ -67,7 +72,7 @@ export class QuoteEditor implements OnInit {toast=inject(TpToastService);
  selected(id:string){return this.selectedHotels().some(r=>r.id===id);}
  updateRoom(index:number,key:'adults'|'children',value:any){this.rooms.update(rooms=>rooms.map((r,i)=>i===index?{...r,[key]:Number(value),childAges:key==='children'?Array.from({length:Number(value)},(_,j)=>r.childAges[j]??null):r.childAges}:r));}
  updateAge(index:number,child:number,age:any){this.rooms.update(rooms=>rooms.map((r,i)=>i===index?{...r,childAges:r.childAges.map((a,j)=>j===child?(age===null?null:Number(age)):a)}:r));}
-  next(){this.error.set('');if(this.step()===0&&!this.employees().some(employee=>employee.id===this.employeeId)){this.error.set('Selecciona un asesor para tu solicitud.');return;}if(this.step()===0&&(!this.name.trim()||!this.phone.trim()||!this.nightCount()||!this.roomValidity())){this.error.set('Completa el nombre, teléfono, fechas y las edades de los menores.');return;}if(this.step()===1&&!this.regimesReady()){this.error.set('Revisa el régimen de alojamiento de cada hotel.');return;}if(this.step()===1&&!this.selectedHotels().length){this.error.set('Selecciona al menos un hotel.');return;}this.step.update(s=>Math.min(2,s+1));}
+  next(){this.error.set('');if(this.step()===0&&!this.employees().some(employee=>employee.id===this.employeeId)){this.error.set('Selecciona un asesor para tu solicitud.');return;}if(this.step()===0&&(!this.name.trim()||!this.phone.trim()||!this.nightCount()||!this.roomValidity())){this.error.set('Completa el nombre, teléfono, fechas y las edades de los menores.');return;}if(this.step()===0&&!this.roomConfigurationValidity()){this.error.set('Selecciona un tipo de habitación válido y revisa las camas elegidas, si las indicaste.');return;}if(this.step()===1&&!this.regimesReady()){this.error.set('Revisa el régimen de alojamiento de cada hotel.');return;}if(this.step()===1&&!this.selectedHotels().length){this.error.set('Selecciona al menos un hotel.');return;}this.step.update(s=>Math.min(2,s+1));}
   whatsappUrl = signal('');
   async save(){
     if(this.busy()||this.success())return;

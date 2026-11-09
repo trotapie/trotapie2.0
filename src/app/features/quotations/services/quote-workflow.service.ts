@@ -1,11 +1,15 @@
 import {Injectable,inject} from '@angular/core';import {TravelDataService,Row} from '../../../data/facades/travel-data.service';import {Room,nights,roomDescription,validRooms} from '../models/room';
+import {validRoomConfiguration,reconcileRoom} from '../models/room-configuration';
 export interface QuoteDraft {name:string;treatmentId?:number|null;email:string;phone:string;start:string;end:string;destinationId:number;destinationName:string;rooms:Room[];notes:string;hotels:Array<{id:number;name:string;regimeId:number|null;price:number|null}>;multiple:boolean;employeeId:number|null;language:string;}
 @Injectable({providedIn:'root'})
 export class QuoteWorkflowService {
  data=inject(TravelDataService);
  async create(draft:QuoteDraft,publicRequest=false){
  if(!publicRequest&&!this.data.auth.hasPermission('cotizaciones.create'))throw new Error('Tu rol no permite crear cotizaciones.');
- if(!draft.name.trim()||!draft.phone.trim()||!nights(draft.start,draft.end)||!validRooms(draft.rooms)||!draft.hotels.length)throw new Error('Revisa los datos del cliente, las fechas, las habitaciones y el hotel.');
+  if(!draft.name.trim()||!draft.phone.trim()||!nights(draft.start,draft.end)||!validRooms(draft.rooms)||!draft.hotels.length)throw new Error('Revisa los datos del cliente, las fechas, las habitaciones y el hotel.');
+  const types=await this.data.catalogs.obtenerTiposHabitacionCamas(draft.language);
+  if(!draft.rooms.every(room=>validRoomConfiguration(room,types)))throw new Error('Selecciona un tipo de habitación con capacidad suficiente y revisa las camas elegidas, si las indicaste.');
+  draft={...draft,rooms:draft.rooms.map(room=>reconcileRoom(room,types))};
  await Promise.all(draft.hotels.map(async hotel=>{
    const configured=await this.data.hotels.obtenerRegimenesCotizacionHotel(hotel.id,draft.language);
    if(configured.length && hotel.regimeId===null)throw new Error(`Selecciona un régimen de alojamiento para ${hotel.name}.`);

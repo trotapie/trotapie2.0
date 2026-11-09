@@ -4,6 +4,8 @@ import { SupabaseService } from './supabase.service';
 import { origenReservacionPayload } from './origen-reservacion-payload';
 import { generateImageTypeKey } from '../utils/image-type-key';
 import { normalizeImageTypeName } from '../utils/image-type-name';
+import {roomCatalogRecord} from '../utils/room-catalog-record';
+import type {RoomType} from '../../features/quotations/models/room-configuration';
 
 const ES_ID = 1;
 
@@ -22,6 +24,7 @@ export type CatalogoAdminKey =
   | 'tarifas'
   | 'tipo_imagen'
   | 'tipos_habitacion'
+  | 'tipos_cama'
   | 'atracciones'
   | 'tratamientos'
   | 'meses_disponibles'
@@ -42,6 +45,39 @@ export class CatalogosAdminService {
 
   private get client() {
     return this.supabase.getClient();
+  }
+
+  async obtenerTiposHabitacionCamas(idioma='es'):Promise<RoomType[]> {
+    const {data,error}=await this.client.rpc('obtener_tipos_habitacion_camas',{p_idioma:idioma});
+    if(error)throw new Error('No pudimos cargar habitaciones y camas. Verifica que se haya aplicado el script tipos-habitacion-camas.sql.');
+    return data??[];
+  }
+
+  private async guardarHabitacionOCama(catalogo:'tipos_habitacion'|'tipos_cama',id:number|null,payload:any){
+    const nombre=String(payload.nombre_habitacion??payload.nombre??'').trim();
+    const descripcion=String(payload.descripcion??'').trim();
+    if(!nombre)throw new Error('El nombre es obligatorio.');
+    if(catalogo==='tipos_habitacion'&&(!Number.isInteger(Number(payload.capacidad_maxima))||Number(payload.capacidad_maxima)<1))throw new Error('La capacidad máxima debe ser un número entero mayor que cero.');
+    const [translations,languages]=await Promise.all([
+      this.supabase.traducirDesdeEspanol({title:nombre,description:descripcion}),
+      this.supabase.obtenerIdiomasPreviewAdmin(),
+    ]);
+    if(!languages.some(language=>language.codigo.toLowerCase()==='es'))throw new Error('Configura el idioma español antes de guardar este catálogo.');
+    const traducciones=languages.map(language=>{
+      const code=language.codigo.toLowerCase();
+      const translation=translations?.[code];
+      const title=code==='es'?nombre:String(translation?.title??'').trim();
+      const description=code==='es'?descripcion:String(translation?.description??'').trim();
+      if(!title||(descripcion&&!description))throw new Error(`No se pudo generar la traducción a ${language.nombre}. Intenta guardar nuevamente.`);
+      return {idioma_id:language.id,nombre:title,descripcion:description};
+    });
+    const {data,error}=await this.client.rpc('guardar_tipo_habitacion_o_cama',{
+      p_catalogo:catalogo,p_id:id,p_nombre:nombre,p_descripcion:descripcion,
+      p_capacidad:catalogo==='tipos_habitacion'?Number(payload.capacidad_maxima):null,
+      p_activo:payload.activo!==false,p_cama_ids:payload.cama_ids??[],p_traducciones:traducciones,
+    });
+    if(error)throw error;
+    return data;
   }
 
   async obtenerDetalleCatalogoAtraccionesAdmin(catalogoAtraccionId: number) {
@@ -444,10 +480,15 @@ export class CatalogosAdminService {
       case 'tipos_habitacion': {
         const { data, error } = await this.client
           .from('tipos_habitacion')
-          .select('id, nombre_habitacion, capacidad_maxima, descripcion')
+          .select('id, nombre_habitacion, capacidad_maxima, descripcion, camas:tipos_habitacion_camas(tipo_cama_id, tipo_cama:tipos_cama(nombre, activo)), traducciones:tipos_habitacion_traducciones(nombre, descripcion, idioma:idiomas(codigo, nombre))')
           .order('id', { ascending: true });
         if (error) throw error;
-        return data ?? [];
+        return (data??[]).map(roomCatalogRecord);
+      }
+      case 'tipos_cama': {
+        const {data,error}=await this.client.from('tipos_cama').select('id, nombre, descripcion, activo, traducciones:tipos_cama_traducciones(nombre, descripcion, idioma:idiomas(codigo, nombre))').order('id');
+        if(error)throw error;
+        return data??[];
       }
       case 'atracciones': {
         const { data, error } = await this.client
@@ -547,6 +588,7 @@ export class CatalogosAdminService {
       tarifas: null,
       tipo_imagen: 'tipos_imagen',
       tipos_habitacion: null,
+      tipos_cama: null,
       atracciones: 'catalogo_atracciones',
       tratamientos: null,
       meses_disponibles: 'meses_disponibles',
@@ -828,18 +870,10 @@ export class CatalogosAdminService {
         return data;
       }
       case 'tipos_habitacion': {
-        const { data, error } = await this.client
-          .from('tipos_habitacion')
-          .insert({
-            nombre_habitacion: payload.nombre_habitacion ?? null,
-            capacidad_maxima: payload.capacidad_maxima ?? null,
-            descripcion: payload.descripcion ?? null
-          })
-          .select('id, nombre_habitacion, capacidad_maxima, descripcion')
-          .single();
-
-        if (error) throw error;
-        return data;
+        return this.guardarHabitacionOCama(catalogo,null,payload);
+      }
+      case 'tipos_cama': {
+        return this.guardarHabitacionOCama(catalogo,null,payload);
       }
       case 'atracciones': {
         const orden = Number(payload.orden);
@@ -1044,6 +1078,11 @@ export class CatalogosAdminService {
           .eq('id', id);
         if (error) throw error;
         return { deleted: 1 };
+      }
+      case 'tipos_cama': {
+        const {error}=await this.client.from('tipos_cama').delete().eq('id',id);
+        if(error)throw error;
+        return {deleted:1};
       }
       case 'tratamientos': {
         const { error } = await this.client
@@ -1334,18 +1373,10 @@ export class CatalogosAdminService {
         return data;
       }
       case 'tipos_habitacion': {
-        const { data, error } = await this.client
-          .from('tipos_habitacion')
-          .update({
-            nombre_habitacion: payload.nombre_habitacion ?? null,
-            capacidad_maxima: payload.capacidad_maxima ?? null,
-            descripcion: payload.descripcion ?? null
-          })
-          .eq('id', id)
-          .select('id')
-          .maybeSingle();
-        if (error) throw error;
-        return data;
+        return this.guardarHabitacionOCama(catalogo,id,payload);
+      }
+      case 'tipos_cama': {
+        return this.guardarHabitacionOCama(catalogo,id,payload);
       }
       case 'atracciones': {
         const { data, error } = await this.client
