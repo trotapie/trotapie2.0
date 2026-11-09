@@ -1,20 +1,6 @@
 <div class="public-shell">
-  <header class="public-header">
-    <a routerLink="/" aria-label="Trotapie, inicio" (click)="navigateHome($event)"
-      ><img src="/brand/trotapie.png" alt="Trotapie Travel"
-    /></a>
-    <nav aria-label="Sitio público" [tpNavIndicator]="activeSection()"><span class="nav-indicator" aria-hidden="true"></span>
-      <a routerLink="/" [class.active]="activeSection()==='home'" [attr.aria-current]="activeSection()==='home'?'page':null" (click)="navigateHome($event)">{{ text('Inicio', 'Home') }}</a
-      ><a href="/#destinos" [class.active]="activeSection()==='destinations'" [attr.aria-current]="activeSection()==='destinations'?'page':null" (click)="navigateDestinations($event)">{{ text('Destinos', 'Destinations') }}</a
-      ><a routerLink="/circuitos" [class.active]="activeSection()==='circuits'" [attr.aria-current]="activeSection()==='circuits'?'page':null">{{ text('Circuitos', 'Tours') }}</a>
-      <a routerLink="/cabanas" [class.active]="activeSection()==='cabins'" [attr.aria-current]="activeSection()==='cabins'?'page':null">{{ text('Cabañas', 'Cabins') }}</a>
-    </nav>
-    <div class="public-tools">
-      <tp-theme-toggle [english]="data.language.language() === 'en'" />
-      <tp-language-menu [english]="data.language.language() === 'en'" (changed)="load()" />
-    </div>
-  </header>
-  <div class="public-scroll-region">
+  <tp-public-navigation [english]="data.language.language() === 'en'" [activeSection]="activeSection()" (homeSelected)="navigateHome($event)" (destinationsSelected)="navigateDestinations($event)" (languageChanged)="load()" (menuChanged)="mobileMenuOpen.set($event)" />
+  <div class="public-scroll-region" [inert]="mobileMenuOpen()">
   <main #scrollArea id="main-content" [class.catalog-scroll-area]="mode==='home'||mode==='destinos'||mode==='hoteles'" (scroll)="updateActiveSection()">
     @if (mode !== 'home' && mode !== 'destino' && mode !== 'hotel') {
       <tp-back-button [label]="text('Regresar', 'Back')" />
@@ -306,7 +292,7 @@
     <button tpButton type="button" class="back-to-top" icon="chevron-up" aria-controls="main-content" (click)="backToTop()">{{text('Volver arriba','Back to top')}}</button>
   }
   </div>
-  <tp-public-footer [english]="data.language.language() === 'en'" />
+  <tp-public-footer [english]="data.language.language() === 'en'" [inert]="mobileMenuOpen()" />
 </div>
 <tp-location-map
   [open]="mapOpen()"

@@ -1,5 +1,7 @@
-<div class="quote-editor-shell" [class.public-request]="publicRequest" [attr.lang]="data.language.language()">
- @if(publicRequest){<a routerLink="/"><img class="request-brand" src="/brand/trotapie.png" alt="Trotapie Travel"/></a>}
+@if(publicRequest){
+ <div class="request-navigation"><tp-public-navigation [english]="data.language.language() === 'en'" (menuChanged)="mobileMenuOpen.set($event)" /></div>
+}
+<div class="quote-editor-shell" [class.public-request]="publicRequest" [attr.lang]="data.language.language()" [inert]="mobileMenuOpen()">
  <tp-page-header [title]="text(publicRequest?'Tu viaje empieza aquí':multiple?'Nueva comparativa':'Nueva cotización')" [description]="text(publicRequest?'Cuéntanos cómo quieres viajar. Te ayudaremos a encontrar tu estancia.':'Una propuesta clara, desde el primer detalle.')" [eyebrow]="text('Trotapie / Cotizaciones')"><a tpButton variant="back" icon="left" [routerLink]="publicRequest ? (hotelId ? '/hotel/'+hotelId : '/') : (preview ? '/vista-previa/cotizaciones' : '/admin/cotizaciones')">{{text('Regresar')}}</a></tp-page-header>
  @if(loading()){<tp-state mode="loading" [title]="text('Un momento, estamos preparando todo.')" [message]="text('Preparando tu siguiente paso…')"/>}@else if(publicRequest && whatsappUrl()){
   <section class="panel" aria-live="polite">

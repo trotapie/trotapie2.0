@@ -1,4 +1,5 @@
 import {quoteAdminSegment} from '../models/quote-route';
+import {PublicNavigation} from '../../../shared/components/public-navigation/public-navigation';
 import {RoomType,validRoomConfiguration} from '../models/room-configuration';
 import {quoteWhatsAppUrl} from '../models/quote-whatsapp';
 import {construirNombreClienteVisible} from '../../../data/utils/cliente-nombre.util';
@@ -8,8 +9,9 @@ import {TpSelectSearchComponent,TpSelectSearchOption} from '../../../shared/comp
 import {DateRangeFilterComponent} from '../../../shared/components/date-range-filter/date-range-filter.component';
 import {TpToastService} from '../../../shared/services/tp-toast.service';
 import {Component,inject,signal,computed,OnInit} from '@angular/core';import {Router,RouterLink,ActivatedRoute} from '@angular/router';import {FormsModule} from '@angular/forms';import {TravelDataService,TravelRecord} from '../../../data/facades/travel-data.service';import {QuoteWorkflowService} from '../services/quote-workflow.service';import {Room,nights,validRooms} from '../models/room';import {PageHeader} from '../../../shared/components/page-header/page-header';import {Field} from '../../../shared/components/field/field';import {Button} from '../../../shared/components/button/button';import {Icon} from '../../../shared/components/icon/icon';import {RoomPicker} from '../components/room-picker/room-picker';import {State} from '../../../shared/components/state/state';
-@Component({selector:'tp-quote-editor',imports:[TpSelectSearchComponent,DateRangeFilterComponent,RouterLink,FormsModule,PageHeader,Field,Button,Icon,State,RoomPicker],templateUrl:'./quote-editor.html',styleUrl:'./quote-editor.scss'})
+ @Component({selector:'tp-quote-editor',imports:[PublicNavigation,TpSelectSearchComponent,DateRangeFilterComponent,RouterLink,FormsModule,PageHeader,Field,Button,Icon,State,RoomPicker],templateUrl:'./quote-editor.html',styleUrl:'./quote-editor.scss'})
 export class QuoteEditor implements OnInit {toast=inject(TpToastService);
+  mobileMenuOpen = signal(false);
  text(es:string,params:Record<string,string|number>={}){return this.data.language.formatText(es,params);}
  private changes=new ChangeTracker();
  private draft(){return {name:this.name,treatmentId:this.treatmentId,email:this.email,phone:this.phone,start:this.start,end:this.end,notes:this.notes,destinationId:this.destinationId,employeeId:this.employeeId,rooms:this.rooms(),hotels:this.selectedHotels().map(h=>h.id),regimes:this.hotelRegimes,prices:this.hotelPrices};}

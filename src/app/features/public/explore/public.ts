@@ -1,4 +1,4 @@
-import {NavIndicatorDirective} from '../../../shared/directives/nav-indicator.directive';
+import {PublicNavigation} from '../../../shared/components/public-navigation/public-navigation';
 import {ImagenesCarruselComponent} from '../../../shared/components/imagenes-carrusel/imagenes-carrusel.component';
 import {RangeSlider} from '../../../shared/components/range-slider/range-slider';
 import {Dialog} from '../../../shared/components/dialog/dialog';
@@ -23,8 +23,6 @@ import { State } from '../../../shared/components/state/state';
 import { FilterBar } from '../../../shared/components/filter-bar/filter-bar';
 import { LocationMap } from '../../../shared/components/location-map/location-map';
 import { BackButton } from '../../../shared/components/back-button/back-button';
-import { ThemeToggle } from '../../../shared/components/theme-toggle/theme-toggle';
-import { LanguageMenu } from '../../../shared/components/language-menu/language-menu';
 import { PublicFooter } from '../../../shared/components/public-footer/public-footer';
 import { QuickFilters } from '../../../shared/components/quick-filters/quick-filters';
 import { HotelInformation } from '../../hotels/components/hotel-information/hotel-information';
@@ -34,14 +32,12 @@ import {appendHotelPage} from '../../../data/utils/append-hotel-page';
 const normalizeExperience = (value:string)=>value.normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().trim();
 @Component({
   selector: 'tp-public',
-  imports: [NavIndicatorDirective,RangeSlider,Dialog,FormsModule,TpInputComponent,TpSelectSearchComponent,
+  imports: [PublicNavigation,RangeSlider,Dialog,FormsModule,TpInputComponent,TpSelectSearchComponent,
     ImagenesCarruselComponent,
     InternationalFilters,
     HotelInformation,
     QuickFilters,
     PublicFooter,
-    ThemeToggle,
-    LanguageMenu,
     BackButton,
     RouterLink,
     Button,
@@ -68,6 +64,7 @@ export class PublicPage implements OnInit, OnDestroy {
   mode = this.route.snapshot.data['mode'] || 'home';
   id = Number(this.route.snapshot.paramMap.get('id'));
   loading = signal(true);
+  mobileMenuOpen = signal(false);
   error = signal('');
   page = signal<Page>({ items: [], total: 0, page: 0 });
   cover = signal<any>(null);

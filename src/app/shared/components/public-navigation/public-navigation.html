@@ -1,0 +1,32 @@
+@if (mobileMenuOpen()) {
+  <div #mobileMenu class="mobile-menu-overlay" animate.enter="mobile-menu-enter" animate.leave="mobile-menu-leave">
+    <div class="mobile-menu-backdrop" aria-hidden="true" (click)="setMenu(false)"></div>
+    <section id="mobile-navigation" class="mobile-menu-panel" role="dialog" aria-modal="true" aria-labelledby="mobile-menu-title" cdkTrapFocus [cdkTrapFocusAutoCapture]="true" (keydown.escape)="setMenu(false); $event.stopPropagation()">
+      <div class="mobile-menu-heading">
+        <h2 id="mobile-menu-title">{{ text('Tu próxima aventura', 'Your next adventure') }}</h2>
+        <button class="mobile-menu-close" type="button" cdkFocusInitial [attr.aria-label]="text('Cerrar menú', 'Close menu')" (click)="setMenu(false)"><tp-icon name="close" /></button>
+      </div>
+      <nav [attr.aria-label]="text('Sitio público', 'Public site')">
+        <a routerLink="/" [class.active]="activeSection()==='home'" [attr.aria-current]="activeSection()==='home'?'page':null" (click)="setMenu(false); homeSelected.emit($event)">{{ text('Inicio', 'Home') }}<tp-icon name="right" /></a>
+        <a routerLink="/" fragment="destinos" [class.active]="activeSection()==='destinations'" [attr.aria-current]="activeSection()==='destinations'?'page':null" (click)="setMenu(false); destinationsSelected.emit($event)">{{ text('Destinos', 'Destinations') }}<tp-icon name="right" /></a>
+        <a routerLink="/circuitos" [class.active]="activeSection()==='circuits'" [attr.aria-current]="activeSection()==='circuits'?'page':null" (click)="setMenu(false)">{{ text('Circuitos', 'Tours') }}<tp-icon name="right" /></a>
+        <a routerLink="/cabanas" [class.active]="activeSection()==='cabins'" [attr.aria-current]="activeSection()==='cabins'?'page':null" (click)="setMenu(false)">{{ text('Cabañas', 'Cabins') }}<tp-icon name="right" /></a>
+      </nav>
+    </section>
+  </div>
+}
+<header class="public-header" [inert]="mobileMenuOpen()">
+  <a routerLink="/" [attr.aria-label]="text('Trotapie, inicio', 'Trotapie, home')" (click)="homeSelected.emit($event)"><img src="/brand/trotapie.png" alt="Trotapie Travel" /></a>
+  <nav [attr.aria-label]="text('Sitio público', 'Public site')" [tpNavIndicator]="activeSection()">
+    <span class="nav-indicator" aria-hidden="true"></span>
+    <a routerLink="/" [class.active]="activeSection()==='home'" [attr.aria-current]="activeSection()==='home'?'page':null" (click)="homeSelected.emit($event)">{{ text('Inicio', 'Home') }}</a>
+    <a routerLink="/" fragment="destinos" [class.active]="activeSection()==='destinations'" [attr.aria-current]="activeSection()==='destinations'?'page':null" (click)="destinationsSelected.emit($event)">{{ text('Destinos', 'Destinations') }}</a>
+    <a routerLink="/circuitos" [class.active]="activeSection()==='circuits'" [attr.aria-current]="activeSection()==='circuits'?'page':null">{{ text('Circuitos', 'Tours') }}</a>
+    <a routerLink="/cabanas" [class.active]="activeSection()==='cabins'" [attr.aria-current]="activeSection()==='cabins'?'page':null">{{ text('Cabañas', 'Cabins') }}</a>
+  </nav>
+  <div class="public-tools">
+    <tp-theme-toggle [english]="english()" />
+    <tp-language-menu [english]="english()" (changed)="languageChanged.emit()" />
+    <button class="mobile-menu-toggle" type="button" aria-controls="mobile-navigation" [attr.aria-expanded]="mobileMenuOpen()" [attr.aria-label]="text('Abrir menú', 'Open menu')" (click)="setMenu(true)"><tp-icon name="menu" /></button>
+  </div>
+</header>

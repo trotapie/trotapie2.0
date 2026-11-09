@@ -1,0 +1,17 @@
+:host { display: block; flex: 0 0 auto; }
+.public-header { display: flex; align-items: center; justify-content: space-between; gap: 24px; min-height: 96px; }
+.public-header > a img { width: 150px; height: 46px; object-fit: contain; }
+.public-header nav { display: flex; gap: 8px; position: relative; isolation: isolate; }
+.public-header nav a { padding: 12px 24px; border-radius: 999px; background: var(--muted-surface); font-size: 12px; position: relative; z-index: 1; transition: color .2s; }
+.public-header nav a.active { background: transparent; color: var(--surface); font-weight: 600; }
+.nav-indicator { position: absolute; left: 0; top: 0; z-index: 0; border-radius: 999px; background: var(--ink); pointer-events: none; opacity: 0; }
+.public-tools { display: flex; align-items: center; gap: 12px; }
+.mobile-menu-toggle { display: none; align-items: center; justify-content: center; flex-shrink: 0; width: 44px; height: 44px; padding: 10px; border: 1px solid var(--line); border-radius: 50%; background: var(--surface); color: var(--ink); cursor: pointer; }
+@media (max-width: 1000px) { .public-header nav a { padding: 10px 16px; } }
+@media (max-width: 700px) {
+  .public-header { gap: 12px; padding: 16px 0; min-height: 76px; }
+  .public-header > a img { width: 120px; height: 36px; }
+  .public-header nav { display: none; }
+  .public-tools { margin-left: auto; gap: 4px; }
+  .mobile-menu-toggle { display: flex; }
+}
