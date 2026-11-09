@@ -14,12 +14,16 @@ export class RoomPicker {
   roomTypes=input<RoomType[]>([]);
   showConfigurationHints=input(false);
   maxRooms=input(8);
-  adultOptions=computed(()=>[1,2,3,4,5,6].map(value=>({value,label:this.text(value===1?'{count} adulto':'{count} adultos',{count:value})})));
-  childOptions=computed(()=>[0,1,2,3,4,5].map(value=>({value,label:this.text(value===1?'{count} menor':'{count} menores',{count:value})})));
+  maxPeoplePerRoom=input(8);
+  adultOptions(room?:Room){return Array.from({length:Math.max(0,this.maxPeoplePerRoom()-(room?.children??0))},(_,i)=>i+1).map(value=>({value,label:this.text(value===1?'{count} adulto':'{count} adultos',{count:value})}));}
+  childOptions(room?:Room){return Array.from({length:Math.max(0,this.maxPeoplePerRoom()-(room?.adults??1)+1)},(_,value)=>({value,label:this.text(value===1?'{count} menor':'{count} menores',{count:value})}));}
   ageOptions=computed(()=>Array.from({length:18},(_,value)=>({value,label:this.text(value===1?'{count} año':'{count} años',{count:value})})));
   typeOptions(room:Room){return availableRoomTypes(room,this.roomTypes()).map(type=>({value:type.id,label:type.nombre_habitacion}));}
   bedOptions(room:Room){return (this.roomTypes().find(type=>type.id===room.roomTypeId)?.camas??[]).map(bed=>({value:bed.id,label:bed.nombre}));}
   update(i:number,key:'adults'|'children',value:number){
+    const room=this.rooms()[i];
+    const count=Number(value);
+    if(!room||!Number.isInteger(count)||count<(key==='adults'?1:0)||count+(key==='adults'?room.children:room.adults)>this.maxPeoplePerRoom())return;
     this.rooms.update(rows=>rows.map((room,j)=>i===j?reconcileRoom({...room,[key]:Number(value),childAges:key==='children'?Array.from({length:Number(value)},(_,k)=>room.childAges[k]??null):room.childAges},this.roomTypes()):room));
   }
   selectType(i:number,value:number|null){this.rooms.update(rows=>rows.map((room,j)=>i===j?selectRoomType(room,value===null?null:Number(value),this.roomTypes()):room));}
@@ -31,6 +35,6 @@ export class RoomPicker {
     }));
   }
   age(i:number,c:number,value:number|null){this.rooms.update(rows=>rows.map((room,j)=>i===j?{...room,childAges:room.childAges.map((age,k)=>k===c?value:age)}:room));}
-  add(){if(this.rooms().length<this.maxRooms())this.rooms.update(rows=>[...rows,{adults:2,children:0,childAges:[]}]);}
+  add(){if(this.rooms().length<this.maxRooms())this.rooms.update(rows=>[...rows,{adults:Math.min(2,this.maxPeoplePerRoom()),children:0,childAges:[]}]);}
   remove(i:number){if(this.rooms().length>1)this.rooms.update(rows=>rows.filter((_,j)=>i!==j));}
 }

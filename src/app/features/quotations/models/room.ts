@@ -1,4 +1,6 @@
 export interface Room { adults:number; children:number; childAges:(number|null)[]; roomTypeId?:number|null;roomTypeName?:string;bedTypeId?:number|null;bedTypeName?:string; }
 export function nights(start:string,end:string){const diff=Date.parse(end+'T00:00:00Z')-Date.parse(start+'T00:00:00Z');return Number.isFinite(diff)&&diff>0?Math.round(diff/86400000):0;}
-export function validRooms(rooms:Room[]){return rooms.length>0&&rooms.every(r=>r.adults>=1&&r.children>=0&&r.children===r.childAges.length&&r.childAges.every(age=>age!==null&&Number.isInteger(age)&&age>=0&&age<=17));}
+export interface QuoteRoomLimits {maxRooms:number;maxPeoplePerRoom:number;}
+export const DEFAULT_ROOM_LIMITS:QuoteRoomLimits={maxRooms:8,maxPeoplePerRoom:8};
+export function validRooms(rooms:Room[],limits:QuoteRoomLimits={maxRooms:Infinity,maxPeoplePerRoom:Infinity}){return rooms.length>0&&rooms.length<=limits.maxRooms&&rooms.every(r=>Number.isInteger(r.adults)&&Number.isInteger(r.children)&&r.adults>=1&&r.children>=0&&r.adults+r.children<=limits.maxPeoplePerRoom&&r.children===r.childAges.length&&r.childAges.every(age=>age!==null&&Number.isInteger(age)&&age>=0&&age<=17));}
 export function roomDescription(rooms:Room[]){const text=rooms.map((r,i)=>`Habitacion ${i+1}: ${r.adults} ${r.adults===1?'adulto':'adultos'}${r.children?' · '+r.children+' menores · edades: '+r.childAges.join(', '):''}${r.roomTypeName?' · Tipo: '+r.roomTypeName:''}${r.bedTypeName?' · Camas: '+r.bedTypeName:''}`).join('\n');return {es:text,traduccion:text};}

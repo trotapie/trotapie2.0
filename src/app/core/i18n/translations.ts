@@ -1446,6 +1446,12 @@ export const UI_TRANSLATIONS: Record<string, Record<string, string>> = {
     "de": "Das Dokument ist vorübergehend nicht verfügbar. Bitte versuchen Sie es später noch einmal.",
     "pt": "O documento não está disponível no momento. Tente novamente mais tarde."
   },
+  "Noches": {
+    "en": "Nights",
+    "fr": "Nuits",
+    "de": "Nächte",
+    "pt": "Noites"
+  },
   "Un momento, estamos preparando todo.": {
     "en": "One moment, we are getting everything ready.",
     "fr": "Un instant, nous préparons tout.",

@@ -1,0 +1,22 @@
+<tp-page-header title="Configuración general" description="Administra las reglas que se aplican en Trotapie." eyebrow="Trotapie / Administración"/>
+@if(error()){<div class="error-banner" role="alert">{{error()}}</div>}
+@if(loading()){
+  <tp-state mode="loading"/>
+} @else if(!saved()){
+  <tp-state mode="error" title="Configuración no disponible" message="Verifica que scripts/configuracion-cotizaciones.sql esté aplicado en Supabase e intenta nuevamente." (retry)="load()"/>
+} @else {
+  <form class="panel settings-panel" (ngSubmit)="save()">
+    <div class="panel-heading"><div><h2>Límites de cotizaciones</h2><p>Una misma configuración para las solicitudes del sitio público y las cotizaciones del equipo.</p></div><span class="settings-scope">General</span></div>
+    <fieldset [disabled]="saving()" class="settings-fields">
+      <legend class="sr-only">Límites de habitaciones y personas</legend>
+      <tp-field label="Máximo de habitaciones por cotización" forId="settings-max-rooms" [required]="true" hint="Cantidad total de habitaciones permitidas en una cotización.">
+        <input id="settings-max-rooms" name="maxRooms" type="number" min="1" max="2147483647" step="1" required [ngModel]="maxRooms()" (ngModelChange)="maxRooms.set($event)" aria-describedby="settings-number-help"/>
+      </tp-field>
+      <tp-field label="Máximo de personas por habitación" forId="settings-max-people" [required]="true" hint="Incluye adultos y menores juntos. Se requiere al menos un adulto.">
+        <input id="settings-max-people" name="maxPeoplePerRoom" type="number" min="1" max="2147483647" step="1" required [ngModel]="maxPeoplePerRoom()" (ngModelChange)="maxPeoplePerRoom.set($event)" aria-describedby="settings-number-help"/>
+      </tp-field>
+    </fieldset>
+    @if(!valid()){<p class="error-banner" role="alert">Completa ambos límites con números enteros válidos.</p>}
+    <div class="settings-actions"><span role="status">{{dirty()?'Tienes cambios sin guardar.':'La configuración está actualizada.'}}</span><div><button tpButton type="button" variant="quiet" [disabled]="saving()||!dirty()" (click)="reset()">Descartar cambios</button><button tpButton type="submit" variant="primary" icon="check" [busy]="saving()" [disabled]="saving()||!dirty()||!valid()">Guardar cambios</button></div></div>
+  </form>
+}

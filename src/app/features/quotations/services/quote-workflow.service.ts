@@ -1,12 +1,16 @@
 import {Injectable,inject} from '@angular/core';import {TravelDataService,Row} from '../../../data/facades/travel-data.service';import {Room,nights,roomDescription,validRooms} from '../models/room';
 import {validRoomConfiguration,reconcileRoom} from '../models/room-configuration';
+import {QuoteSettingsService} from './quote-settings.service';
 export interface QuoteDraft {name:string;treatmentId?:number|null;email:string;phone:string;start:string;end:string;destinationId:number;destinationName:string;rooms:Room[];notes:string;hotels:Array<{id:number;name:string;regimeId:number|null;price:number|null}>;multiple:boolean;employeeId:number|null;language:string;}
 @Injectable({providedIn:'root'})
 export class QuoteWorkflowService {
  data=inject(TravelDataService);
+ settings=inject(QuoteSettingsService);
  async create(draft:QuoteDraft,publicRequest=false){
  if(!publicRequest&&!this.data.auth.hasPermission('cotizaciones.create'))throw new Error('Tu rol no permite crear cotizaciones.');
   if(!draft.name.trim()||!draft.phone.trim()||!nights(draft.start,draft.end)||!validRooms(draft.rooms)||!draft.hotels.length)throw new Error('Revisa los datos del cliente, las fechas, las habitaciones y el hotel.');
+   const limits=await this.settings.load();
+   if(!validRooms(draft.rooms,limits))throw new Error(`Se permiten hasta ${limits.maxRooms} habitaciones y ${limits.maxPeoplePerRoom} personas por habitación, entre adultos y menores.`);
   const types=await this.data.catalogs.obtenerTiposHabitacionCamas(draft.language);
   if(!draft.rooms.every(room=>validRoomConfiguration(room,types)))throw new Error('Selecciona un tipo de habitación con capacidad suficiente y revisa las camas elegidas, si las indicaste.');
   draft={...draft,rooms:draft.rooms.map(room=>reconcileRoom(room,types))};
@@ -21,7 +25,7 @@ export class QuoteWorkflowService {
   if(advisors.error)throw advisors.error;
   if(!advisors.data?.some((employee:{id:number})=>employee.id===employeeId))throw new Error('El asesor seleccionado ya no está disponible. Selecciona un asesor activo y habilitado para cotizaciones.');
  const client=await this.data.legacy.upsertCliente({nombre:draft.name.trim(),nombre_completo:draft.name.trim(),tratamiento_id:draft.treatmentId??null,email:draft.email.trim()||null,telefono:draft.phone.trim(),recibir_ofertas:false});
- const common={cliente_id:client.id,empleado_id:employeeId,fecha_entrada:draft.start,fecha_salida:draft.end,noches:nights(draft.start,draft.end),habitaciones:roomDescription(draft.rooms),peticiones_especiales:draft.notes.trim()||null};
+  const common={cliente_id:client.id,empleado_id:employeeId,fecha_entrada:draft.start,fecha_salida:draft.end,noches:nights(draft.start,draft.end),habitaciones:{...roomDescription(draft.rooms),distribucion:draft.rooms.map(room=>({adultos:room.adults,menores:room.children}))},peticiones_especiales:draft.notes.trim()||null};
  let result:any;
  if(draft.multiple)result=await this.data.legacy.guardarCotizacionMultiple({...common,nombre_persona:draft.name.trim(),correo:draft.email.trim()||null,telefono:draft.phone.trim(),destino_id:draft.destinationId,total_personas:draft.rooms.reduce((n,r)=>n+r.adults+r.children,0),total_habitaciones:draft.rooms.length,estatus_clave:'pendiente',hoteles:draft.hotels.map((h,i)=>({hotel_id:h.id,hotel_nombre:h.name,regimen_id:h.regimeId,destino_id:null,catalogo_destino_id:draft.destinationId,destino_nombre:draft.destinationName,orden:i+1,es_principal:i===0,precio:h.price}))});
  else result=await this.data.legacy.crearSolicitudCotizacion({...common,hotel_id:draft.hotels[0].id,regimen_id:draft.hotels[0].regimeId,idioma:draft.language,recibir_ofertas:false});

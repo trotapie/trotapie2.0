@@ -1,4 +1,6 @@
 import {quoteAdminSegment} from '../models/quote-route';
+import {QuoteSettingsService} from '../services/quote-settings.service';
+import {DEFAULT_ROOM_LIMITS} from '../models/room';
 import {PublicNavigation} from '../../../shared/components/public-navigation/public-navigation';
 import {RoomType,validRoomConfiguration} from '../models/room-configuration';
 import {quoteWhatsAppUrl} from '../models/quote-whatsapp';
@@ -12,6 +14,10 @@ import {Component,inject,signal,computed,OnInit} from '@angular/core';import {Ro
  @Component({selector:'tp-quote-editor',imports:[PublicNavigation,TpSelectSearchComponent,DateRangeFilterComponent,RouterLink,FormsModule,PageHeader,Field,Button,Icon,State,RoomPicker],templateUrl:'./quote-editor.html',styleUrl:'./quote-editor.scss'})
 export class QuoteEditor implements OnInit {toast=inject(TpToastService);
   mobileMenuOpen = signal(false);
+  settings=inject(QuoteSettingsService);
+  roomLimits=signal({...DEFAULT_ROOM_LIMITS});
+  limitsReady=signal(false);
+  configuredRoomsValid=computed(()=>this.limitsReady()&&validRooms(this.rooms(),this.roomLimits()));
  text(es:string,params:Record<string,string|number>={}){return this.data.language.formatText(es,params);}
  private changes=new ChangeTracker();
  private draft(){return {name:this.name,treatmentId:this.treatmentId,email:this.email,phone:this.phone,start:this.start,end:this.end,notes:this.notes,destinationId:this.destinationId,employeeId:this.employeeId,rooms:this.rooms(),hotels:this.selectedHotels().map(h=>h.id),regimes:this.hotelRegimes,prices:this.hotelPrices};}
@@ -31,7 +37,12 @@ export class QuoteEditor implements OnInit {toast=inject(TpToastService);
   clientDisplayName(){return construirNombreClienteVisible({nombreCompleto:this.name,tratamientoAbreviacion:this.treatments().find(treatment=>treatment.id===this.treatmentId)?.abreviacion});}
   advisorName(){return this.employees().find(employee=>employee.id===this.employeeId)?.nombre||'Equipo Trotapie';}
  totalGuests=(n:number,r:Room)=>n+r.adults+r.children;
- async ngOnInit(){try{await this.loadDestinations();this.employeeId=null;
+  async ngOnInit(){try{
+   const limits=await this.settings.load();
+   this.roomLimits.set(limits);
+   this.rooms.update(rooms=>rooms.map(room=>({...room,adults:Math.min(room.adults,limits.maxPeoplePerRoom)})));
+   this.limitsReady.set(true);
+   await this.loadDestinations();this.employeeId=null;
   this.roomTypes.set(await this.data.catalogs.obtenerTiposHabitacionCamas(this.data.language.language()));
   this.treatments.set(await this.data.legacy.obtenerTratamientosActivos());
   const advisors=await this.data.employees.asesoresCotizacion();
@@ -77,7 +88,7 @@ export class QuoteEditor implements OnInit {toast=inject(TpToastService);
   next(){this.error.set('');if(this.step()===0&&!this.employees().some(employee=>employee.id===this.employeeId)){this.error.set('Selecciona un asesor para tu solicitud.');return;}if(this.step()===0&&(!this.name.trim()||!this.phone.trim()||!this.nightCount()||!this.roomValidity())){this.error.set('Completa el nombre, teléfono, fechas y las edades de los menores.');return;}if(this.step()===0&&!this.roomConfigurationValidity()){this.error.set('Selecciona un tipo de habitación válido y revisa las camas elegidas, si las indicaste.');return;}if(this.step()===1&&!this.regimesReady()){this.error.set('Revisa el régimen de alojamiento de cada hotel.');return;}if(this.step()===1&&!this.selectedHotels().length){this.error.set('Selecciona al menos un hotel.');return;}this.step.update(s=>Math.min(2,s+1));}
   whatsappUrl = signal('');
   async save(){
-    if(this.busy()||this.success())return;
+    if(this.busy()||this.success()||!this.configuredRoomsValid())return;
     this.busy.set(true);
     this.error.set('');
     try{
@@ -113,5 +124,5 @@ export class QuoteEditor implements OnInit {toast=inject(TpToastService);
       else this.toast.error(e instanceof Error?e.message:'No pudimos guardar la solicitud.');
     }finally{this.busy.set(false);}
   }
- removeRoom(i:number){if(this.rooms().length>1)this.rooms.update(r=>r.filter((_,index)=>i!==index));}addRoom(){if(this.rooms().length<8)this.rooms.update(r=>[...r,{adults:2,children:0,childAges:[]}]);}
+ removeRoom(i:number){if(this.rooms().length>1)this.rooms.update(r=>r.filter((_,index)=>i!==index));}addRoom(){if(this.limitsReady()&&this.rooms().length<this.roomLimits().maxRooms)this.rooms.update(r=>[...r,{adults:Math.min(2,this.roomLimits().maxPeoplePerRoom),children:0,childAges:[]}]);}
 }

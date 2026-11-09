@@ -16,6 +16,7 @@ function setup({blocked=false,publicRequest=true}={}){
     {open(...args){opened.push(args);if(blocked)throw new Error('Blocked');}},quoteWhatsAppUrl,()=> 'quote-id',
   );
   const editor={
+    configuredRoomsValid:()=>true,
     save,publicRequest,busy:signal(false),success:signal(''),error:signal(''),whatsappUrl:signal(''),
     name:'Ana',phone:'6181234567',email:'',start:'2026-12-20',end:'2026-12-23',notes:'',
     destinationId:1,employeeId:2,multiple:false,treatmentId:null,hotelRegimes:{3:4},hotelPrices:{},

@@ -3,8 +3,8 @@
     <section class="room">
       <header><h3>{{text('Habitación {number}',{number:i+1})}}</h3>@if(rooms().length>1){<button tpButton variant="icon" icon="trash" type="button" [attr.aria-label]="text('Quitar habitación {number}',{number:i+1})" (click)="remove(i)"></button>}</header>
       <div class="form-grid">
-        <app-tp-select-search [label]="text('Adultos')" [name]="'adults-'+i" [options]="adultOptions()" [ngModel]="room.adults" (ngModelChange)="update(i,'adults',$event)" [showClear]="false" [showSearch]="false"/>
-        <app-tp-select-search [label]="text('Menores')" [name]="'children-'+i" [options]="childOptions()" [ngModel]="room.children" (ngModelChange)="update(i,'children',$event)" [showClear]="false" [showSearch]="false"/>
+        <app-tp-select-search [label]="text('Adultos')" [name]="'adults-'+i" [options]="adultOptions(room)" [ngModel]="room.adults" (ngModelChange)="update(i,'adults',$event)" [showClear]="false" [showSearch]="false"/>
+        <app-tp-select-search [label]="text('Menores')" [name]="'children-'+i" [options]="childOptions(room)" [ngModel]="room.children" (ngModelChange)="update(i,'children',$event)" [showClear]="false" [showSearch]="false"/>
         <app-tp-select-search [label]="text('Tipo de habitación')" [name]="'room-type-'+i" [options]="typeOptions(room)" [ngModel]="room.roomTypeId" (ngModelChange)="selectType(i,$event)" [required]="true" [placeholder]="text('Seleccionar habitación')" [emptyMessage]="text('No hay habitaciones con capacidad suficiente.')"/>
         <app-tp-select-search [label]="text('Camas (opcional)')" [name]="'bed-type-'+i" [options]="bedOptions(room)" [ngModel]="room.bedTypeId" (ngModelChange)="selectBed(i,$event)" [disabled]="!room.roomTypeId||!bedOptions(room).length" [placeholder]="text(!room.roomTypeId?'Selecciona una habitación primero':bedOptions(room).length?'Seleccionar camas':'Sin opciones disponibles')"/>
       </div>

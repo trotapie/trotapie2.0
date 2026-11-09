@@ -10,7 +10,7 @@ export class AuthService {
   private pending?: Promise<boolean>;
   private checked = 0;
   error = signal('');
-  hasPermission(key: string) { return this.identity()?.role === 'admin' || !!this.identity()?.permissions.includes(key); }
+  hasPermission(key: string) { return this.identity()?.role === 'admin' || (key !== 'configuracion.manage' && !!this.identity()?.permissions.includes(key)); }
   async ensure(): Promise<boolean> {
     if (this.identity() && Date.now() - this.checked < 60_000) return true;
     if (this.pending) return this.pending;

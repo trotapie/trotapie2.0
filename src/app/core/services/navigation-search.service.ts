@@ -7,8 +7,7 @@ export const workspaceNavigation=[{name:'Dashboard',path:'dashboard',icon:'grid'
 export const workspaceMoreNavigation=[{name:'Hoteles',path:'hoteles',icon:'hotel',permission:'hoteles.view'},{name:'Clientes',path:'clientes',icon:'people',permission:'cotizaciones.view'},{name:'Empleados',path:'empleados',icon:'people',permission:'empleados.manage'},
   // {name:'Circuitos',path:'circuitos',icon:'suitcase',permission:'circuitos.view'},
   {name:'Catálogos',path:'catalogos',icon:'grid',permission:'destinos.edit'},{name:'Imágenes del inicio',path:'imagenes-inicio',icon:'home',permission:'destinos.edit'},
-  // Entrega posterior: administración de roles y permisos.
-  // {name:'Configuración',path:'configuracion',icon:'settings',permission:'empleados.manage'}
+  {name:'Configuración general',path:'configuracion',icon:'settings',permission:'configuracion.manage'}
 ];
 
 @Injectable({providedIn:'root'})

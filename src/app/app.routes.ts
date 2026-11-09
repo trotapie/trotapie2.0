@@ -10,6 +10,7 @@ const catalogRoutes=(preview=false):Routes=>[
  {path:'',pathMatch:'full',redirectTo:'dashboard'},
   {path:'dashboard',loadComponent:dashboard,data:{preview}},
   {path:'imagenes-inicio',loadComponent:()=>import('./features/admin/home-images/home-images').then(m=>m.HomeImages),data:{permission:'destinos.edit'},canActivate:[authGuard],canDeactivate:[unsavedChangesGuard]},
+  {path:'configuracion',title:'Configuración general | Trotapie',loadComponent:()=>import('./features/configuration/general-settings/general-settings').then(m=>m.GeneralSettings),data:{permission:'configuracion.manage'},canActivate:[authGuard],canDeactivate:[unsavedChangesGuard]},
  // Entrega posterior: gestión de acceso, roles y permisos.
  // {path:'empleados/:id/acceso',loadComponent:()=>import('./features/employees/access/employee-access').then(m=>m.EmployeeAccess),data:{permission:'empleados.manage'},canActivate:[authGuard]},
  {path:'circuitos/:id/flyer',loadComponent:()=>import('./features/circuits/flyer/flyer-editor').then(m=>m.FlyerEditor),data:{permission:'circuitos.edit'},canActivate:[authGuard]},

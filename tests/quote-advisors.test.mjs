@@ -13,7 +13,7 @@ const roomTypes=[{id:1,nombre_habitacion:'Doble',capacidad_maxima:2,camas:[{id:1
 
 function setup({advisors=[{id:2,nombre:'Asesor'}],error=null,employeeId=2}={}){
   const writes=[];
-  const workflow=Object.assign(new Workflow(),{data:{
+  const workflow=Object.assign(new Workflow(),{settings:{load:async()=>({maxRooms:8,maxPeoplePerRoom:8})},data:{
     auth:{hasPermission:()=>true,identity:()=>({employeeId:99})},
     employees:{asesoresCotizacion:async()=>({data:advisors,error})},
     hotels:{obtenerRegimenesCotizacionHotel:async()=>[]},
@@ -68,6 +68,7 @@ for(const publicRequest of [false,true]){
   test(`loads the same restricted advisor list (${publicRequest?'public':'internal'})`,async()=>{
     const editor=Object.assign(new Editor(),{
       publicRequest,hotelId:0,employeeId:99,employees:signal([]),treatments:signal([]),roomTypes:signal([]),error:signal(''),loading:signal(true),
+      settings:{load:async()=>({maxRooms:8,maxPeoplePerRoom:8})},roomLimits:signal({}),limitsReady:signal(false),rooms:{update(){}},
       async loadDestinations(){},changes:{capture(){}},draft:()=>({}),
       data:{auth:{identity:()=>({employeeId:99})},legacy:{obtenerTratamientosActivos:async()=>[]},
         catalogs:{obtenerTiposHabitacionCamas:async()=>roomTypes},language:{language:()=> 'es'},
@@ -102,4 +103,25 @@ test('saves a quotation without selecting beds',async()=>{
   await workflow.create(draft);
   assert.match(writes[1].habitaciones.es,/Tipo: Doble/);
   assert.doesNotMatch(writes[1].habitaciones.es,/Camas:/);
+});
+
+test('validates configured occupancy before writing any data',async()=>{
+  const {workflow,draft,writes}=setup();
+  workflow.settings.load=async()=>({maxRooms:1,maxPeoplePerRoom:1});
+  await assert.rejects(workflow.create(draft),/1 personas por habitación/);
+  assert.equal(writes.length,0);
+});
+
+test('validates configured room count before writing any data',async()=>{
+  const {workflow,draft,writes}=setup();
+  workflow.settings.load=async()=>({maxRooms:1,maxPeoplePerRoom:8});
+  draft.rooms.push({...draft.rooms[0]});
+  await assert.rejects(workflow.create(draft),/hasta 1 habitaciones/);
+  assert.equal(writes.length,0);
+});
+
+test('includes structured occupancy for database validation',async()=>{
+  const {workflow,draft,writes}=setup();
+  await workflow.create(draft);
+  assert.deepEqual(writes[1].habitaciones.distribucion,[{adultos:2,menores:0}]);
 });
