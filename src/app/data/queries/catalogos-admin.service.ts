@@ -2,6 +2,8 @@
 import { inject, Injectable } from '@angular/core';
 import { SupabaseService } from './supabase.service';
 import { origenReservacionPayload } from './origen-reservacion-payload';
+import { generateImageTypeKey } from '../utils/image-type-key';
+import { normalizeImageTypeName } from '../utils/image-type-name';
 
 const ES_ID = 1;
 
@@ -863,29 +865,28 @@ export class CatalogosAdminService {
         return data;
       }
       case 'tipo_imagen': {
-        const { data: ultimoRegistro, error: ultimoError } = await this.client
+        const descripcion = normalizeImageTypeName(payload.descripcion_es ?? payload.descripcion ?? payload.nombre);
+        const { data: registros, error: ultimoError } = await this.client
           .from('tipos_imagen')
-          .select('orden')
-          .order('orden', { ascending: false })
-          .limit(1)
-          .maybeSingle();
+          .select('clave, orden');
 
         if (ultimoError) throw ultimoError;
 
-        const ordenMaximo = Number((ultimoRegistro as any)?.orden);
-        const siguienteOrden = Number.isFinite(ordenMaximo) ? ordenMaximo + 1 : 1;
+        const ordenMaximo = (registros ?? []).reduce((maximo, registro) => Math.max(maximo, Number(registro.orden) || 0), 0);
+        const siguienteOrden = ordenMaximo + 1;
+        const clave = generateImageTypeKey(descripcion, (registros ?? []).map(registro => String(registro.clave ?? '')));
 
         const { data, error } = await this.client
           .from('tipos_imagen')
           .insert({
-            clave: payload.clave ?? null,
+            clave,
             orden: siguienteOrden
           })
           .select('id, clave, orden')
           .single();
 
         if (error) throw error;
-        await this.guardarTraduccionesTipoImagen(Number((data as any).id), String(payload.descripcion_es ?? '').trim());
+        await this.guardarTraduccionesTipoImagen(Number((data as any).id), descripcion);
         return data;
       }
       default:
@@ -1325,14 +1326,11 @@ export class CatalogosAdminService {
       case 'tipo_imagen': {
         const { data, error } = await this.client
           .from('tipos_imagen')
-          .update({
-            clave: payload.clave ?? null
-          })
-          .eq('id', id)
           .select('id')
+          .eq('id', id)
           .maybeSingle();
         if (error) throw error;
-        await this.guardarTraduccionesTipoImagen(id, String(payload.descripcion_es ?? '').trim());
+        await this.guardarTraduccionesTipoImagen(id, normalizeImageTypeName(payload.descripcion_es ?? payload.descripcion ?? payload.nombre));
         return data;
       }
       case 'tipos_habitacion': {

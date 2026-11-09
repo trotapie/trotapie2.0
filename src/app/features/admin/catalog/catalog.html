@@ -297,6 +297,21 @@
       (saved)="save($event)"
       (cancelled)="closeEditor()"
     />
+    @if (kind === 'catalogos' && catalog() === 'tipo_imagen') {
+      <section class="image-type-translations" aria-labelledby="image-type-translations-title">
+        <h3 id="image-type-translations-title">Traducciones guardadas</h3>
+        <p>Se generan automáticamente al guardar el nombre en español.</p>
+        @if (imageTranslations().length) {
+          <dl>
+            @for (translation of imageTranslations(); track translation.code) {
+              <div><dt>{{translation.label}}</dt><dd [attr.lang]="translation.code">{{translation.text || 'Sin traducción'}}</dd></div>
+            }
+          </dl>
+        } @else {
+          <p>Aún no hay traducciones guardadas.</p>
+        }
+      </section>
+    }
     @if (selected() && canEdit() && kind !== 'clientes' && !(kind==='empleados' && selected()!.title.trim().toLowerCase()==='otro')) {
       <div class="delete-area">
         <button tpButton icon="trash" variant="danger" (click)="removeOpen.set(true)">

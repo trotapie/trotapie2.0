@@ -1,4 +1,5 @@
 import {quoteAdminSegment} from '../../quotations/models/quote-route';
+import {imageTypeTranslations} from '../../catalogs/models/image-type-translations';
 import {viewChild} from '@angular/core';
 import {protectUnsavedChanges} from '../../../core/guards/unsaved-changes.guard';
 import {combineLatest} from 'rxjs';
@@ -19,6 +20,7 @@ import {BannerComponent} from '../../../shared/components/banner/banner.componen
 import {employeeActions,isProtectedEmployee} from '../../employees/models/employee-management';
 @Component({selector:'tp-catalog',imports:[BannerComponent,CatalogPicker,DecimalPipe,CatalogScrollDirective,TpSelectSearchComponent,TpActionsMenuComponent,QuoteColumnFilters,RouterLink,FormsModule,PageHeader,Button,Icon,State,FilterBar,DataTable,ImageCard,Dialog,ResourceForm],templateUrl:'./catalog.html',styleUrl:'./catalog.scss'})
 export class Catalog implements OnInit,OnDestroy {toast=inject(TpToastService);
+ imageTranslations=computed(()=>imageTypeTranslations(this.value()['traducciones_preview']));
  private editorForm=viewChild<ResourceForm>('editorForm');
  private pendingChanges=protectUnsavedChanges(()=>this.kind!=='circuitos'&&this.editorOpen()&&!this.editorLoading()&&!!this.editorForm()?.hasChanges(),()=>this.kind!=='circuitos'&&(this.saving()||this.removing()));
  canDeactivate(){return this.pendingChanges.confirm();}
