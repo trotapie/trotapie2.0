@@ -69,3 +69,21 @@ test('resetting home design does not clear content or activation',()=>{
   assert.equal(reset.url_imagen,image.url_imagen);
   assert.equal(image.presentacion.zoom,2);
 });
+
+test('zoom and pan preserve the full natural image before the hero clips it',()=>{
+  for(const dimensions of [{width:2400,height:1000},{width:1000,height:2400},{width:1200,height:1200}]){
+    for(const zoom of [0.5,0.85,1,1.5]){
+      const scale=Math.max(800/dimensions.width,500/dimensions.height)*zoom;
+      const width=dimensions.width*scale,height=dimensions.height*scale;
+      for(const position of [0,50,100]){
+        const rendered=homeImagePhotoStyle({zoom,x:position,y:position},dimensions);
+        assert.equal(parseFloat(rendered.width),width);
+        assert.equal(parseFloat(rendered.height),height);
+        assert.ok(Math.abs(parseFloat(rendered.left)-(800-width)*position/100)<0.00001);
+        assert.ok(Math.abs(parseFloat(rendered.top)-(500-height)*position/100)<0.00001);
+        assert.ok(Math.abs(width/height-dimensions.width/dimensions.height)<0.00001);
+        assert.equal(rendered.transform,'none');
+      }
+    }
+  }
+});

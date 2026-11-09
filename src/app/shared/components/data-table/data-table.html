@@ -1,11 +1,11 @@
 <div class="table-scroll" [class.sticky-header]="stickyHeader()" [attr.tabindex]="stickyHeader()?0:null" [attr.role]="stickyHeader()?'region':null" [attr.aria-label]="stickyHeader()?'Listado de registros':null">
   <table>
-    <thead><tr><th scope="col">{{title()}}</th>@for(c of columns();track c.key){<th scope="col" [class.column-details]="!!c.detailsKey">{{c.label}}</th>}<th scope="col">Estado</th>@if(actionable()){<th scope="col"><span class="sr-only">Acciones</span></th>}</tr></thead>
+    <thead><tr><th scope="col">{{title() | uiText}}</th>@for(c of columns();track c.key){<th scope="col" [class.column-details]="!!c.detailsKey">{{c.label | uiText}}</th>}<th scope="col">{{'Estado' | uiText}}</th>@if(actionable()){<th scope="col"><span class="sr-only">{{'Acciones' | uiText}}</span></th>}</tr></thead>
     <tbody>@for(r of records();track r.id){
       <tr class="record-row">
         <td class="record-name"><div class="table-identity">@if(r.image){<img [src]="r.image" [alt]="r.title" loading="lazy" (error)="imageError($event)"/>}@else if(r.raw['icono']){<span class="table-initial"><tp-catalog-icon [value]="r.raw['icono']"/></span>}@else{<span class="table-initial">{{r.title.slice(0,1)}}</span>}<div><strong>{{r.title}}</strong><small>{{r.subtitle}}</small></div></div></td>
         @for(c of columns();track c.key){
-          <td [attr.data-label]="c.label" [class.column-details]="!!c.detailsKey">
+          <td [attr.data-label]="c.label | uiText" [class.column-details]="!!c.detailsKey">
             <span class="cell-with-details">
               @if(!c.detailsKey||details(r,c).length<=1){<span>{{c.key==='created_at' ? (r.raw[c.key] | date:'d MMMM yyyy':undefined:'es-MX') : r.raw[c.key] || '—'}}</span>}
               @if(details(r,c).length>1){
@@ -14,7 +14,7 @@
                 </button>
                 <ng-template cdkConnectedOverlay [cdkConnectedOverlayOrigin]="detailsOrigin" [cdkConnectedOverlayOpen]="detailsOpen()===detailsId(r,c)" [cdkConnectedOverlayPositions]="detailsPositions" [cdkConnectedOverlayHasBackdrop]="true" cdkConnectedOverlayBackdropClass="cdk-overlay-transparent-backdrop" [cdkConnectedOverlayPush]="true" [cdkConnectedOverlayViewportMargin]="12" (backdropClick)="detailsOpen.set(null)" (overlayKeydown)="$event.key==='Escape'&&detailsOpen.set(null)" (detach)="detailsOpen.set(null)">
                   <section class="cell-details-panel" role="region" [id]="detailsId(r,c)" [attr.aria-label]="c.label+' de '+r.title">
-                    <strong>{{c.label}}</strong>
+                    <strong>{{c.label | uiText}}</strong>
                     <small>{{r.title}}</small>
                     <ul>@for(detail of details(r,c);track $index){<li>{{detail}}</li>}</ul>
                   </section>

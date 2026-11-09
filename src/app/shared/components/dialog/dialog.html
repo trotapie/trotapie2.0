@@ -7,22 +7,22 @@
   [class.dialog-editor]="size() === 'editor'"
   [class.dialog-wide]="size() === 'wide'"
   [class.dialog-adaptive]="placement() === 'adaptive'"
-  [attr.aria-label]="title()"
+  [attr.aria-label]="title() | uiText"
   (cancel)="cancel($event)"
   (keydown)="keepFocus($event)"
   (click)="backdrop($event)"
 >
   <header>
     <div>
-      <span class="eyebrow">{{ eyebrow() }}</span>
-      <h2>{{ title() }}</h2>
+      <span class="eyebrow">{{ eyebrow() | uiText }}</span>
+      <h2>{{ title() | uiText }}</h2>
     </div>
     <button
       tpButton
       variant="icon"
       icon="close"
       type="button"
-      [attr.aria-label]="closeLabel()"
+      [attr.aria-label]="closeLabel() | uiText"
       [disabled]="busy()"
       (click)="closed.emit()"
     ></button>

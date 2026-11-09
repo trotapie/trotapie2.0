@@ -12,12 +12,12 @@
     [busy]="loading()"
     aria-label="Actualizar datos"
   >
-    Actualizar
+    {{'Actualizar' | uiText}}
   </button>
   @if (kind === 'cotizaciones') {
     @if (preview || data.auth.hasPermission('cotizaciones.create')) {
       <a tpButton icon="plus" variant="primary" [routerLink]="base + '/cotizaciones/nueva'"
-         >Nueva</a
+         >{{'Nueva' | uiText}}</a
        >
       <!-- Oculto temporalmente: creación de cotizaciones comparativas.
       <a
@@ -31,7 +31,7 @@
     }
   } @else if (preview || canEdit()) {
     <button tpButton icon="plus" variant="primary" (click)="open(null)">
-      Crear {{ definition().singular }}
+      {{'Crear' | uiText}} {{ definition().singular | uiText }}
     </button>
   }
 </tp-page-header>
@@ -40,9 +40,9 @@
   <div>
     <tp-icon [name]="definition().icon" /><span
       ><small>{{
-        kind === 'catalogos'
+        (kind === 'catalogos'
           ? catalogTitle()
-          : 'Registros disponibles'
+          : 'Registros disponibles') | uiText
       }}</small
       ><strong>{{
         preview && kind !== 'destinos' && kind !== 'hoteles' && kind !== 'circuitos'
@@ -52,9 +52,9 @@
     >
   </div>
   <span>{{
-    preview
+    (preview
       ? 'Consulta las pantallas. Inicia sesión para gestionar datos privados.'
-      : 'Selecciona un registro para consultar o editar su información.'
+      : 'Selecciona un registro para consultar o editar su información.') | uiText
   }}</span>
 </section>
 <section class="panel catalog-panel" tpCatalogScroll>
@@ -91,7 +91,7 @@
         icon="grid"
         [class.active]="view() === 'cards'"
         [attr.aria-pressed]="view() === 'cards'"
-        aria-label="Vista de tarjetas"
+        [attr.aria-label]="'Vista de tarjetas' | uiText"
         (click)="view.set('cards')"
       ></button
       ><button
@@ -100,7 +100,7 @@
         icon="menu"
         [class.active]="view() === 'table'"
         [attr.aria-pressed]="view() === 'table'"
-        aria-label="Vista de tabla"
+        [attr.aria-label]="'Vista de tabla' | uiText"
         (click)="view.set('table')"
       ></button>
     </div>
@@ -177,14 +177,14 @@
           [disabled]="page().page === 0 || loading()"
           (click)="load(page().page - 1)"
         >
-          Anterior</button
+          {{'Anterior' | uiText}}</button
         ><button
           tpButton
           icon="right"
           [disabled]="(page().page + 1) * pageSize() >= page().total || loading()"
           (click)="load(page().page + 1)"
         >
-          Siguiente
+          {{'Siguiente' | uiText}}
         </button>
       </div>
     </div>
@@ -214,7 +214,7 @@
   }
   <div class="dialog-actions">
     @if(employeePending();as pending){
-      <button tpButton icon="close" [disabled]="employeeBusy()" (click)="employeePending.set(null)">Cancelar</button>
+      <button tpButton icon="close" [disabled]="employeeBusy()" (click)="employeePending.set(null)">{{'Cancelar' | uiText}}</button>
       <button tpButton [icon]="pending.action==='delete-employee'?'trash':'check'" [variant]="pending.action==='employee-status'&&pending.record.raw['estatus_clave']!=='activo'?'primary':'danger'" [busy]="employeeBusy()" [disabled]="employeeBusy()" (click)="confirmEmployeeAction()">{{pending.action==='remove-access'?'Confirmar retiro de acceso':pending.action==='delete-employee'?'Eliminar empleado':pending.record.raw['estatus_clave']==='activo'?'Inhabilitar empleado':'Habilitar empleado'}}</button>
     }
   </div>
@@ -224,9 +224,9 @@
     <tp-quote-column-filters [value]="quoteFilterDraft()" [status]="quoteStatusDraft()" [multiple]="multiple()" (changed)="quoteFilterDraft.set($event)" (statusChanged)="quoteStatusDraft.set($event)"/>
   }
   <div class="dialog-actions">
-    <button tpButton variant="quiet" type="button" (click)="resetQuoteFilterDraft()">Limpiar filtros</button>
-    <button tpButton type="button" (click)="quoteFiltersOpen.set(false)">Cancelar</button>
-    <button tpButton variant="primary" icon="filter" type="button" (click)="applyQuoteFilters()">Aplicar filtros</button>
+    <button tpButton variant="quiet" type="button" (click)="resetQuoteFilterDraft()">{{'Limpiar filtros' | uiText}}</button>
+    <button tpButton type="button" (click)="quoteFiltersOpen.set(false)">{{'Cancelar' | uiText}}</button>
+    <button tpButton variant="primary" icon="filter" type="button" (click)="applyQuoteFilters()">{{'Aplicar filtros' | uiText}}</button>
   </div>
 </tp-dialog>
 <tp-dialog [open]="hotelFiltersOpen()" title="Filtrar hoteles" eyebrow="Personaliza los resultados" placement="adaptive" (closed)="hotelFiltersOpen.set(false)">

@@ -1,1 +1,1 @@
-<div class="field"><label [attr.for]="forId()">{{label()}}@if(required()){<span class="required"> *</span>}</label><ng-content/>@if(error()){<span class="field-error" role="alert">{{error()}}</span>}@else if(hint()){<small>{{hint()}}</small>}</div>
+<div class="field"><label [attr.for]="forId()">{{label() | uiText}}@if(required()){<span class="required"> *</span>}</label><ng-content/>@if(error()){<span class="field-error" role="alert">{{error() | uiText}}</span>}@else if(hint()){<small>{{hint() | uiText}}</small>}</div>

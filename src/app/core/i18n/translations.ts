@@ -1035,8 +1035,8 @@ export const UI_TRANSLATIONS: Record<string, Record<string, string>> = {
   "El próximo destino está por llegar": {
     "en": "Your next destination is on its way",
     "fr": "La prochaine destination arrive bientôt",
-    "de": "Das nächste Reiseziel ist auf dem Weg",
-    "pt": "O próximo destino está a caminho"
+    "de": "Das nächste Reiseziel kommt bald",
+    "pt": "O próximo destino está chegando"
   },
   "Prueba otra búsqueda o explora otra categoría.": {
     "en": "Try another search or category.",
@@ -2297,5 +2297,617 @@ export const UI_TRANSLATIONS: Record<string, Record<string, string>> = {
     "fr": "Réessayer",
     "de": "Erneut versuchen",
     "pt": "Tentar novamente"
+  },
+  "Navegación rápida": {
+    "en": "Quick navigation",
+    "fr": "Navigation rapide",
+    "de": "Schnellnavigation",
+    "pt": "Navegação rápida"
+  },
+  "Cerrar buscador": {
+    "en": "Close search",
+    "fr": "Fermer la recherche",
+    "de": "Suche schließen",
+    "pt": "Fechar busca"
+  },
+  "Busca una sección o catálogo…": {
+    "en": "Search for a section or catalog…",
+    "fr": "Recherchez une section ou un catalogue…",
+    "de": "Bereich oder Katalog suchen…",
+    "pt": "Busque uma seção ou catálogo…"
+  },
+  "Secciones y catálogos disponibles": {
+    "en": "Available sections and catalogs",
+    "fr": "Sections et catalogues disponibles",
+    "de": "Verfügbare Bereiche und Kataloge",
+    "pt": "Seções e catálogos disponíveis"
+  },
+  "Secciones": {
+    "en": "Sections",
+    "fr": "Sections",
+    "de": "Bereiche",
+    "pt": "Seções"
+  },
+  "resultado": {
+    "en": "result",
+    "fr": "résultat",
+    "de": "Ergebnis",
+    "pt": "resultado"
+  },
+  "resultados": {
+    "en": "results",
+    "fr": "résultats",
+    "de": "Ergebnisse",
+    "pt": "resultados"
+  },
+  "↑ ↓ elegir · Enter abrir": {
+    "en": "↑ ↓ choose · Enter open",
+    "fr": "↑ ↓ choisir · Entrée ouvrir",
+    "de": "↑ ↓ auswählen · Enter öffnen",
+    "pt": "↑ ↓ escolher · Enter abrir"
+  },
+  "No encontramos esa sección": {
+    "en": "We could not find that section",
+    "fr": "Cette section est introuvable",
+    "de": "Dieser Bereich wurde nicht gefunden",
+    "pt": "Não encontramos essa seção"
+  },
+  "Prueba con “idiomas”, “destinos” o “cotizaciones”.": {
+    "en": "Try “languages”, “destinations” or “quotes”.",
+    "fr": "Essayez « langues », « destinations » ou « devis ».",
+    "de": "Versuchen Sie „Sprachen“, „Reiseziele“ oder „Reiseangebote“.",
+    "pt": "Tente “idiomas”, “destinos” ou “cotações”."
+  },
+  "Busca sin salir de tu pantalla. Pulsa Esc o toca fuera para cerrar.": {
+    "en": "Search without leaving this screen. Press Esc or tap outside to close.",
+    "fr": "Recherchez sans quitter cet écran. Appuyez sur Échap ou à l’extérieur pour fermer.",
+    "de": "Suchen Sie, ohne diese Ansicht zu verlassen. Esc drücken oder außerhalb tippen zum Schließen.",
+    "pt": "Busque sem sair desta tela. Pressione Esc ou toque fora para fechar."
+  },
+  "Actualizar": {
+    "en": "Refresh",
+    "fr": "Actualiser",
+    "de": "Aktualisieren",
+    "pt": "Atualizar"
+  },
+  "Nueva": {
+    "en": "New",
+    "fr": "Nouveau",
+    "de": "Neu",
+    "pt": "Nova"
+  },
+  "Crear": {
+    "en": "Create",
+    "fr": "Créer",
+    "de": "Erstellen",
+    "pt": "Criar"
+  },
+  "Editar": {
+    "en": "Edit",
+    "fr": "Modifier",
+    "de": "Bearbeiten",
+    "pt": "Editar"
+  },
+  "Guardar": {
+    "en": "Save",
+    "fr": "Enregistrer",
+    "de": "Speichern",
+    "pt": "Salvar"
+  },
+  "Cancelar": {
+    "en": "Cancel",
+    "fr": "Annuler",
+    "de": "Abbrechen",
+    "pt": "Cancelar"
+  },
+  "Cerrar": {
+    "en": "Close",
+    "fr": "Fermer",
+    "de": "Schließen",
+    "pt": "Fechar"
+  },
+  "Eliminar": {
+    "en": "Delete",
+    "fr": "Supprimer",
+    "de": "Löschen",
+    "pt": "Excluir"
+  },
+  "Limpiar": {
+    "en": "Clear",
+    "fr": "Effacer",
+    "de": "Leeren",
+    "pt": "Limpar"
+  },
+  "Limpiar filtros": {
+    "en": "Clear filters",
+    "fr": "Effacer les filtres",
+    "de": "Filter zurücksetzen",
+    "pt": "Limpar filtros"
+  },
+  "Aplicar filtros": {
+    "en": "Apply filters",
+    "fr": "Appliquer les filtres",
+    "de": "Filter anwenden",
+    "pt": "Aplicar filtros"
+  },
+  "Registros disponibles": {
+    "en": "Available records",
+    "fr": "Enregistrements disponibles",
+    "de": "Verfügbare Einträge",
+    "pt": "Registros disponíveis"
+  },
+  "Selecciona un registro para consultar o editar su información.": {
+    "en": "Select a record to view or edit its information.",
+    "fr": "Sélectionnez une entrée pour consulter ou modifier ses informations.",
+    "de": "Wählen Sie einen Eintrag zum Anzeigen oder Bearbeiten.",
+    "pt": "Selecione um registro para consultar ou editar suas informações."
+  },
+  "Consulta las pantallas. Inicia sesión para gestionar datos privados.": {
+    "en": "Explore the screens. Sign in to manage private data.",
+    "fr": "Explorez les écrans. Connectez-vous pour gérer les données privées.",
+    "de": "Erkunden Sie die Ansichten. Melden Sie sich zur Verwaltung privater Daten an.",
+    "pt": "Explore as telas. Entre para gerenciar dados privados."
+  },
+  "Vista de tarjetas": {
+    "en": "Card view",
+    "fr": "Vue en cartes",
+    "de": "Kartenansicht",
+    "pt": "Visualização em cartões"
+  },
+  "Vista de tabla": {
+    "en": "Table view",
+    "fr": "Vue en tableau",
+    "de": "Tabellenansicht",
+    "pt": "Visualização em tabela"
+  },
+  "Filtrar empleados": {
+    "en": "Filter employees",
+    "fr": "Filtrer les employés",
+    "de": "Mitarbeitende filtern",
+    "pt": "Filtrar funcionários"
+  },
+  "Filtrar cotizaciones": {
+    "en": "Filter quotes",
+    "fr": "Filtrer les devis",
+    "de": "Angebote filtern",
+    "pt": "Filtrar cotações"
+  },
+  "Filtrar destinos": {
+    "en": "Filter destinations",
+    "fr": "Filtrer les destinations",
+    "de": "Reiseziele filtern",
+    "pt": "Filtrar destinos"
+  },
+  "Personaliza los resultados": {
+    "en": "Customize results",
+    "fr": "Personnalisez les résultats",
+    "de": "Ergebnisse anpassen",
+    "pt": "Personalize os resultados"
+  },
+  "Los detalles que hacen funcionar cada viaje. Mantén las opciones de tu agencia al día.": {
+    "en": "The details behind every trip. Keep your agency options up to date.",
+    "fr": "Les détails qui font fonctionner chaque voyage. Gardez les options de votre agence à jour.",
+    "de": "Die Details hinter jeder Reise. Halten Sie Ihre Agenturoptionen aktuell.",
+    "pt": "Os detalhes que fazem cada viagem funcionar. Mantenha as opções da sua agência atualizadas."
+  },
+  "Fuente única de configuración": {
+    "en": "One source of configuration",
+    "fr": "Une source unique de configuration",
+    "de": "Eine zentrale Konfigurationsquelle",
+    "pt": "Fonte única de configuração"
+  },
+  "Todo lo que tu operación necesita": {
+    "en": "Everything your operations need",
+    "fr": "Tout ce dont votre activité a besoin",
+    "de": "Alles, was Ihr Betrieb braucht",
+    "pt": "Tudo o que sua operação precisa"
+  },
+  "Elige un catálogo para consultar, filtrar o actualizar sus registros.": {
+    "en": "Choose a catalog to view, filter or update its records.",
+    "fr": "Choisissez un catalogue pour consulter, filtrer ou actualiser ses données.",
+    "de": "Wählen Sie einen Katalog, um Einträge anzuzeigen, zu filtern oder zu aktualisieren.",
+    "pt": "Escolha um catálogo para consultar, filtrar ou atualizar seus registros."
+  },
+  "catálogos disponibles": {
+    "en": "available catalogs",
+    "fr": "catalogues disponibles",
+    "de": "verfügbare Kataloge",
+    "pt": "catálogos disponíveis"
+  },
+  "Dashboard": {
+    "en": "Dashboard",
+    "fr": "Tableau de bord",
+    "de": "Übersicht",
+    "pt": "Painel"
+  },
+  "Cotizaciones": {
+    "en": "Quotes",
+    "fr": "Devis",
+    "de": "Reiseangebote",
+    "pt": "Cotações"
+  },
+  "Hoteles": {
+    "en": "Hotels",
+    "fr": "Hôtels",
+    "de": "Hotels",
+    "pt": "Hotéis"
+  },
+  "Clientes": {
+    "en": "Customers",
+    "fr": "Clients",
+    "de": "Kunden",
+    "pt": "Clientes"
+  },
+  "Empleados": {
+    "en": "Employees",
+    "fr": "Employés",
+    "de": "Mitarbeitende",
+    "pt": "Funcionários"
+  },
+  "Catálogos": {
+    "en": "Catalogs",
+    "fr": "Catalogues",
+    "de": "Kataloge",
+    "pt": "Catálogos"
+  },
+  "Imágenes del inicio": {
+    "en": "Homepage images",
+    "fr": "Images d’accueil",
+    "de": "Startseitenbilder",
+    "pt": "Imagens da página inicial"
+  },
+  "Más": {
+    "en": "More",
+    "fr": "Plus",
+    "de": "Mehr",
+    "pt": "Mais"
+  },
+  "Buscar sección o catálogo": {
+    "en": "Search sections or catalogs",
+    "fr": "Rechercher une section ou un catalogue",
+    "de": "Bereich oder Katalog suchen",
+    "pt": "Buscar seção ou catálogo"
+  },
+  "Menú de usuario": {
+    "en": "User menu",
+    "fr": "Menu utilisateur",
+    "de": "Benutzermenü",
+    "pt": "Menu do usuário"
+  },
+  "Vista de diseño": {
+    "en": "Design preview",
+    "fr": "Aperçu du design",
+    "de": "Designvorschau",
+    "pt": "Prévia do design"
+  },
+  "Sin datos de una sesión real": {
+    "en": "No active session data",
+    "fr": "Aucune donnée de session active",
+    "de": "Keine aktiven Sitzungsdaten",
+    "pt": "Sem dados de sessão ativa"
+  },
+  "Ver sitio público": {
+    "en": "View public website",
+    "fr": "Voir le site public",
+    "de": "Öffentliche Website ansehen",
+    "pt": "Ver site público"
+  },
+  "Cerrar sesión": {
+    "en": "Sign out",
+    "fr": "Se déconnecter",
+    "de": "Abmelden",
+    "pt": "Sair"
+  },
+  "Iniciar sesión": {
+    "en": "Sign in",
+    "fr": "Se connecter",
+    "de": "Anmelden",
+    "pt": "Entrar"
+  },
+  "Entrar a mi cuenta": {
+    "en": "Sign in to my account",
+    "fr": "Accéder à mon compte",
+    "de": "Bei meinem Konto anmelden",
+    "pt": "Entrar na minha conta"
+  },
+  "Vista previa de las pantallas nuevas.": {
+    "en": "Preview of the new screens.",
+    "fr": "Aperçu des nouveaux écrans.",
+    "de": "Vorschau der neuen Ansichten.",
+    "pt": "Prévia das novas telas."
+  },
+  "Las métricas privadas requieren iniciar sesión.": {
+    "en": "Sign in to view private metrics.",
+    "fr": "Connectez-vous pour voir les statistiques privées.",
+    "de": "Für private Kennzahlen ist eine Anmeldung erforderlich.",
+    "pt": "Entre para ver as métricas privadas."
+  },
+  "Trotapie / Administración": {
+    "en": "Trotapie / Administration",
+    "fr": "Trotapie / Administration",
+    "de": "Trotapie / Verwaltung",
+    "pt": "Trotapie / Administração"
+  },
+  "Trotapie / Espacio de trabajo": {
+    "en": "Trotapie / Workspace",
+    "fr": "Trotapie / Espace de travail",
+    "de": "Trotapie / Arbeitsbereich",
+    "pt": "Trotapie / Espaço de trabalho"
+  },
+  "Trotapie / Contenido": {
+    "en": "Trotapie / Content",
+    "fr": "Trotapie / Contenu",
+    "de": "Trotapie / Inhalte",
+    "pt": "Trotapie / Conteúdo"
+  },
+  "El mundo empieza aquí": {
+    "en": "The world starts here",
+    "fr": "Le monde commence ici",
+    "de": "Die Welt beginnt hier",
+    "pt": "O mundo começa aqui"
+  },
+  "Hola,": {
+    "en": "Hello,",
+    "fr": "Bonjour,",
+    "de": "Hallo,",
+    "pt": "Olá,"
+  },
+  "equipo Trotapie": {
+    "en": "Trotapie team",
+    "fr": "équipe Trotapie",
+    "de": "Trotapie-Team",
+    "pt": "equipe Trotapie"
+  },
+  "Cada viaje cuenta. Así va tu agencia hoy.": {
+    "en": "Every trip counts. Here is your agency today.",
+    "fr": "Chaque voyage compte. Voici votre agence aujourd’hui.",
+    "de": "Jede Reise zählt. So steht Ihre Agentur heute da.",
+    "pt": "Cada viagem conta. Veja como está sua agência hoje."
+  },
+  "Solicitudes recibidas": {
+    "en": "Requests received",
+    "fr": "Demandes reçues",
+    "de": "Eingegangene Anfragen",
+    "pt": "Solicitações recebidas"
+  },
+  "Cotizaciones realizadas": {
+    "en": "Quotes prepared",
+    "fr": "Devis réalisés",
+    "de": "Erstellte Angebote",
+    "pt": "Cotações realizadas"
+  },
+  "Hagamos que suceda.": {
+    "en": "Let’s make it happen.",
+    "fr": "Donnons vie à vos projets.",
+    "de": "Machen wir es möglich.",
+    "pt": "Vamos fazer acontecer."
+  },
+  "Por atender": {
+    "en": "Awaiting attention",
+    "fr": "À traiter",
+    "de": "Zu bearbeiten",
+    "pt": "A atender"
+  },
+  "Solicitudes pendientes": {
+    "en": "Pending requests",
+    "fr": "Demandes en attente",
+    "de": "Offene Anfragen",
+    "pt": "Solicitações pendentes"
+  },
+  "Cotizadas": {
+    "en": "Quoted",
+    "fr": "Devis établis",
+    "de": "Angebot erstellt",
+    "pt": "Cotadas"
+  },
+  "Pendientes": {
+    "en": "Pending",
+    "fr": "En attente",
+    "de": "Offen",
+    "pt": "Pendentes"
+  },
+  "Propuestas que abren caminos": {
+    "en": "Proposals that open new paths",
+    "fr": "Des propositions qui ouvrent de nouvelles voies",
+    "de": "Angebote, die neue Wege eröffnen",
+    "pt": "Propostas que abrem caminhos"
+  },
+  "Tu operación": {
+    "en": "Your operations",
+    "fr": "Votre activité",
+    "de": "Ihr Betrieb",
+    "pt": "Sua operação"
+  },
+  "Solicitudes": {
+    "en": "Requests",
+    "fr": "Demandes",
+    "de": "Anfragen",
+    "pt": "Solicitações"
+  },
+  "Cotizadas respecto al total": {
+    "en": "Quoted as a share of total requests",
+    "fr": "Part des demandes avec devis",
+    "de": "Anteil der Anfragen mit Angebot",
+    "pt": "Cotadas em relação ao total"
+  },
+  "Datos privados disponibles con tu sesión": {
+    "en": "Sign in to view private data",
+    "fr": "Connectez-vous pour consulter les données privées",
+    "de": "Anmelden, um private Daten zu sehen",
+    "pt": "Entre para ver os dados privados"
+  },
+  "Consulta actual · Sin ventas estimadas": {
+    "en": "Current data · No estimated sales",
+    "fr": "Données actuelles · Sans ventes estimées",
+    "de": "Aktuelle Daten · Keine geschätzten Verkäufe",
+    "pt": "Dados atuais · Sem vendas estimadas"
+  },
+  "El próximo viaje de tus clientes": {
+    "en": "Your customers’ next trip",
+    "fr": "Le prochain voyage de vos clients",
+    "de": "Die nächste Reise Ihrer Kunden",
+    "pt": "A próxima viagem dos seus clientes"
+  },
+  "Editar imágenes": {
+    "en": "Edit images",
+    "fr": "Modifier les images",
+    "de": "Bilder bearbeiten",
+    "pt": "Editar imagens"
+  },
+  "Ver cotizaciones pendientes": {
+    "en": "View pending quotes",
+    "fr": "Voir les devis en attente",
+    "de": "Offene Angebote ansehen",
+    "pt": "Ver cotações pendentes"
+  },
+  "Ver solicitudes cotizadas": {
+    "en": "View quoted requests",
+    "fr": "Voir les demandes avec devis",
+    "de": "Anfragen mit Angebot ansehen",
+    "pt": "Ver solicitações cotadas"
+  },
+  "Explorar todos los destinos": {
+    "en": "Explore all destinations",
+    "fr": "Explorer toutes les destinations",
+    "de": "Alle Reiseziele entdecken",
+    "pt": "Explorar todos os destinos"
+  },
+  "Solicitudes recientes": {
+    "en": "Recent requests",
+    "fr": "Demandes récentes",
+    "de": "Letzte Anfragen",
+    "pt": "Solicitações recentes"
+  },
+  "Una vista rápida de tus próximos viajes": {
+    "en": "A quick look at your upcoming trips",
+    "fr": "Un aperçu de vos prochains voyages",
+    "de": "Ein kurzer Blick auf Ihre nächsten Reisen",
+    "pt": "Uma visão rápida das suas próximas viagens"
+  },
+  "Ver todas": {
+    "en": "View all",
+    "fr": "Tout voir",
+    "de": "Alle ansehen",
+    "pt": "Ver todas"
+  },
+  "De la idea al viaje": {
+    "en": "From idea to journey",
+    "fr": "De l’idée au voyage",
+    "de": "Von der Idee zur Reise",
+    "pt": "Da ideia à viagem"
+  },
+  "El siguiente viaje": {
+    "en": "The next journey",
+    "fr": "Le prochain voyage",
+    "de": "Die nächste Reise",
+    "pt": "A próxima viagem"
+  },
+  "empieza contigo.": {
+    "en": "starts with you.",
+    "fr": "commence avec vous.",
+    "de": "beginnt mit Ihnen.",
+    "pt": "começa com você."
+  },
+  "Prepara una propuesta individual o reúne alternativas en una comparativa.": {
+    "en": "Prepare an individual proposal or compare several alternatives.",
+    "fr": "Préparez une proposition individuelle ou comparez plusieurs options.",
+    "de": "Erstellen Sie ein einzelnes Angebot oder vergleichen Sie mehrere Alternativen.",
+    "pt": "Prepare uma proposta individual ou compare várias alternativas."
+  },
+  "Crear cotización": {
+    "en": "Create quote",
+    "fr": "Créer un devis",
+    "de": "Angebot erstellen",
+    "pt": "Criar cotação"
+  },
+  "Explorar sitio público": {
+    "en": "Explore public website",
+    "fr": "Explorer le site public",
+    "de": "Öffentliche Website erkunden",
+    "pt": "Explorar site público"
+  },
+  "Tu actividad, en un solo lugar": {
+    "en": "Your activity, all in one place",
+    "fr": "Toute votre activité au même endroit",
+    "de": "Ihre Aktivitäten an einem Ort",
+    "pt": "Sua atividade em um só lugar"
+  },
+  "No hay solicitudes recientes": {
+    "en": "No recent requests",
+    "fr": "Aucune demande récente",
+    "de": "Keine neuen Anfragen",
+    "pt": "Nenhuma solicitação recente"
+  },
+  "Inicia sesión para consultar el resumen de tu agencia.": {
+    "en": "Sign in to view your agency summary.",
+    "fr": "Connectez-vous pour consulter le résumé de votre agence.",
+    "de": "Melden Sie sich für die Übersicht Ihrer Agentur an.",
+    "pt": "Entre para consultar o resumo da sua agência."
+  },
+  "Registra una solicitud para empezar a dar seguimiento.": {
+    "en": "Add a request to start tracking it.",
+    "fr": "Ajoutez une demande pour commencer le suivi.",
+    "de": "Erfassen Sie eine Anfrage, um mit der Nachverfolgung zu beginnen.",
+    "pt": "Registre uma solicitação para começar o acompanhamento."
+  },
+  "Las fotografías de tu catálogo aparecerán aquí.": {
+    "en": "Your catalog photos will appear here.",
+    "fr": "Les photos de votre catalogue apparaîtront ici.",
+    "de": "Die Fotos Ihres Katalogs erscheinen hier.",
+    "pt": "As fotos do seu catálogo aparecerão aqui."
+  },
+  "No pudimos consultar el resumen. Revisa tu conexión.": {
+    "en": "We could not load the summary. Check your connection.",
+    "fr": "Impossible de charger le résumé. Vérifiez votre connexion.",
+    "de": "Die Übersicht konnte nicht geladen werden. Prüfen Sie Ihre Verbindung.",
+    "pt": "Não foi possível carregar o resumo. Verifique sua conexão."
+  },
+  "Estado": {
+    "en": "Status",
+    "fr": "Statut",
+    "de": "Status",
+    "pt": "Status"
+  },
+  "Acciones": {
+    "en": "Actions",
+    "fr": "Actions",
+    "de": "Aktionen",
+    "pt": "Ações"
+  },
+  "Nombre": {
+    "en": "Name",
+    "fr": "Nom",
+    "de": "Name",
+    "pt": "Nome"
+  },
+  "Cliente / pasajero": {
+    "en": "Customer / passenger",
+    "fr": "Client / voyageur",
+    "de": "Kunde / Reisender",
+    "pt": "Cliente / passageiro"
+  },
+  "No pudimos cargar la información": {
+    "en": "We could not load the information",
+    "fr": "Impossible de charger les informations",
+    "de": "Die Informationen konnten nicht geladen werden",
+    "pt": "Não foi possível carregar as informações"
+  },
+  "Todo listo para empezar": {
+    "en": "Ready to get started",
+    "fr": "Tout est prêt pour commencer",
+    "de": "Alles bereit zum Start",
+    "pt": "Tudo pronto para começar"
+  },
+  "Revisa tu conexión e intenta de nuevo.": {
+    "en": "Check your connection and try again.",
+    "fr": "Vérifiez votre connexion et réessayez.",
+    "de": "Prüfen Sie Ihre Verbindung und versuchen Sie es erneut.",
+    "pt": "Verifique sua conexão e tente novamente."
+  },
+  "Los registros aparecerán aquí en cuanto los agregues.": {
+    "en": "Records will appear here as you add them.",
+    "fr": "Les données apparaîtront ici dès leur ajout.",
+    "de": "Einträge erscheinen hier, sobald Sie sie hinzufügen.",
+    "pt": "Os registros aparecerão aqui assim que forem adicionados."
   }
 };

@@ -4,10 +4,14 @@ import {FormsModule} from '@angular/forms';
 import {Dialog} from '../dialog/dialog';
 import {Icon} from '../icon/icon';
 import {NavigationEntry} from '../../models/navigation-entry';
+import {inject} from '@angular/core';
+import {LanguageService} from '../../../core/services/language.service';
+import {UiTextPipe} from '../../pipes/ui-text.pipe';
 
 function normalize(value:string){return value.normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLocaleLowerCase();}
-@Component({selector:'tp-navigation-search',imports:[Dialog,Icon,FormsModule,RouterLink],templateUrl:'./navigation-search.html',styleUrl:'./navigation-search.scss'})
+@Component({selector:'tp-navigation-search',imports:[UiTextPipe,Dialog,Icon,FormsModule,RouterLink],templateUrl:'./navigation-search.html',styleUrl:'./navigation-search.scss'})
 export class NavigationSearch {
+  private readonly language=inject(LanguageService);
   open=input(false);
   entries=input<NavigationEntry[]>([]);
   closed=output<void>();
@@ -19,7 +23,7 @@ export class NavigationSearch {
   id=`navigation-search-${NavigationSearch.nextId++}`;
   results=computed(()=>{
     const words=normalize(this.query()).trim().split(/\s+/).filter(Boolean);
-    return this.entries().filter(entry=>words.every(word=>normalize(`${entry.title} ${entry.description} ${entry.group} ${entry.keywords||''}`).includes(word)));
+    return this.entries().filter(entry=>words.every(word=>normalize(`${entry.title} ${this.language.translateText(entry.title)} ${entry.description} ${this.language.translateText(entry.description)} ${entry.group} ${this.language.translateText(entry.group)} ${entry.keywords||''}`).includes(word)));
   });
   constructor(){
     effect(()=>{if(this.open()){this.query.set('');this.active.set(0);}});

@@ -1,11 +1,12 @@
 import { Component, input, output, viewChild, ElementRef, afterRenderEffect, inject } from '@angular/core';
 import { Button } from '../button/button';
+import {UiTextPipe} from '../../pipes/ui-text.pipe';
 import { MotionService } from '../../../core/services/motion.service';
 import {Overlay,OverlayContainer} from '@angular/cdk/overlay';
 import {DialogOverlayContainer} from '../../../core/services/dialog-overlay-container.service';
 @Component({
   selector: 'tp-dialog',
-  imports: [Button],
+  imports: [UiTextPipe,Button],
   providers:[Overlay,{provide:OverlayContainer,useClass:DialogOverlayContainer}],
   templateUrl: './dialog.html',
   styleUrl: './dialog.scss',

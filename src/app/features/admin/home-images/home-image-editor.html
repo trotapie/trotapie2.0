@@ -1,12 +1,28 @@
 <div class="home-composer" [attr.aria-busy]="busy()">
   <section class="preview-panel">
-    <div class="preview-tools"><span>Vista previa del inicio</span><div role="group" aria-label="Dispositivo de vista previa">
-      @for(d of [{id:'desktop',label:'Escritorio'},{id:'tablet',label:'Tablet'},{id:'mobile',label:'Móvil'}];track d.id){<button tpButton type="button" [variant]="device()===d.id?'primary':'secondary'" [attr.aria-pressed]="device()===d.id" (click)="device.set(d.id)">{{d.label}}</button>}
+    <div class="preview-tools"><div role="group" aria-label="Tipo de vista previa">
+      <button tpButton type="button" [variant]="previewMode()==='home'?'primary':'secondary'" [attr.aria-pressed]="previewMode()==='home'" (click)="previewMode.set('home')">Vista del inicio</button>
+      <button tpButton type="button" [variant]="previewMode()==='original'?'primary':'secondary'" [attr.aria-pressed]="previewMode()==='original'" (click)="previewMode.set('original')">Foto completa</button>
+    </div><div role="group" aria-label="Dispositivo de vista previa">
+      @for(d of [{id:'desktop',label:'Escritorio'},{id:'tablet',label:'Tablet'},{id:'mobile',label:'Móvil'}];track d.id){<button tpButton type="button" [variant]="device()===d.id?'primary':'secondary'" [attr.aria-pressed]="device()===d.id" (click)="device.set(d.id); previewMode.set('home')">{{d.label}}</button>}
     </div></div>
-    <div class="preview-area"><div class="preview-frame" [class.tablet]="device()==='tablet'" [class.mobile]="device()==='mobile'" (pointerdown)="start($event)" (pointermove)="drag($event)" (pointerup)="end()" (pointercancel)="end()" (lostpointercapture)="end()">
+    <p class="image-dimensions" aria-live="polite">
+      @if(imageSize(); as size){Original: {{size.width}} × {{size.height}} px · {{size.width===size.height?'Cuadrada':size.width>size.height?'Horizontal':'Vertical'}}}
+      @else if(imageFailed()){No se pudieron leer las dimensiones de la imagen.}
+      @else if(imageUrl()){Cargando dimensiones…}
+      @else{Agrega una imagen para ver sus dimensiones.}
+    </p>
+    <div class="preview-area" [class.original-preview]="previewMode()==='original'">
+    @if(previewMode()==='original'){
+      @if(imageUrl() && !imageFailed()){
+        <img class="original-photo" [src]="imageUrl()" [alt]="value()['nombre_destino'] || 'Fotografía original completa'"/>
+      }
+    }@else{
+    <div class="preview-frame" [class.tablet]="device()==='tablet'" [class.mobile]="device()==='mobile'" (pointerdown)="start($event)" (pointermove)="drag($event)" (pointerup)="end()" (pointercancel)="end()" (lostpointercapture)="end()">
       <tp-photo-carousel variant="hero" [photos]="photos()" [autoplay]="false" eyebrow="Tu próxima historia" headline="Un destino. Mil recuerdos." label="Vista previa de la imagen del inicio"/>
-    </div></div>
-    <p class="hint">Arrastra la fotografía para ajustar el encuadre. El nombre se muestra como una etiqueta, igual que en el diseño actual del inicio.</p>
+    </div>
+    }</div>
+    <p class="hint">{{previewMode()==='original'?'Fotografía completa, sin recortes ni deformaciones, reducida para caber en esta vista. Las dimensiones indicadas corresponden al archivo original.':'Arrastra la fotografía para ajustar el encuadre del inicio. El zoom se calcula respecto al marco, no al tamaño original en píxeles.'}}</p>
   </section>
   <section class="editor-controls"><fieldset [disabled]="busy()">
     <nav class="tabs" aria-label="Ajustes de la imagen del inicio">
@@ -25,8 +41,8 @@
       <h3>Zoom y encuadre</h3>
       <label>Zoom: {{(style().zoom*100).toFixed(0)}} %<input type="range" min="0.5" max="3" step="0.05" [ngModel]="style().zoom" (ngModelChange)="setStyle('zoom',$event)"/></label>
       <p class="hint">Puedes alejar la fotografía hasta el 50 %. Por debajo del 100 % pueden quedar márgenes visibles dentro del marco.</p>
-      <tp-input label="Horizontal (%)" type="number" [min]="0" [max]="100" [ngModel]="style().x" (ngModelChange)="setStyle('x',$event)"/>
-      <tp-input label="Vertical (%)" type="number" [min]="0" [max]="100" [ngModel]="style().y" (ngModelChange)="setStyle('y',$event)"/>
+      <label>Horizontal: {{style().x.toFixed(0)}} %<input type="range" min="0" max="100" step="1" [attr.aria-valuetext]="style().x.toFixed(0)+' %'" [ngModel]="style().x" (ngModelChange)="setStyle('x',$event)"/></label>
+      <label>Vertical: {{style().y.toFixed(0)}} %<input type="range" min="0" max="100" step="1" [attr.aria-valuetext]="style().y.toFixed(0)+' %'" [ngModel]="style().y" (ngModelChange)="setStyle('y',$event)"/></label>
       <button tpButton type="button" icon="refresh" (click)="resetFrame()">Restablecer encuadre</button>
     }
     @if(tab()==='type'){

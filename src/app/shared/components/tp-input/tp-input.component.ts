@@ -1,9 +1,11 @@
 import { Component, EventEmitter, forwardRef, Input, Output } from '@angular/core';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
+import {UiTextPipe} from '../../pipes/ui-text.pipe';
 
 @Component({
   selector: 'tp-input, app-tp-input',
   standalone: true,
+  imports: [UiTextPipe],
   templateUrl: './tp-input.component.html',
   styleUrl: './tp-input.component.scss',
   providers: [{ provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => TpInputComponent), multi: true }]
@@ -75,4 +77,3 @@ export class TpInputComponent implements ControlValueAccessor {
     this.blur.emit();
   }
 }
-

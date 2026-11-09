@@ -18,7 +18,8 @@ import {TpSelectSearchComponent} from '../../../shared/components/tp-select-sear
 import {TpActionMenuItem,TpActionsMenuComponent} from '../../../shared/components/tp-actions-menu/tp-actions-menu.component';
 import {BannerComponent} from '../../../shared/components/banner/banner.component';
 import {employeeActions,isProtectedEmployee} from '../../employees/models/employee-management';
-@Component({selector:'tp-catalog',imports:[BannerComponent,CatalogPicker,DecimalPipe,CatalogScrollDirective,TpSelectSearchComponent,TpActionsMenuComponent,QuoteColumnFilters,RouterLink,FormsModule,PageHeader,Button,Icon,State,FilterBar,DataTable,ImageCard,Dialog,ResourceForm],templateUrl:'./catalog.html',styleUrl:'./catalog.scss'})
+import {UiTextPipe} from '../../../shared/pipes/ui-text.pipe';
+@Component({selector:'tp-catalog',imports:[UiTextPipe,BannerComponent,CatalogPicker,DecimalPipe,CatalogScrollDirective,TpSelectSearchComponent,TpActionsMenuComponent,QuoteColumnFilters,RouterLink,FormsModule,PageHeader,Button,Icon,State,FilterBar,DataTable,ImageCard,Dialog,ResourceForm],templateUrl:'./catalog.html',styleUrl:'./catalog.scss'})
 export class Catalog implements OnInit,OnDestroy {toast=inject(TpToastService);
  imageTranslations=computed(()=>imageTypeTranslations(this.value()['traducciones_preview']));
   private editorForm=viewChild<ResourceForm>('editorForm');

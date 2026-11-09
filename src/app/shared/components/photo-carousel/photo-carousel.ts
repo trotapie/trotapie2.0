@@ -58,6 +58,16 @@ export class PhotoCarousel {
     return Math.min(Math.max(0, this.startIndex()), Math.max(0, this.orderedPhotos().length - 1));
   });
   current = computed(() => this.orderedPhotos()[this.index()]);
+  private naturalImageSize = signal<{src:string;width:number;height:number}|null>(null);
+  heroPhotoStyle = computed(() => {
+    const photo=this.current();
+    const dimensions=this.naturalImageSize();
+    return homeImagePhotoStyle(photo?.homeStyle, dimensions?.src===photo?.src ? dimensions ?? undefined : undefined);
+  });
+  photoLoaded(event:Event) {
+    const image=event.target as HTMLImageElement;
+    this.naturalImageSize.set({src:image.getAttribute('src') || '',width:image.naturalWidth,height:image.naturalHeight});
+  }
   nextPhoto = computed(() => this.orderedPhotos()[(this.index() + 1) % this.orderedPhotos().length]);
   reducedMotion = signal(true);
   paused = linkedSignal(() => this.reducedMotion());

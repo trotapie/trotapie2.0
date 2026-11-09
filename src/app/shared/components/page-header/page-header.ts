@@ -1,7 +1,8 @@
 import {Component,input,contentChildren,computed} from '@angular/core';
 import {Button} from '../button/button';
 import {BackButton} from '../back-button/back-button';
-@Component({selector:'tp-page-header',imports:[BackButton],templateUrl: './page-header.html', styleUrl: './page-header.scss'})
+import {UiTextPipe} from '../../pipes/ui-text.pipe';
+@Component({selector:'tp-page-header',imports:[UiTextPipe,BackButton],templateUrl: './page-header.html', styleUrl: './page-header.scss'})
 export class PageHeader {
  customTitle=input(false);
  title=input('');description=input('');eyebrow=input('Trotapie / Administración');

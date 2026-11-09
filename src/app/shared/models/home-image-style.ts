@@ -20,8 +20,20 @@ export function normalizeHomeImageStyle(raw:unknown):HomeImageStyle {
     textPosition:HOME_IMAGE_POSITIONS.includes(value['textPosition'] as HomeImagePosition) ? value['textPosition'] as HomeImagePosition : HOME_IMAGE_STYLE.textPosition,
   };
 }
-export function homeImagePhotoStyle(raw:unknown):Record<string,string> {
+export function homeImagePhotoStyle(raw:unknown,dimensions?:{width:number;height:number}):Record<string,string> {
   const value = normalizeHomeImageStyle(raw);
+  if(dimensions && dimensions.width>0 && dimensions.height>0){
+    // Size the complete image before clipping it against the 800 × 500 hero.
+    // object-fit:cover on a frame-sized <img> would discard pixels before zooming.
+    const scale=Math.max(800/dimensions.width,500/dimensions.height)*value.zoom;
+    const width=dimensions.width*scale, height=dimensions.height*scale;
+    return {
+      width:`${width}px`,height:`${height}px`,
+      left:`${(800-width)*value.x/100}px`,top:`${(500-height)*value.y/100}px`,
+      right:'auto',bottom:'auto','max-width':'none',
+      'object-fit':'fill',transform:'none',
+    };
+  }
   return {'object-position':`${value.x}% ${value.y}%`,transform:`scale(${value.zoom})`,'transform-origin':`${value.x}% ${value.y}%`};
 }
 

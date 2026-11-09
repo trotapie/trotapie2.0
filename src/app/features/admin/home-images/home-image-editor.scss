@@ -9,6 +9,9 @@
 .preview-frame:active{cursor:grabbing}
 .preview-frame.tablet{max-width:600px}
 .preview-frame.mobile{max-width:360px}
+.image-dimensions{flex:none;margin:0 0 12px;font-size:12px;color:var(--muted)}
+.original-preview{overflow:hidden;background:var(--muted-surface);border-radius:20px}
+.original-photo{display:block;width:100%;height:100%;min-width:0;min-height:0;object-fit:contain}
 .hint{flex:none;font-size:12px;line-height:1.7;color:var(--muted);margin-top:10px}
 .editor-controls{overflow:auto;min-height:0;padding-right:10px;scrollbar-gutter:stable}
 .editor-controls fieldset{border:0;padding:0;margin:0;display:flex;flex-direction:column;gap:16px;min-width:0}
