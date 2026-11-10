@@ -1,12 +1,14 @@
 <section class="hotel-information" [attr.aria-label]="text('Información de tu estancia', 'Stay information')">
   <div class="section-heading"><span class="eyebrow">{{ text('Todo para tu estancia', 'Everything for your stay') }}</span><h2>{{ text('Conoce tu hotel', 'Get to know your hotel') }}</h2></div>
-  <div class="hotel-tabs" role="tablist" [attr.aria-label]="text('Información del hotel', 'Hotel information')">
+  <div class="hotel-tabs">
     @for (tab of tabs(); track $index) {
-      <button type="button" role="tab" [id]="tabId($index)" [attr.aria-selected]="selected() === $index" [attr.aria-controls]="panelId()" [attr.tabindex]="selected() === $index ? 0 : -1" [class.selected]="selected() === $index" (click)="select($index)" (keydown)="navigateTabs($event, $index)"><tp-icon [name]="tab.icon" /><span>{{ tab.label }}</span></button>
-    }
-  </div>
-  <div #panel class="hotel-panel" role="tabpanel" [id]="panelId()" [attr.aria-labelledby]="tabId(selected())" tabindex="0">
-    @switch (selected()) {
+      <h3 class="accordion-heading" [style.grid-column]="$index + 1">
+        <button type="button" [id]="tabId($index)" [attr.aria-expanded]="selected() === $index" [attr.aria-controls]="panelId($index)" [class.selected]="selected() === $index" (click)="select($index)" (keydown)="navigateTabs($event, $index)"><tp-icon [name]="tab.icon" /><span>{{ tab.label }}</span><tp-icon class="expand-icon" name="chevron-down" /></button>
+      </h3>
+      <div class="hotel-panel-collapse" [class.open]="selected() === $index" role="region" [id]="panelId($index)" [attr.aria-labelledby]="tabId($index)" [attr.aria-hidden]="selected() !== $index" [attr.inert]="selected() !== $index ? '' : null">
+        <div class="hotel-panel-clip">
+          <div class="hotel-panel">
+    @switch ($index) {
       @case (0) {
         <h3>{{ text('Planea tu llegada', 'Plan your arrival') }}</h3>
         <div class="schedule-grid">
@@ -27,6 +29,10 @@
         <ul class="plan-options"><li>{{ regimen() }}</li></ul>
         <p class="description">{{ hotel().plan_todo_incluido?.descripcion || text('Consulta con tu asesor qué incluye este régimen y las condiciones de tu reserva.', 'Ask your adviser what this plan includes and about your booking conditions.') }}</p>
       }
+    }
+          </div>
+        </div>
+      </div>
     }
   </div>
   <div class="hotel-actions">
