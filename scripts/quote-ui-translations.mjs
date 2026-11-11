@@ -1,5 +1,6 @@
 // Static quotation UI. Catalog options continue to come from their translated records.
 export const quoteUiTranslations = {
+  'Regresar al catálogo': {en:'Back to catalog',fr:'Retour au catalogue',de:'Zurück zum Katalog',pt:'Voltar ao catálogo'},
   'Noches': {en:'Nights',fr:'Nuits',de:'Nächte',pt:'Noites'},
   'Un momento, estamos preparando todo.': {en:'One moment, we are getting everything ready.',fr:'Un instant, nous préparons tout.',de:'Einen Moment, wir bereiten alles vor.',pt:'Um momento, estamos preparando tudo.'},
   'Rango de fechas': {en:'Date range',fr:'Période',de:'Zeitraum',pt:'Período'},

@@ -22,6 +22,14 @@ test('quotation UI translations cover all four target languages and preserve par
     }
   }
 });
+test('catalog return button follows the selected language',()=>{
+  const language=new Language();
+  const expected={es:'Regresar al catálogo',en:'Back to catalog',fr:'Retour au catalogue',de:'Zurück zum Katalog',pt:'Voltar ao catálogo'};
+  for(const [lang,label] of Object.entries(expected)){
+    language.language.set(lang);
+    assert.equal(language.formatText('Regresar al catálogo'),label);
+  }
+});
 test('French quotation headings, controls, counters and validation use the selected language',()=>{
   const language=new Language();
   language.language.set('fr');
