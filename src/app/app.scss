@@ -1,0 +1,32 @@
+:host {
+  display: block;
+}
+
+.test-environment {
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 4px 16px;
+  padding: 10px 20px;
+  border-bottom: 2px solid #b45309;
+  background: #fef3c7;
+  color: #78350f;
+  font-size: 13px;
+  line-height: 1.5;
+  text-align: center;
+
+  strong {
+    font-size: 12px;
+    letter-spacing: .08em;
+  }
+}
+
+@media print {
+  .test-environment {
+    position: static;
+  }
+}

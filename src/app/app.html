@@ -1,2 +1,9 @@
-<a class="skip-link" href="#main-content">Ir al contenido</a><router-outlet tpPageMotion/><tp-toast-host/>
+<a class="skip-link" href="#main-content">Ir al contenido</a>
+@if(isTestEnvironment){
+  <aside class="test-environment" aria-label="Aviso de ambiente de pruebas">
+    <strong>AMBIENTE DE PRUEBAS</strong>
+    <span>Los cambios en producción no se reflejan aquí.</span>
+  </aside>
+}
+<router-outlet tpPageMotion/><tp-toast-host/>
 @if(loading.visible()){<tp-route-loader/>}
