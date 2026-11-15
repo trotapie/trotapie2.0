@@ -32,7 +32,7 @@
       </div>
       <tp-field [label]="text('Teléfono')" forId="quote-phone" [required]="true"><input id="quote-phone" name="phone" type="tel" [(ngModel)]="phone" required autocomplete="tel"/></tp-field>
       <tp-field [label]="text('Correo electrónico')" forId="quote-email"><input id="quote-email" name="email" type="email" [(ngModel)]="email" email autocomplete="email"/></tp-field>
-      <app-date-range-filter class="quote-stay-field" [label]="text('Fechas del viaje')" inputId="quote-stay" name="stayDates" [min]="today" [(ngModel)]="stayDates" [mostrarEstadia]="false" [minNights]="1" [required]="true" [disabled]="busy()"/>
+      <app-date-range-filter class="quote-stay-field" [label]="text('Fechas del viaje')" startLabel="Fecha de entrada" endLabel="Fecha de salida" inputId="quote-stay" name="stayDates" [min]="today" [(ngModel)]="stayDates" [mostrarEstadia]="false" [minNights]="1" [required]="true" [disabled]="busy()"/>
       @if(start && end && nightCount()>0){
          <tp-field class="quote-advisor-field" [label]="text('Noches')" forId="quote-nights" aria-live="polite"><input id="quote-nights" [value]="text(nightCount()===1?'{count} noche':'{count} noches',{count:nightCount()})" readonly/></tp-field>
        }
