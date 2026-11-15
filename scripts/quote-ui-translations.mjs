@@ -4,6 +4,8 @@ export const quoteUiTranslations = {
   'Noches': {en:'Nights',fr:'Nuits',de:'Nächte',pt:'Noites'},
   'Un momento, estamos preparando todo.': {en:'One moment, we are getting everything ready.',fr:'Un instant, nous préparons tout.',de:'Einen Moment, wir bereiten alles vor.',pt:'Um momento, estamos preparando tudo.'},
   'Rango de fechas': {en:'Date range',fr:'Période',de:'Zeitraum',pt:'Período'},
+  'Fechas del viaje': {en:'Travel dates',fr:'Dates du voyage',de:'Reisedaten',pt:'Datas da viagem'},
+  'La fecha de salida debe ser posterior a la fecha de entrada.': {en:'Check-out must be after check-in.',fr:'La date de départ doit être postérieure à la date d’arrivée.',de:'Das Abreisedatum muss nach dem Anreisedatum liegen.',pt:'A data de saída deve ser posterior à data de entrada.'},
   'No pudimos cargar habitaciones y camas. Verifica que se haya aplicado el script tipos-habitacion-camas.sql.': {en:'We could not load room and bed options. Please try again later.',fr:'Impossible de charger les options de chambres et de lits. Veuillez réessayer plus tard.',de:'Zimmer- und Bettenoptionen konnten nicht geladen werden. Bitte versuchen Sie es später erneut.',pt:'Não foi possível carregar as opções de quartos e camas. Tente novamente mais tarde.'},
   'Trotapie / Cotizaciones': {en:'Trotapie / Quotes',fr:'Trotapie / Devis',de:'Trotapie / Reiseangebote',pt:'Trotapie / Cotações'},
   'Tu viaje empieza aquí': {en:'Your journey starts here',fr:'Votre voyage commence ici',de:'Ihre Reise beginnt hier',pt:'Sua viagem começa aqui'},

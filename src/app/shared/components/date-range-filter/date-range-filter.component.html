@@ -1,14 +1,14 @@
 <div class="date-range-control" cdkOverlayOrigin #trigger="cdkOverlayOrigin">
   @if(label){<label class="control-label" [for]="inputId || labelId+'-start'" [id]="labelId">{{text(label)}}@if(required){<span class="required-mark"> *</span>}</label>}
   <div [class.date-range-fields]="!single">
-    <button #startTrigger type="button" [id]="inputId || labelId+'-start'" [class.date-trigger]="single" [class.placeholder]="single && !value.start" [disabled]="disabled" (click)="abierto ? close() : open('start')" [attr.aria-label]="text(single ? (label || 'Seleccionar fecha') : 'Fecha de inicio')" [attr.aria-expanded]="abierto && (single || activeEndpoint==='start')" aria-haspopup="dialog" [attr.aria-controls]="abierto ? panelId : null">
-      @if(!single){<small>{{text('Inicio del período')}}</small>}
+    <button #startTrigger type="button" [id]="inputId || labelId+'-start'" [class.date-trigger]="single" [class.placeholder]="single && !value.start" [disabled]="disabled" (click)="abierto ? close() : open('start')" [attr.aria-label]="text(single ? (label || 'Seleccionar fecha') : mostrarEstadia ? 'Fecha de entrada' : 'Fecha de inicio')" [attr.aria-expanded]="abierto && (single || activeEndpoint==='start')" aria-haspopup="dialog" [attr.aria-controls]="abierto ? panelId : null">
+      @if(!single){<small>{{text(mostrarEstadia ? 'Fecha de entrada' : 'Inicio del período')}}</small>}
       <span>{{value.start ? formatDate(value.start) : text(single ? 'dd/mm/aaaa' : 'Seleccionar')}}</span>
       <tp-icon name="calendar"/>
     </button>
-    @if(!single){<button #endTrigger type="button" [disabled]="disabled" (click)="abierto ? close() : open('end')" [attr.aria-label]="text('Fecha de fin')" [attr.aria-expanded]="abierto && activeEndpoint==='end'" aria-haspopup="dialog" [attr.aria-controls]="abierto ? panelId : null"><small>{{text('Fin')}}</small><span>{{value.end ? formatDate(value.end) : text('Seleccionar')}}</span><tp-icon name="calendar"/></button>}
+    @if(!single){<button #endTrigger type="button" [disabled]="disabled" (click)="abierto ? close() : open('end')" [attr.aria-label]="text(mostrarEstadia ? 'Fecha de salida' : 'Fecha de fin')" [attr.aria-expanded]="abierto && activeEndpoint==='end'" aria-haspopup="dialog" [attr.aria-controls]="abierto ? panelId : null"><small>{{text(mostrarEstadia ? 'Fecha de salida' : 'Fin')}}</small><span>{{value.end ? formatDate(value.end) : text('Seleccionar')}}</span><tp-icon name="calendar"/></button>}
   </div>
-  @if(mostrarEstadia && value.start && value.end){<small>{{text(nights(value)===1?'{count} noche':'{count} noches',{count:nights(value)})}}</small>}
+  @if(mostrarEstadia && value.start && value.end){<small class="stay-duration" aria-live="polite">{{text(nights(value)===1?'{count} noche':'{count} noches',{count:nights(value)})}}</small>}
 </div>
 <ng-template cdkConnectedOverlay [cdkConnectedOverlayOrigin]="trigger" [cdkConnectedOverlayOpen]="abierto" [cdkConnectedOverlayHasBackdrop]="true" cdkConnectedOverlayBackdropClass="cdk-overlay-transparent-backdrop" [cdkConnectedOverlayPositions]="posiciones" [cdkConnectedOverlayPush]="true" (attach)="focusCalendar()" (backdropClick)="close()" (overlayKeydown)="$event.key==='Escape' && close()" (detach)="close()">
   <section #calendarPanel tpPopupKeyboard (dismissed)="close()" class="range-panel" [class.single-date-panel]="single" [id]="panelId" tpMotion="menu" role="dialog" [attr.aria-label]="single ? (text('Seleccionar fecha')+': '+text(label)) : text('Seleccionar rango de fechas')">
@@ -24,11 +24,12 @@
         </section>
       }
     </div>
+    @if(!single && pendingValue.start && pendingValue.end && nights(pendingValue)<minNights){<p class="range-error" role="status">{{text('La fecha de salida debe ser posterior a la fecha de entrada.')}}</p>}
     <div class="calendar-footer">
       @if(mostrarEstadia){<small>{{estadiaLabel}}</small>}
       @if(single){<button tpButton icon="calendar" type="button" [disabled]="isDisabled(todayKey)" (click)="chooseToday()">{{text('Hoy')}}</button>}
       <button tpButton icon="trash" type="button" (click)="clear()">{{text('Borrar')}}</button>
-      @if(!single){<button tpButton icon="check" variant="primary" type="button" [disabled]="!!pendingValue.start && !pendingValue.end" (click)="apply()">{{text('Aplicar')}}</button>}
+      @if(!single){<button tpButton icon="check" variant="primary" type="button" [disabled]="pendingRangeInvalid" (click)="apply()">{{text('Aplicar')}}</button>}
     </div>
   </section>
 </ng-template>

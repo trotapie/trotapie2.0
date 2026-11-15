@@ -7,6 +7,12 @@
 .date-trigger:disabled{opacity:.58;cursor:not-allowed}
 .date-trigger tp-icon{width:18px;height:18px;color:var(--muted)}
 .date-range-fields{display:grid;grid-template-columns:var(--date-range-columns,1fr 1fr);border:1px solid var(--line);border-radius:16px;overflow:hidden;background:var(--surface)}
+.date-range-fields:hover,.date-range-fields:focus-within{border-color:var(--brand)}
+.stay-duration{display:block;margin-top:7px;color:var(--muted);font-size:12px}
+.range-error{margin:0 0 12px;color:var(--danger);font-size:12px;line-height:1.5}
+.date-range-fields button:disabled{opacity:.58;cursor:not-allowed}
+.date-range-fields button:focus-visible{outline-offset:-3px}
+:host.ng-invalid.ng-touched .date-range-fields{border-color:var(--danger)}
 .date-range-fields button{position:relative;padding:12px 42px 12px 14px;border:0;background:transparent;color:var(--ink);text-align:left;font-size:13px;cursor:pointer}
 .date-range-fields button+button{border-left:var(--date-range-divider-left,1px) solid var(--line);border-top:var(--date-range-divider-top,0) solid var(--line)}
 .date-range-fields small{display:block;color:var(--muted);font-size:10px;margin-bottom:4px}

@@ -1470,6 +1470,18 @@ export const UI_TRANSLATIONS: Record<string, Record<string, string>> = {
     "de": "Zeitraum",
     "pt": "Período"
   },
+  "Fechas del viaje": {
+    "en": "Travel dates",
+    "fr": "Dates du voyage",
+    "de": "Reisedaten",
+    "pt": "Datas da viagem"
+  },
+  "La fecha de salida debe ser posterior a la fecha de entrada.": {
+    "en": "Check-out must be after check-in.",
+    "fr": "La date de départ doit être postérieure à la date d’arrivée.",
+    "de": "Das Abreisedatum muss nach dem Anreisedatum liegen.",
+    "pt": "A data de saída deve ser posterior à data de entrada."
+  },
   "No pudimos cargar habitaciones y camas. Verifica que se haya aplicado el script tipos-habitacion-camas.sql.": {
     "en": "We could not load room and bed options. Please try again later.",
     "fr": "Impossible de charger les options de chambres et de lits. Veuillez réessayer plus tard.",

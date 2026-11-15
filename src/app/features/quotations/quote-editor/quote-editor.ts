@@ -9,11 +9,15 @@ import {ChangeTracker} from '../../../core/utils/change-snapshot';
 import {protectUnsavedChanges} from '../../../core/guards/unsaved-changes.guard';
 import {TpSelectSearchComponent,TpSelectSearchOption} from '../../../shared/components/tp-select-search/tp-select-search.component';
 import {DateRangeFilterComponent} from '../../../shared/components/date-range-filter/date-range-filter.component';
+import {DateRangeFilterValue} from '../../../shared/components/date-range-filter/date-range-filter.model';
 import {TpToastService} from '../../../shared/services/tp-toast.service';
 import {Component,inject,signal,computed,OnInit} from '@angular/core';import {Router,RouterLink,ActivatedRoute} from '@angular/router';import {FormsModule} from '@angular/forms';import {TravelDataService,TravelRecord} from '../../../data/facades/travel-data.service';import {QuoteWorkflowService} from '../services/quote-workflow.service';import {Room,nights,validRooms} from '../models/room';import {PageHeader} from '../../../shared/components/page-header/page-header';import {Field} from '../../../shared/components/field/field';import {Button} from '../../../shared/components/button/button';import {Icon} from '../../../shared/components/icon/icon';import {RoomPicker} from '../components/room-picker/room-picker';import {State} from '../../../shared/components/state/state';
  @Component({selector:'tp-quote-editor',imports:[PublicNavigation,TpSelectSearchComponent,DateRangeFilterComponent,RouterLink,FormsModule,PageHeader,Field,Button,Icon,State,RoomPicker],templateUrl:'./quote-editor.html',styleUrl:'./quote-editor.scss'})
 export class QuoteEditor implements OnInit {toast=inject(TpToastService);
   mobileMenuOpen = signal(false);
+  private stayRange: DateRangeFilterValue = {start:null,end:null};
+  get stayDates(): DateRangeFilterValue { return this.stayRange; }
+  set stayDates(value: DateRangeFilterValue) { this.stayRange=value || {start:null,end:null};this.start=value?.start || '';this.end=value?.end || ''; }
   settings=inject(QuoteSettingsService);
   roomLimits=signal({...DEFAULT_ROOM_LIMITS});
   limitsReady=signal(false);

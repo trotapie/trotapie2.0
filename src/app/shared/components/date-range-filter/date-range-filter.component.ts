@@ -9,6 +9,7 @@ import { Component, Input, forwardRef, ElementRef, ViewChild, OnChanges } from '
 import { AbstractControl, ControlValueAccessor, NG_VALUE_ACCESSOR, NG_VALIDATORS, Validator, ValidationErrors } from '@angular/forms';
 import { DateRangeFilterValue, EMPTY_DATE_RANGE } from './date-range-filter.model';
 import { DateRangeEndpoint, emptyDateRange, selectDateInRange } from './date-range-selection.util';
+import { dateRangeErrors } from './date-range-validation';
 
 interface CalendarDay {
   key: string;
@@ -39,6 +40,7 @@ export class DateRangeFilterComponent implements ControlValueAccessor, Validator
   @Input() max: Date | string | null = null;
   @Input() single = false;
   @Input() required = false;
+  @Input() minNights = 0;
   @Input() inputId = '';
   @ViewChild('startTrigger') private startTrigger?: ElementRef<HTMLButtonElement>;
   @ViewChild('endTrigger') private endTrigger?: ElementRef<HTMLButtonElement>;
@@ -68,13 +70,20 @@ export class DateRangeFilterComponent implements ControlValueAccessor, Validator
   ngOnChanges(): void { this.onValidatorChange(); }
   registerOnValidatorChange(fn: () => void): void { this.onValidatorChange = fn; }
   validate(control: AbstractControl): ValidationErrors | null {
-    if (!this.single) return null;
+    if (!this.single) return dateRangeErrors(control.value, {
+      required: this.required, min: this.boundKey(this.min), max: this.boundKey(this.max), minNights: this.minNights,
+    });
     const key = control.value;
     if (!key) return this.required ? { required: true } : null;
     if (typeof key !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(key) || this.keyFromDate(this.dateFromKey(key)) !== key) return { date: true };
     return this.isDisabled(key) ? { dateBounds: { min: this.boundKey(this.min), max: this.boundKey(this.max) } } : null;
   }
   get panelId(): string { return `${this.labelId}-calendar`; }
+  get pendingRangeInvalid(): boolean {
+    return !!dateRangeErrors(this.pendingValue, {
+      min: this.boundKey(this.min), max: this.boundKey(this.max), minNights: this.minNights,
+    });
+  }
   get todayKey(): string { return this.keyFromDate(new Date()); }
 
   get months(): Date[] {
@@ -149,6 +158,7 @@ export class DateRangeFilterComponent implements ControlValueAccessor, Validator
   }
 
   apply(): void {
+    if (!this.single && this.pendingRangeInvalid) return;
     this.value = { ...this.pendingValue };
     this.onChange(this.single ? this.value.start || '' : { ...this.value });
     this.onTouched();
