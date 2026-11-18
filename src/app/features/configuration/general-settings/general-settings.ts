@@ -16,12 +16,13 @@ import {HOTEL_TIME_FIELDS} from '../../hotels/models/hotel-editor-model';
 import {QuoteCopyService, type CopySection, type QuoteCopySnapshot} from '../../quotations/services/quote-copy.service';
 import {COPY_GROUPS, copyGroups, validCopyText, type CopyBlock} from '../../../../../supabase/functions/_shared/quote-copy';
 import {HOME_COPY} from '../../../../../supabase/functions/_shared/home-copy';
+import {DESTINATION_COPY} from '../../../../../supabase/functions/_shared/destination-copy';
 import {QuoteCopyPreview} from '../quote-copy-preview/quote-copy-preview';
 import {PublicPage} from '../../public/explore/public';
 import {InlineCopy} from '../inline-copy/inline-copy';
 
-const TEXT_GROUPS = {cotizacion: COPY_GROUPS, inicio: copyGroups(HOME_COPY)};
-const TEXT_SECTIONS = ['cotizacion', 'inicio'] as const;
+const TEXT_GROUPS = {cotizacion: COPY_GROUPS, inicio: copyGroups(HOME_COPY), destino: copyGroups(DESTINATION_COPY)};
+const TEXT_SECTIONS = ['cotizacion', 'inicio', 'destino'] as const;
 type TextDraft = {saved: QuoteCopySnapshot|null; textos: CopyBlock; error: string};
 const emptyDraft = (): TextDraft => ({saved: null, textos: {}, error: ''});
 
@@ -42,8 +43,9 @@ export class GeneralSettings implements OnInit {
   readonly textScreens=[
     {key:'cotizacion',label:'Cotizaciones',icon:'quote'},
     {key:'inicio',label:'Inicio',icon:'home'},
+    {key:'destino',label:'Destinos',icon:'map'},
   ] as const;
-  private readonly textDrafts=signal({cotizacion:emptyDraft(),inicio:emptyDraft()});
+  private readonly textDrafts=signal({cotizacion:emptyDraft(),inicio:emptyDraft(),destino:emptyDraft()});
   readonly textError=computed(()=>this.textDrafts()[this.textScreen()].error);
   readonly savedTexts=computed(()=>this.textDrafts()[this.textScreen()].saved);
   readonly texts=computed(()=>this.textDrafts()[this.textScreen()].textos);
@@ -131,7 +133,7 @@ export class GeneralSettings implements OnInit {
       if(this.tab()==='texts'){
         this.updateTextDraft(section,{error:''});
         this.applyTexts(section,await this.quoteCopy.save({version:this.savedTexts()!.version,textos:this.textOverrides()},section));
-        this.toast.success(`Textos de ${section==='inicio'?'Inicio':'Cotizaciones'} guardados.`);
+        this.toast.success(`Textos de ${this.textScreens.find(screen=>screen.key===section)?.label} guardados.`);
         return;
       }else if(this.tab()==='hotels'){
         this.hotelError.set('');

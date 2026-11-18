@@ -1,33 +1,29 @@
 <section class="hotel-suggestions" aria-labelledby="hotels-heading">
   <div class="suggestions-heading">
     <div>
-      <span class="eyebrow">{{ text('Tu próximo descanso', 'Your next getaway') }}</span>
-      <h2 id="hotels-heading">{{ text('Encuentra tu estancia', 'Find your stay') }}</h2>
-      <p>
-        {{
-          text(
-            'Una selección para comenzar a planear tu viaje.',
-            'A selection to start planning your trip.'
-          )
-        }}
-      </p>
+      <span class="eyebrow"><ng-container *ngTemplateOutlet="copyText; context:{key:'antetitulo',en:'Your next getaway'}"/></span>
+      <h2 id="hotels-heading"><ng-container *ngTemplateOutlet="copyText; context:{key:'titulo',en:'Find your stay'}"/></h2>
+      <p><ng-container *ngTemplateOutlet="copyText; context:{key:'descripcion',en:'A selection to start planning your trip.'}"/></p>
     </div>
-    <span class="result-count">{{ page().items.length }} {{ text('opciones', 'options') }}</span>
+    <span class="result-count">{{ page().items.length }} {{ copyEditor() ? 'opciones' : text('opciones', 'options') }}</span>
   </div>
   @if (page().items.length) {
     <div class="hotel-suggestions-grid">
       @for (record of page().items; track record.id) {
         <tp-image-card
           [record]="record"
-          [label]="text('Ver hotel', 'View hotel')"
+          [label]="hotelText('tarjeta', 'View hotel')"
+          [labelTemplate]="copyEditor()?cardLabel:null"
           (selected)="selected.emit($event)"
         />
       }
     </div>
     <div class="suggestions-actions">
-      <a tpButton icon="right" [routerLink]="['/hoteles', destinationId()]">{{
-        text('Ver más hoteles', 'See more hotels')
-      }}</a>
+      @if(copyEditor(); as editor){
+        <ng-container *ngTemplateOutlet="editor; context:field('verMas')"/>
+      } @else {
+        <a tpButton icon="right" [routerLink]="['/hoteles', destinationId()]">{{ hotelText('verMas', 'See more hotels') }}</a>
+      }
     </div>
   } @else {
     <tp-state
@@ -41,3 +37,8 @@
     />
   }
 </section>
+<ng-template #copyText let-key="key" let-en="en">
+  @if(copyEditor(); as editor){<ng-container *ngTemplateOutlet="editor; context:field(key)"/>}
+  @else { {{hotelText(key,en)}} }
+</ng-template>
+<ng-template #cardLabel><ng-container *ngTemplateOutlet="copyEditor(); context:field('tarjeta')"/></ng-template>

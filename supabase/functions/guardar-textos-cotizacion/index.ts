@@ -1,6 +1,7 @@
 import {createClient} from 'npm:@supabase/supabase-js@2.56.0';
 import {changedCopy, cleanCopy, COPY_LANGUAGES, mergeCopyTranslations, QUOTE_COPY, type CopyBlock} from '../_shared/quote-copy.ts';
 import {HOME_COPY} from '../_shared/home-copy.ts';
+import {DESTINATION_COPY} from '../_shared/destination-copy.ts';
 
 const cors = {
   'Access-Control-Allow-Origin': '*',
@@ -27,15 +28,15 @@ Deno.serve(async (request) => {
 
   let next: CopyBlock;
   let version: number;
-  let section: 'cotizacion' | 'inicio';
+  let section: 'cotizacion' | 'inicio' | 'destino';
   let defaults: CopyBlock;
   try {
     const raw = await request.text();
     if (raw.length > 48_000) return reply(413, {error: 'El bloque de textos es demasiado grande.'});
     const body = JSON.parse(raw);
     section = body.seccion === undefined ? 'cotizacion' : body.seccion;
-    if (section !== 'cotizacion' && section !== 'inicio') throw new Error('La sección no es válida.');
-    defaults = section === 'inicio' ? HOME_COPY : QUOTE_COPY;
+    if (section !== 'cotizacion' && section !== 'inicio' && section !== 'destino') throw new Error('La sección no es válida.');
+    defaults = section === 'inicio' ? HOME_COPY : section === 'destino' ? DESTINATION_COPY : QUOTE_COPY;
     if (!Number.isInteger(body.version) || body.version < 0) throw new Error('La versión no es válida.');
     version = body.version;
     next = cleanCopy(body.textos, defaults);
@@ -84,7 +85,7 @@ Deno.serve(async (request) => {
     return reply(502, {error: 'No pudimos generar todas las traducciones. No se publicó ningún cambio; intenta de nuevo.'});
   }
 
-  const published = await admin.rpc(section === 'inicio' ? 'publicar_textos_inicio' : 'publicar_textos_cotizacion', {
+  const published = await admin.rpc(`publicar_textos_${section}`, {
     p_version: version, p_textos: next, p_traducciones: translations,
   });
   if (published.error?.code === '40001') return conflict();

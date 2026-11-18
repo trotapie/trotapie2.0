@@ -32,19 +32,18 @@ import {InternationalCountry} from '../../../data/models/international-geography
 import {appendHotelPage} from '../../../data/utils/append-hotel-page';
 import {QuoteCopyService} from '../../quotations/services/quote-copy.service';
 import {HOME_COPY} from '../../../../../supabase/functions/_shared/home-copy';
+import {DESTINATION_COPY} from '../../../../../supabase/functions/_shared/destination-copy';
 import type {CopyBlock} from '../../../../../supabase/functions/_shared/quote-copy';
+import type {PublicCopyField} from '../../../shared/models/public-copy-editor';
 
 type HomeGroup = keyof typeof HOME_COPY;
 type HomeKey<G extends HomeGroup> = keyof (typeof HOME_COPY)[G] & string;
-interface HomeField {
-  group: HomeGroup;
-  key: string;
-  fallback: string;
-  icon?: string;
-  variant?: 'primary'|'secondary';
-}
 const PREVIEW_DESTINATION: TravelRecord = {
   id:'muestra',title:'Riviera Maya',subtitle:'Quintana Roo',image:'',status:'',raw:{},
+};
+const DESTINATION_PREVIEW_ID = 19584; // Mazatlán, the reference destination.
+const PREVIEW_HOTEL: TravelRecord = {
+  id:'muestra-hotel',title:'Hotel de muestra',subtitle:'Mazatlán',image:'',status:'',raw:{},
 };
 const normalizeExperience = (value:string)=>value.normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().trim();
 @Component({
@@ -69,7 +68,7 @@ const normalizeExperience = (value:string)=>value.normalize('NFD').replace(/[\u0
   ],
   templateUrl: './public.html',
   styleUrl: './public.scss',
-  host: {'[class.home-preview]':'!!homeEditor()'},
+  host: {'[class.home-preview]':'isCopyPreview()'},
 })
 export class PublicPage implements OnInit, OnDestroy {
   data = inject(PublicTravelService);
@@ -79,24 +78,36 @@ export class PublicPage implements OnInit, OnDestroy {
   private startAtDestinations = (this.router.currentNavigation()?.extras.info as {publicSection?:string} | undefined)?.publicSection === 'destinations';
   private browseStates = inject(PublicBrowseStateService);
   private browseKey = '/' + this.route.snapshot.pathFromRoot.flatMap(route=>route.url.map(segment=>segment.path)).join('/');
-  readonly homeEditor = input<TemplateRef<HomeField>|null>(null);
-  get mode(){return this.homeEditor() ? 'home' : this.route.snapshot.data['mode'] || 'home';}
+  readonly homeEditor = input<TemplateRef<PublicCopyField>|null>(null);
+  readonly destinationEditor = input<TemplateRef<PublicCopyField>|null>(null);
+  readonly isCopyPreview = computed(()=>!!(this.homeEditor() || this.destinationEditor()));
+  get mode(){return this.destinationEditor() ? 'destino' : this.homeEditor() ? 'home' : this.route.snapshot.data['mode'] || 'home';}
   private readonly copyService = inject(QuoteCopyService);
   private readonly homeSnapshot = signal<{language:string;textos:CopyBlock}|null>(null);
+  private readonly destinationSnapshot = signal<{language:string;textos:CopyBlock}|null>(null);
+  readonly destinationCopy = computed(()=>this.destinationSnapshot()?.textos ?? {});
   readonly homeCopyPending = computed(()=>!this.homeEditor() && this.mode==='home' &&
     this.homeSnapshot()?.language!==this.data.language.language());
+  private usesDestinationCopy(){return !this.isCopyPreview() && (this.mode==='destino' || this.mode==='hotel');}
+  readonly destinationCopyPending = computed(()=>this.usesDestinationCopy() &&
+    this.destinationSnapshot()?.language!==this.data.language.language());
+  readonly copyPending = computed(()=>this.homeCopyPending() || this.destinationCopyPending() ||
+    (this.isCopyPreview() && this.loading()));
   readonly previewFilters = [
     {key:'playas',label:'Playas'}, {key:'ciudades',label:'Ciudades Coloniales'}, {key:'cabanas',label:'Cabañas'},
   ];
   readonly homeCards = computed(()=>
     this.homeEditor()&&!this.loading()&&!this.page().items.length ? [PREVIEW_DESTINATION] : this.page().items);
-  id = Number(this.route.snapshot.paramMap.get('id'));
+  get id(){return this.destinationEditor() ? DESTINATION_PREVIEW_ID : Number(this.route.snapshot.paramMap.get('id'));}
   loading = signal(true);
   error = signal('');
   page = signal<Page>({ items: [], total: 0, page: 0 });
   cover = signal<any>(null);
   heroPhotos = signal<Array<{src:string;location:string;homeStyle?:unknown}>>([]);
   detail = signal<any>(null);
+  readonly destinationPreviewDetail = computed(()=>this.detail() ?? {nombre:'Mazatlán'});
+  readonly suggestedHotels = computed(()=>this.destinationEditor() && !this.page().items.length
+    ? {items:[PREVIEW_HOTEL],total:1,page:0} : this.page());
   destinationPhotos = computed(() =>
     destinationPhotos(this.detail()?.atracciones_principales || [], this.cover()?.url_imagen || ''),
   );
@@ -174,12 +185,21 @@ export class PublicPage implements OnInit, OnDestroy {
       const resolve=(textos:CopyBlock)=>{if(current)this.homeSnapshot.set({language,textos});};
       void this.copyService.loadLanguage(language,'inicio').then(resolve,()=>resolve({}));
     });
+    effect(onCleanup=>{
+      if(!this.usesDestinationCopy())return;
+      const language=this.data.language.language();
+      this.destinationSnapshot.set(null);
+      let current=true;
+      onCleanup(()=>{current=false;});
+      const resolve=(textos:CopyBlock)=>{if(current)this.destinationSnapshot.set({language,textos});};
+      void this.copyService.loadLanguage(language,'destino').then(resolve,()=>resolve({}));
+    });
     afterRenderEffect(()=>{
       const top = this.pendingScroll();
       const destinations = this.pendingDestinations();
       const area = this.scrollArea()?.nativeElement;
       const section = this.destinationSection()?.nativeElement;
-      if ((!destinations && top===null) || this.loading() || this.homeCopyPending() || !area || (destinations && !section)) return;
+      if ((!destinations && top===null) || this.loading() || this.copyPending() || !area || (destinations && !section)) return;
       gsap.killTweensOf(area);
       area.scrollTop = destinations
         ? area.scrollTop + section!.getBoundingClientRect().top - area.getBoundingClientRect().top
@@ -216,7 +236,7 @@ export class PublicPage implements OnInit, OnDestroy {
     else gsap.to(area, { scrollTop: top, duration: 0.65, ease: 'power2.inOut', overwrite: true });
   }
   ngOnInit() {
-    if(this.homeEditor()){void this.load();return;}
+    if(this.isCopyPreview()){void this.load();return;}
     const state = this.isBrowsePage() ? this.browseStates.get(this.browseKey) : undefined;
     // An explicit header click wins over the previously saved homepage scroll.
     this.pendingDestinations.set(this.mode==='home'&&(this.startAtDestinations||(!state&&this.route.snapshot.fragment==='destinos')));
@@ -255,7 +275,7 @@ export class PublicPage implements OnInit, OnDestroy {
     });
   }
   ngOnDestroy() {
-    if(!this.homeEditor())this.saveBrowseState();
+    if(!this.isCopyPreview())this.saveBrowseState();
     clearTimeout(this.timer);
     const area = this.scrollArea()?.nativeElement;
     if (area) gsap.killTweensOf(area);
@@ -277,6 +297,7 @@ export class PublicPage implements OnInit, OnDestroy {
         this.detail.set(detail);
         this.cover.set({ url_imagen: detail.fondo, nombre_destino: detail.nombre_hotel });
       } else if (this.mode === 'destino') {
+        const language = this.destinationEditor() ? 'es' : this.data.language.language();
         const [record, info, hotels] = await Promise.all([
           this.data.backend.client
             .from('catalogo_destinos')
@@ -285,9 +306,9 @@ export class PublicPage implements OnInit, OnDestroy {
             .eq('activo', true)
             .maybeSingle(),
           this.data.cached('destination-detail:' + this.id, () =>
-            this.data.destinations.obtenerDetalleDestino(this.id, this.data.language.language()),
+            this.data.destinations.obtenerDetalleDestino(this.id, language), undefined, language,
           ),
-          this.data.featuredHotels(this.id),
+          this.data.featuredHotels(this.id, language),
         ]);
         if (generation !== this.generation) return;
         if (record.error || !record.data) throw new Error('No encontramos este destino.');
@@ -416,7 +437,7 @@ export class PublicPage implements OnInit, OnDestroy {
   text(es: string, en?: string) {
     return this.data.language.translateText(es, en);
   }
-  homeField<G extends HomeGroup>(group:G,key:HomeKey<G>,icon?:string,variant?:HomeField['variant']):HomeField {
+  homeField<G extends HomeGroup>(group:G,key:HomeKey<G>,icon?:string,variant?:PublicCopyField['variant']):PublicCopyField {
     return {group,key,fallback:HOME_COPY[group][key] as string,icon,variant};
   }
   homeText<G extends HomeGroup>(group:G,key:HomeKey<G>,english:string) {
@@ -424,6 +445,13 @@ export class PublicPage implements OnInit, OnDestroy {
     if(this.homeEditor())return fallback;
     if(this.homeCopyPending())return '';
     return (this.mode==='home' ? this.homeSnapshot()?.textos[group]?.[key] : undefined) || this.text(fallback,english);
+  }
+  destinationField(key:keyof typeof DESTINATION_COPY.ficha):PublicCopyField {
+    return {group:'ficha',key,fallback:DESTINATION_COPY.ficha[key],
+      ...(key==='ubicacion' ? {icon:'pin',variant:'quiet'} : {})};
+  }
+  destinationText(key:keyof typeof DESTINATION_COPY.ficha,english:string) {
+    return this.destinationCopy().ficha?.[key] ?? this.text(DESTINATION_COPY.ficha[key],english);
   }
   imageError(event: Event) {
     (event.target as HTMLImageElement).src = '/brand/iso.png';

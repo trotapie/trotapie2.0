@@ -4,6 +4,7 @@ import {readFileSync} from 'node:fs';
 import ts from 'typescript';
 import {parseTemplate} from '@angular/compiler';
 import {HOME_COPY} from '../supabase/functions/_shared/home-copy.ts';
+import {DESTINATION_COPY} from '../supabase/functions/_shared/destination-copy.ts';
 import {changedCopy,cleanCopy,COPY_LANGUAGES,copyGroups,mergeCopyTranslations,QUOTE_COPY,validCopyText} from '../supabase/functions/_shared/quote-copy.ts';
 
 const read=path=>readFileSync(new URL('../'+path,import.meta.url),'utf8');
@@ -70,19 +71,23 @@ test('the inline editor commits the draft on Enter and restores the previous val
   assert.equal(editing,null);
 });
 
-test('the Edge Function publishes Inicio in one batch, or leaves it unchanged on failure',async()=>{
+for (const [section,group,updatedKey,sharedGroup,sharedKey] of [
+  ['inicio','principal','titulo','destinos','enlace'],
+  ['destino','ficha','antetitulo','hoteles','tarjeta'],
+]) {
+test(`the Edge Function publishes ${section} in one batch, or leaves it unchanged on failure`,async()=>{
   const source=read('supabase/functions/guardar-textos-cotizacion/index.ts');
   const code=ts.transpile(source.slice(source.indexOf('const cors')), {target:ts.ScriptTarget.ES2022});
   let handler, allowed=true, incomplete=false;
   const reads=[], batches=[], publishes=[];
-  const old={principal:{titulo:'Título anterior'},destinos:{enlace:'Explora el destino'}};
-  const next={principal:{titulo:'Un nuevo viaje'},destinos:{enlace:'Explora el destino'}};
+  const old={[group]:{[updatedKey]:'Texto anterior'},[sharedGroup]:{[sharedKey]:'Texto compartido'}};
+  const next={...old,[group]:{[updatedKey]:'Un nuevo viaje'}};
   const user={auth:{getUser:async()=>({data:{user:{id:'admin'}}})},rpc:async()=>({data:allowed})};
   const backend={
     from(table){return {select(){return this;},eq(column,section){
       reads.push([table,column,section]);
       if(table==='textos_configurables')return {single:async()=>({data:{version:3,textos:old}})};
-      return Promise.resolve({data:COPY_LANGUAGES.map(idioma=>({idioma,textos:{principal:{titulo:'Old'},destinos:{enlace:'Existing'}}}))});
+      return Promise.resolve({data:COPY_LANGUAGES.map(idioma=>({idioma,textos:{[group]:{[updatedKey]:'Old'},[sharedGroup]:{[sharedKey]:'Existing'}}}))});
     }};},
     rpc:async (...args)=>{publishes.push(args);return {data:4};},
   };
@@ -90,19 +95,19 @@ test('the Edge Function publishes Inicio in one batch, or leaves it unchanged on
   const translate=async (_url,{body})=>{
     batches.push(JSON.parse(body));
     return Response.json({ok:true,traducciones:Object.fromEntries(
-      COPY_LANGUAGES.filter(lang=>!incomplete||lang!=='de').map(lang=>[lang,{principal:{titulo:`${lang}: Un nuevo viaje`}}])
+      COPY_LANGUAGES.filter(lang=>!incomplete||lang!=='de').map(lang=>[lang,{[group]:{[updatedKey]:`${lang}: Un nuevo viaje`}}])
     )});
   };
-  new Function('Deno','createClient','fetch','changedCopy','cleanCopy','COPY_LANGUAGES','mergeCopyTranslations','QUOTE_COPY','HOME_COPY',code)(
-    deno,(_url,_key,options)=>options?user:backend,translate,changedCopy,cleanCopy,COPY_LANGUAGES,mergeCopyTranslations,QUOTE_COPY,HOME_COPY,
+  new Function('Deno','createClient','fetch','changedCopy','cleanCopy','COPY_LANGUAGES','mergeCopyTranslations','QUOTE_COPY','HOME_COPY','DESTINATION_COPY',code)(
+    deno,(_url,_key,options)=>options?user:backend,translate,changedCopy,cleanCopy,COPY_LANGUAGES,mergeCopyTranslations,QUOTE_COPY,HOME_COPY,DESTINATION_COPY,
   );
-  const save=(textos=next)=>handler(new Request('http://localhost',{method:'POST',headers:{Authorization:'Bearer mock'},body:JSON.stringify({seccion:'inicio',version:3,textos})}));
+  const save=(textos=next)=>handler(new Request('http://localhost',{method:'POST',headers:{Authorization:'Bearer mock'},body:JSON.stringify({seccion:section,version:3,textos})}));
   assert.equal((await save()).status,200);
-  assert.ok(reads.every(([,column,section])=>column==='seccion'&&section==='inicio'));
+  assert.ok(reads.every(([,column,value])=>column==='seccion'&&value===section));
   assert.equal(batches.length,1);
-  assert.deepEqual(batches[0].textos,{principal:{titulo:'Un nuevo viaje'}});
-  assert.equal(publishes[0][0],'publicar_textos_inicio');
-  assert.equal(publishes[0][1].p_traducciones.en.destinos.enlace,'Existing');
+  assert.deepEqual(batches[0].textos,{[group]:{[updatedKey]:'Un nuevo viaje'}});
+  assert.equal(publishes[0][0],`publicar_textos_${section}`);
+  assert.equal(publishes[0][1].p_traducciones.en[sharedGroup][sharedKey],'Existing');
   incomplete=true;
   assert.equal((await save()).status,502);
   assert.equal(publishes.length,1);
@@ -111,3 +116,4 @@ test('the Edge Function publishes Inicio in one batch, or leaves it unchanged on
   assert.equal((await save()).status,403);
   assert.equal(batches.length,2);
 });
+}
