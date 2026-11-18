@@ -9,9 +9,11 @@
 .request-hotel strong{display:block;margin-top:10px;font-size:15px;line-height:1.5;overflow-wrap:anywhere}
 .regime-message{font-size:12px;line-height:1.5;color:var(--muted);margin-top:10px}
 .quote-advisor-field,.quote-client-name{grid-column:1/-1;min-width:0}
-.quote-stay-field{grid-column:1/-1;min-width:0}
-.quote-nights-field{display:block;grid-column:1/-1;min-width:0}
-.quote-nights-field input{width:100%;box-sizing:border-box}
+.quote-stay-row{grid-column:1/-1;display:flex;align-items:flex-end;gap:12px;min-width:0}
+.quote-stay-field{flex:1;min-width:0}
+.quote-nights{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;flex:0 0 auto;min-height:64px;box-sizing:border-box;padding:10px 16px;border-radius:12px;background:#1e293b;color:#fff;font-size:12px;font-weight:700;font-variant-numeric:tabular-nums;white-space:nowrap}
+.quote-nights tp-icon{width:18px;height:18px}
+@media(max-width:480px){.quote-stay-row{gap:8px}.quote-stay-field{--date-range-columns:1fr;--date-range-divider-left:0;--date-range-divider-top:1px}.quote-nights{padding:12px;align-self:stretch;margin-top:22px}}
 .quote-client-name{display:grid;grid-template-columns:minmax(120px,180px) minmax(0,1fr);gap:16px}
 .quote-client-name>*{min-width:0}
 @media(max-width:400px){.quote-client-name{grid-template-columns:1fr}}

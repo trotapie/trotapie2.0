@@ -103,3 +103,10 @@ test('quotation and room templates route static text through the existing transl
   assert.match(picker,/showConfigurationHints\(\)&&room\.roomTypeId/);
   assert.doesNotMatch(picker,/label="Camas/);
 });
+test('quotation nights appear as a compact output beside the dates, not a separate input',()=>{
+  const template=read('../src/app/features/quotations/quote-editor/quote-editor.html');
+  assert.match(template,/<div class="quote-stay-row">[\s\S]*?<app-date-range-filter[\s\S]*?<output class="quote-nights"[\s\S]*?<\/output>[\s\S]*?<\/div>/);
+  assert.match(template,/<output[^>]*aria-live="polite"/);
+  assert.doesNotMatch(template,/forId="quote-nights"|<input[^>]*id="quote-nights"/);
+  assert.match(template,/nightCount\(\)===1\?'\{count\} noche':'\{count\} noches'/);
+});
