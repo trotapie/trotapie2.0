@@ -1,22 +1,49 @@
-<tp-page-header title="Configuración general" description="Administra las reglas que se aplican en Trotapie." eyebrow="Trotapie / Administración"/>
-@if(error()){<div class="error-banner" role="alert">{{error()}}</div>}
+<tp-page-header [showBack]="false" title="Configuración general" description="Administra los límites de cotizaciones y los horarios predeterminados de los hoteles." eyebrow="Trotapie / Administración / Configuración"/>
+<div class="settings-header-actions">
+  <a tpButton variant="back" icon="left" routerLink="/admin">Regresar</a>
+  <button tpButton type="button" variant="primary" icon="check" [busy]="saving()" [disabled]="loading()||saving()||!activeDirty()||!activeValid()" (click)="save()">Guardar cambios</button>
+</div>
+<div class="settings-tabs filter-options" role="group" aria-label="Secciones de configuración">
+  <button tpButton icon="quote" [variant]="tab()==='quotes'?'primary':'secondary'" [attr.aria-pressed]="tab()==='quotes'" [disabled]="saving()" (click)="tab.set('quotes')">Cotizaciones @if(quoteDirty()){<span aria-label="Cambios sin guardar">•</span>}</button>
+  <button tpButton icon="clock" [variant]="tab()==='hotels'?'primary':'secondary'" [attr.aria-pressed]="tab()==='hotels'" [disabled]="saving()" (click)="tab.set('hotels')">Hoteles @if(hotelDirty()){<span aria-label="Cambios sin guardar">•</span>}</button>
+</div>
 @if(loading()){
   <tp-state mode="loading"/>
-} @else if(!saved()){
-  <tp-state mode="error" title="Configuración no disponible" message="Verifica que scripts/configuracion-cotizaciones.sql esté aplicado en Supabase e intenta nuevamente." (retry)="load()"/>
 } @else {
-  <form class="panel settings-panel" (ngSubmit)="save()">
-    <div class="panel-heading"><div><h2>Límites de cotizaciones</h2><p>Una misma configuración para las solicitudes del sitio público y las cotizaciones del equipo.</p></div><span class="settings-scope">General</span></div>
-    <fieldset [disabled]="saving()" class="settings-fields">
-      <legend class="sr-only">Límites de habitaciones y personas</legend>
-      <tp-field label="Máximo de habitaciones por cotización" forId="settings-max-rooms" [required]="true" hint="Cantidad total de habitaciones permitidas en una cotización.">
-        <input id="settings-max-rooms" name="maxRooms" type="number" min="1" max="2147483647" step="1" required [ngModel]="maxRooms()" (ngModelChange)="maxRooms.set($event)" aria-describedby="settings-number-help"/>
-      </tp-field>
-      <tp-field label="Máximo de personas por habitación" forId="settings-max-people" [required]="true" hint="Incluye adultos y menores juntos. Se requiere al menos un adulto.">
-        <input id="settings-max-people" name="maxPeoplePerRoom" type="number" min="1" max="2147483647" step="1" required [ngModel]="maxPeoplePerRoom()" (ngModelChange)="maxPeoplePerRoom.set($event)" aria-describedby="settings-number-help"/>
-      </tp-field>
-    </fieldset>
-    @if(!valid()){<p class="error-banner" role="alert">Completa ambos límites con números enteros válidos.</p>}
-    <div class="settings-actions"><span role="status">{{dirty()?'Tienes cambios sin guardar.':'La configuración está actualizada.'}}</span><div><button tpButton type="button" variant="quiet" [disabled]="saving()||!dirty()" (click)="reset()">Descartar cambios</button><button tpButton type="submit" variant="primary" icon="check" [busy]="saving()" [disabled]="saving()||!dirty()||!valid()">Guardar cambios</button></div></div>
-  </form>
+  @if(tab()==='quotes' ? error() : hotelError()){<div class="error-banner" role="alert">{{tab()==='quotes'?error():hotelError()}}</div>}
+  @if(tab()==='quotes' ? !saved() : savedHours()===null){
+    <tp-state mode="error" title="Configuración no disponible" message="Revisa la configuración de esta sección en la base de datos de este ambiente." (retry)="load()"/>
+  } @else {
+    <form class="panel settings-panel" (ngSubmit)="save()">
+      @if(tab()==='quotes'){
+        <div class="panel-heading"><div><h2>Límites de cotizaciones</h2><p>Una misma configuración para las solicitudes del sitio público y las cotizaciones del equipo.</p></div></div>
+        <fieldset [disabled]="saving()" class="settings-fields">
+          <legend class="sr-only">Límites de habitaciones y personas</legend>
+          <tp-field label="Máximo de habitaciones por cotización" forId="settings-max-rooms" [required]="true" hint="Cantidad total de habitaciones permitidas en una cotización.">
+            <input id="settings-max-rooms" name="maxRooms" type="number" min="1" max="2147483647" step="1" required [ngModel]="maxRooms()" (ngModelChange)="maxRooms.set($event)"/>
+          </tp-field>
+          <tp-field label="Máximo de personas por habitación" forId="settings-max-people" [required]="true" hint="Incluye adultos y menores juntos. Se requiere al menos un adulto.">
+            <input id="settings-max-people" name="maxPeoplePerRoom" type="number" min="1" max="2147483647" step="1" required [ngModel]="maxPeoplePerRoom()" (ngModelChange)="maxPeoplePerRoom.set($event)"/>
+          </tp-field>
+        </fieldset>
+        @if(!valid()){<p class="error-banner" role="alert">Completa ambos límites con números enteros válidos.</p>}
+      } @else {
+        <div class="panel-heading"><div><h2>Horarios generales de hoteles</h2><p>Define los horarios predeterminados para las fichas públicas de los hoteles.</p></div></div>
+        <div class="settings-note"><strong>Los horarios propios de cada hotel tienen prioridad.</strong><p>Si un hotel no tiene un horario específico, usará el valor general de ese campo. Deja un campo vacío si no deseas establecer un horario predeterminado.</p></div>
+        <fieldset [disabled]="saving()" class="settings-fields">
+          <legend class="sr-only">Horarios predeterminados de estancia</legend>
+          @for(field of timeFields;track field.key){
+            <tp-field [label]="field.label" [forId]="'settings-'+field.key">
+              <input [id]="'settings-'+field.key" [name]="field.key" type="time" [ngModel]="hours()[field.key]||''" (ngModelChange)="setHour(field.key,$event)"/>
+            </tp-field>
+          }
+        </fieldset>
+        @if(!hotelValid()){<p class="error-banner" role="alert">Revisa los horarios. Usa el formato HH:mm.</p>}
+      }
+      <div class="settings-actions">
+        <span role="status">{{activeDirty()?'Tienes cambios sin guardar en esta sección.':'Esta sección está actualizada.'}} Los cambios se guardan por sección.</span>
+        <button tpButton type="button" variant="quiet" [disabled]="saving()||!activeDirty()" (click)="reset()">Descartar cambios</button>
+      </div>
+    </form>
+  }
 }
