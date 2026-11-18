@@ -5,7 +5,8 @@ import ts from 'typescript';
 import {HOTEL_TIME_FIELDS} from '../src/app/features/hotels/models/hotel-editor-model.ts';
 import {normalizarHorarios,resolverHorarios} from '../src/app/data/models/hotel-estancia.interface.ts';
 import {parseTemplate} from '@angular/compiler';
-import {COPY_GROUPS,COPY_LIMIT,validCopyText} from '../supabase/functions/_shared/quote-copy.ts';
+import {COPY_GROUPS,copyGroups,validCopyText} from '../supabase/functions/_shared/quote-copy.ts';
+import {HOME_COPY} from '../supabase/functions/_shared/home-copy.ts';
 
 const source=path=>readFileSync(new URL('../'+path,import.meta.url),'utf8');
 const classCode=(path,name)=>ts.transpile(source(path).slice(source(path).indexOf('export class '+name)).replace('export class','class'),{target:ts.ScriptTarget.ES2022});
@@ -17,15 +18,17 @@ function editor({allowed=true,loadError=false,saveError=false,hotelLoadError=fal
   const settings={load:async()=>{if(loadError)throw new Error('No disponible');return {maxRooms:8,maxPeoplePerRoom:8};},save:async value=>{writes.push(value);if(saveError)throw new Error('Sin permiso');return value;}};
   const hotels={load:async()=>{if(hotelLoadError)throw new Error('Horarios no disponibles');return {check_in_desde:'15:00',check_out:'12:00'};},save:async value=>{hotelWrites.push(value);if(hotelSaveError)throw new Error('Error al guardar horarios');return normalizarHorarios(value)||{};}};
   const textWrites=[];
-  const texts={loadOriginal:async()=>({version:1,textos:{}}),save:async value=>{
+  const textSections=[];
+  const texts={loadOriginal:async section=>({version:section==='inicio'?5:1,textos:{}}),save:async (value,section)=>{
     textWrites.push(value);
+    textSections.push(section);
     if(textSaveError)throw new Error('No se pudo traducir');
     return {...value,version:value.version+1};
   }};
   const dependencies=[settings,{hasPermission:()=>allowed},{success:()=>{}},hotels,texts];
   const code=classCode('src/app/features/configuration/general-settings/general-settings.ts','GeneralSettings');
-  const Editor=new Function('inject','signal','computed','protectUnsavedChanges','QuoteSettingsService','AuthService','TpToastService','HotelSettingsService','HOTEL_TIME_FIELDS','QuoteCopyService','COPY_GROUPS','COPY_LIMIT','validCopyText',`${code};return GeneralSettings;`)(()=>dependencies.shift(),signal,fn=>fn,(dirty,busy)=>({sync(){},confirm:()=>!busy()&&!dirty()}),null,null,null,null,HOTEL_TIME_FIELDS,null,COPY_GROUPS,COPY_LIMIT,validCopyText);
-  return {page:new Editor(),writes,hotelWrites,textWrites};
+  const Editor=new Function('inject','signal','computed','protectUnsavedChanges','QuoteSettingsService','AuthService','TpToastService','HotelSettingsService','HOTEL_TIME_FIELDS','QuoteCopyService','TEXT_GROUPS','TEXT_SECTIONS','emptyDraft','validCopyText',`${code};return GeneralSettings;`)(()=>dependencies.shift(),signal,fn=>fn,(dirty,busy)=>({sync(){},confirm:()=>!busy()&&!dirty()}),null,null,null,null,HOTEL_TIME_FIELDS,null,{cotizacion:COPY_GROUPS,inicio:copyGroups(HOME_COPY)},['cotizacion','inicio'],()=>({saved:null,textos:{},error:''}),validCopyText);
+  return {page:new Editor(),writes,hotelWrites,textWrites,textSections};
 }
 
 test('quote copy saves a single nested block of overrides and leaves other settings alone',async()=>{
@@ -48,6 +51,27 @@ test('quote copy rejects variables and keeps valid edits when translation fails'
   assert.equal(page.textError(),'No se pudo traducir');
   assert.equal(page.textValue('habitaciones','titulo','Habitación'),'Estancia');
   assert.equal(page.canDeactivate(),false);
+});
+
+test('Inicio and Cotizaciones retain separate drafts, versions and publication',async()=>{
+  const {page,textWrites,textSections}=editor();
+  await page.load();
+  page.tab.set('texts');
+  page.setText('cliente','telefono','Teléfono de contacto');
+  page.textScreen.set('inicio');
+  assert.equal(page.textDirty(),false);
+  assert.equal(page.canDeactivate(),false);
+  page.setText('destinos','enlace','Explorar destino');
+  await page.load();
+  await page.save();
+  assert.deepEqual(textSections,['inicio']);
+  assert.deepEqual(textWrites,[{version:5,textos:{destinos:{enlace:'Explorar destino'}}}]);
+  assert.equal(page.savedTexts().version,6);
+  page.textScreen.set('cotizacion');
+  assert.equal(page.textValue('cliente','telefono','Teléfono'),'Teléfono de contacto');
+  assert.equal(page.savedTexts().version,1);
+  page.reset();
+  assert.equal(page.canDeactivate(),true);
 });
 
 test('general settings loads, saves both limits and clears the pending state',async()=>{

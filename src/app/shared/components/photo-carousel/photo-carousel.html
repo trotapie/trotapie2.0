@@ -26,10 +26,12 @@
       <span class="carousel-location" [ngStyle]="photo.homeStyle ? homeImageTextStyle(photo.homeStyle) : null"><tp-icon name="pin" />{{ photo.location }}</span>
     }
     @if (variant()==='hero' && (photo.title || photo.description || headline())) {
-      <div class="carousel-caption">
-        @if (eyebrow()) { <span class="carousel-eyebrow">{{ eyebrow() }}</span> }
+      <div class="carousel-caption" [class.editable-caption]="!!headlineTemplate()">
+        @if (eyebrow() || eyebrowTemplate()) {
+          <span class="carousel-eyebrow">@if(eyebrowTemplate(); as template){<ng-container *ngTemplateOutlet="template"/>}@else{ {{ eyebrow() }} }</span>
+        }
         @if (photo.title || headline()) {
-          <h2>{{ headline() || photo.title }}</h2>
+          <h2>@if(headlineTemplate(); as template){<ng-container *ngTemplateOutlet="template"/>}@else{ {{ headline() || photo.title }} }</h2>
         }
         @if (photo.description) {
           <p>{{ photo.description }}</p>
@@ -49,7 +51,7 @@
         decoding="async"
         fetchpriority="low"
       />
-      <div class="carousel-controls">
+      <div class="carousel-controls" [inert]="!!headlineTemplate()">
         <button
           tpButton
           variant="icon"
@@ -109,5 +111,11 @@
     }
   } @else {
     <tp-icon name="landscape" />
+    @if(headlineTemplate(); as template){
+      <div class="carousel-caption editable-caption">
+        <span class="carousel-eyebrow"><ng-container *ngTemplateOutlet="eyebrowTemplate()"/></span>
+        <h2><ng-container *ngTemplateOutlet="template"/></h2>
+      </div>
+    }
   }
 </div>

@@ -1,6 +1,6 @@
 import {ImageComposer} from '../image-composer/image-composer';
 import {CompositionScaleDirective} from '../../directives/composition-scale.directive';
-import {NgStyle} from '@angular/common';
+import {NgStyle, NgTemplateOutlet} from '@angular/common';
 import {homeImagePhotoStyle,homeImageTextStyle} from '../../models/home-image-style';
 import {
   Component,
@@ -14,6 +14,7 @@ import {
   input,
   linkedSignal,
   signal,
+  TemplateRef,
 } from '@angular/core';
 import { Button } from '../button/button';
 import { Icon } from '../icon/icon';
@@ -24,7 +25,7 @@ import { gsap } from 'gsap';
 
 @Component({
   selector: 'tp-photo-carousel',
-  imports: [ImageComposer, Button, Icon, NgStyle, CompositionScaleDirective],
+  imports: [ImageComposer, Button, Icon, NgStyle, NgTemplateOutlet, CompositionScaleDirective],
   templateUrl: './photo-carousel.html',
   styleUrl: './photo-carousel.scss',
   host: {
@@ -46,6 +47,8 @@ export class PhotoCarousel {
   variant = input<'gallery' | 'hero' | 'lightbox'>('gallery');
   headline = input('');
   eyebrow = input('');
+  eyebrowTemplate = input<TemplateRef<unknown>|null>(null);
+  headlineTemplate = input<TemplateRef<unknown>|null>(null);
   intervalMs = input(3000);
   startIndex = input(0);
   orderedPhotos = linkedSignal<CarouselPhoto[]>(() => {

@@ -1,6 +1,6 @@
 <section class="quick-filters" [attr.aria-label]="title()">
-  <span class="quick-filter-label">{{ title() }}</span>
-  <div class="quick-filter-track" [style.--option-count]="options().length || 1" role="group" [attr.aria-label]="title()">
+  <span class="quick-filter-label">@if(titleTemplate(); as template){<ng-container *ngTemplateOutlet="template"/>}@else{ {{ title() }} }</span>
+  <div class="quick-filter-track" [inert]="!!titleTemplate()" [style.--option-count]="options().length || 1" role="group" [attr.aria-label]="title()">
     @for(option of options();track option.key){
       <button type="button" [class.selected]="selected()===option.key" [attr.aria-pressed]="selected()===option.key" (click)="changed.emit(option.key)">{{ option.label }}</button>
     }

@@ -1,4 +1,9 @@
-<button type="button" class="image-card" (click)="selected.emit(record())">
+@if(labelTemplate()){
+  <div class="image-card"><ng-container *ngTemplateOutlet="content"/></div>
+} @else {
+  <button type="button" class="image-card" (click)="selected.emit(record())"><ng-container *ngTemplateOutlet="content"/></button>
+}
+<ng-template #content>
   <div class="image-card-photo" [class.image-card-photo-contain]="containImage()">
     @if (record().image) {
       <img
@@ -25,9 +30,9 @@
       @if (showStatus() && record().status) {
         <tp-badge [label]="record().status" />
       } @else {
-        <span>{{ label() }}</span>
+        <span>@if(labelTemplate(); as template){<ng-container *ngTemplateOutlet="template"/>}@else{ {{ label() }} }</span>
       }
       @if(!hasActions()){<tp-icon name="right" />}
     </div>
   </div>
-</button>
+</ng-template>

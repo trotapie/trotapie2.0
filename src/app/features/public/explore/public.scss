@@ -346,7 +346,7 @@
 /* Only main scrolls; the header and footer occupy their own rows. */
 .public-scroll-region{position:relative;display:flex;flex-direction:column;flex:1 1 auto;min-height:0}
 .back-to-top{position:absolute;right:16px;bottom:16px;z-index:5;min-height:44px;background:var(--surface);color:var(--ink);border:1px solid var(--line);box-shadow:0 4px 16px #00000014;font-size:12px}
-.public-scroll-region > main {
+.public-scroll-region > .public-main {
   min-height: 0;
   flex: 1 1 auto;
   overflow: auto;
@@ -354,19 +354,19 @@
   scrollbar-gutter: stable;
   padding-right: 8px;
 }
-.public-scroll-region > main.catalog-scroll-area{padding-bottom:76px}
-.public-scroll-region > main::-webkit-scrollbar {
+.public-scroll-region > .public-main.catalog-scroll-area{padding-bottom:76px}
+.public-scroll-region > .public-main::-webkit-scrollbar {
   width: 7px;
 }
-.public-scroll-region > main::-webkit-scrollbar-thumb {
+.public-scroll-region > .public-main::-webkit-scrollbar-thumb {
   background: var(--line);
   border-radius: 999px;
 }
-.public-scroll-region > main::-webkit-scrollbar-track {
+.public-scroll-region > .public-main::-webkit-scrollbar-track {
   background: transparent;
 }
 @media (max-width: 700px) {
-  .public-scroll-region > main {
+  .public-scroll-region > .public-main {
     padding-right: 4px;
   }
 }
@@ -383,13 +383,24 @@
     box-shadow: none;
   }
   .back-to-top{display:none}
-  .public-scroll-region > main {
+  .public-scroll-region > .public-main {
     overflow: visible;
     padding: 0;
   }
 }
 
 .detail-photo.destination-composition{height:auto;aspect-ratio:16/10;align-self:start}
+.home-copy-pending{visibility:hidden}
+.home-copy-loader{position:absolute;inset:0;display:grid;place-items:center}
+:host(.home-preview){height:auto;overflow:visible;container-type:inline-size}
+:host(.home-preview) .public-shell{height:auto;width:100%;margin:0;padding:16px clamp(16px,4cqw,48px);box-shadow:none;border:1px solid var(--line)}
+:host(.home-preview) .public-main.catalog-scroll-area{padding:0;overflow:visible;scrollbar-gutter:auto}
+:host(.home-preview) .home-copy-pending{min-height:240px}
+.preview-hero-action{display:block;margin-top:32px}
+:host(.home-preview) .public-hero-copy h1{font-size:clamp(30px,5cqw,68px)}
+@container (max-width: 720px){
+  :host(.home-preview) .public-hero{grid-template-columns:1fr;gap:24px}
+}
 
 
 .hotel-filter-toolbar{display:flex;justify-content:flex-end;flex-wrap:wrap;align-items:center;gap:10px;margin:20px 0}.hotel-filters-dialog{display:grid;gap:18px}.filter-count{display:grid;place-items:center;min-width:20px;height:20px;border-radius:50%;background:var(--brand-soft);color:var(--brand);font-size:11px}

@@ -1,5 +1,6 @@
 import {CatalogIcon} from '../catalog-icon/catalog-icon';
-import { Component, input, output, computed, linkedSignal } from '@angular/core';
+import { Component, input, output, computed, linkedSignal, TemplateRef } from '@angular/core';
+import { NgTemplateOutlet } from '@angular/common';
 import { Icon } from '../icon/icon';
 import { Badge } from '../badge/badge';
 import { MotionDirective } from '../../directives/motion.directive';
@@ -7,13 +8,14 @@ import type { TravelRecord } from '../../../data/facades/travel-data.service';
 @Component({
   selector: 'tp-image-card',
   hostDirectives: [MotionDirective],
-  imports: [CatalogIcon,Icon, Badge],
+  imports: [CatalogIcon,Icon, Badge,NgTemplateOutlet],
   templateUrl: './image-card.html',
   styleUrl: './image-card.scss',
 })
 export class ImageCard {
   record = input.required<TravelRecord>();
   label = input('Descubrir destino');
+  labelTemplate = input<TemplateRef<unknown>|null>(null);
   imageFit = input<'cover' | 'contain'>('cover');
   private landscapePhoto=linkedSignal(()=>{this.record().image;return false;});
   containImage=computed(()=>this.imageFit()==='contain'&&!this.landscapePhoto()&&!/\.(?:jpe?g|avif)(?:[?#]|$)/i.test(this.record().image));
