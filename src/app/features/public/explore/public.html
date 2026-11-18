@@ -54,7 +54,9 @@
         [routerLink]="mode === 'hotel' ? returnUrl : '/destinos'"
         >{{ text('Volver al catálogo', 'Back to catalog') }}</a
       >}
-      @if (detailRecord(); as record) {
+       @if (mode === 'hotel' && error() && !hotelEditor()) {
+         <tp-state mode="error" [message]="error()" (retry)="load()" />
+       } @else if (detailRecord(); as record) {
         <section class="detail-hero">
           <div class="detail-photo" [class.destination-composition]="mode==='destino'">
             @if (mode === 'destino') {
@@ -303,11 +305,7 @@
           }
         }
       </section>
-    } @else if (mode === 'hotel' && loading() && !hotelEditor()) {
-      <tp-state mode="loading" />
-    } @else if (mode === 'hotel' && error() && !hotelEditor()) {
-      <tp-state mode="error" [message]="error()" (retry)="load()" />
-    }
+     }
   </div>
   @if(showBackToTop()&&!isCopyPreview()&&!copyPending()){
     <button tpButton type="button" class="back-to-top" icon="chevron-up" aria-controls="main-content" (click)="backToTop()">{{text('Volver arriba','Back to top')}}</button>

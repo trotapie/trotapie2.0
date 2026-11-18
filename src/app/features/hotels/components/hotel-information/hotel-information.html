@@ -3,16 +3,21 @@
     <span class="eyebrow"><ng-container *ngTemplateOutlet="label; context:{key:'antetitulo',en:'Everything for your stay'}"/></span>
     <h2><ng-container *ngTemplateOutlet="label; context:{key:'titulo',en:'Get to know your hotel'}"/></h2>
   </div>
-  <div class="hotel-tabs" [inert]="!!copyEditor()">
-    @for (tab of tabs(); track $index) {
-      <h3 class="accordion-heading" [style.grid-column]="$index + 1">
-        <button type="button" [id]="tabId($index)" [attr.aria-expanded]="selected() === $index" [attr.aria-controls]="panelId($index)" [class.selected]="selected() === $index" (click)="select($index)" (keydown)="navigateTabs($event, $index)"><tp-icon [name]="tab.icon" /><span>{{ tab.label }}</span><tp-icon class="expand-icon" name="chevron-down" /></button>
+  <div class="hotel-tabs" [inert]="!!copyEditor()" [style.--tab-columns]="columns()" [style.--panel-row]="panelRow()">
+    @for (tab of tabs(); track tab.key) {
+      <h3 class="accordion-heading" [class.row-start]="$index % columns() === 0" [class.row-end]="($index + 1) % columns() === 0 || $last"
+        [class.next-row]="$index >= columns()" [style.grid-column]="$index % columns() + 1" [style.grid-row]="tabRow($index)">
+        <button type="button" [id]="tabId(tab.key)" [attr.aria-expanded]="selected() === tab.key" [attr.aria-controls]="panelId(tab.key)" [class.selected]="selected() === tab.key" (click)="select(tab.key)" (keydown)="navigateTabs($event, $index)">
+          @if (tab.svg; as icon) { <tp-svg-path-icon [icon]="icon" /> }
+          @else { <tp-icon [name]="tab.icon" /> }
+          <span>{{ tab.label }}</span><tp-icon class="expand-icon" [name]="selected() === tab.key ? 'close' : 'chevron-down'" />
+        </button>
       </h3>
-      <div class="hotel-panel-collapse" [class.open]="selected() === $index" role="region" [id]="panelId($index)" [attr.aria-labelledby]="tabId($index)" [attr.aria-hidden]="selected() !== $index" [attr.inert]="selected() !== $index ? '' : null">
+      <div class="hotel-panel-collapse" [class.open]="selected() === tab.key" role="region" [id]="panelId(tab.key)" [attr.aria-labelledby]="tabId(tab.key)" [attr.aria-hidden]="selected() !== tab.key" [attr.inert]="selected() !== tab.key ? '' : null">
         <div class="hotel-panel-clip">
           <div class="hotel-panel">
-    @switch ($index) {
-      @case (0) {
+    @switch (tab.key) {
+      @case ('hours') {
         <h3>{{ text('Planea tu llegada', 'Plan your arrival') }}</h3>
         <div class="schedule-grid">
           @for (item of schedules(); track item.label) {
@@ -21,16 +26,22 @@
         </div>
         <p class="note">{{ text('Consulta con tu asesor la disponibilidad para llegadas anticipadas y salidas tardías.', 'Ask your adviser about early arrivals and late departures.') }}</p>
       }
-      @case (1) { <h3>{{ text('Una estancia a tu manera', 'A stay your way') }}</h3><p class="description">{{ hotel().descripcion || text('La descripción de este hotel estará disponible próximamente.', 'This hotel description will be available soon.') }}</p> }
-      @case (2) {
+      @case ('description') { <h3>{{ text('Una estancia a tu manera', 'A stay your way') }}</h3><p class="description">{{ hotel().descripcion || text('La descripción de este hotel estará disponible próximamente.', 'This hotel description will be available soon.') }}</p> }
+      @case ('amenities') {
         <h3>{{ text('Detalles que hacen la diferencia', 'Details that make a difference') }}</h3>
         @if (hotel().actividades?.length) {
           <ul class="amenity-grid">@for (item of hotel().actividades; track $index) { <li><tp-icon name="check" /><span>{{ item.descripcion || item.nombre }}</span></li> }</ul>
         } @else { <p class="note">{{ text('Consulta con tu asesor las amenidades disponibles en este hotel.', 'Ask your adviser about amenities available at this hotel.') }}</p> }
       }
-      @case (3) { <h3>{{ regimen() }}</h3>
-        <ul class="plan-options"><li>{{ regimen() }}</li></ul>
-        <p class="description">{{ hotel().plan_todo_incluido?.descripcion || text('Consulta con tu asesor qué incluye este régimen y las condiciones de tu reserva.', 'Ask your adviser what this plan includes and about your booking conditions.') }}</p>
+      @default {
+        <h3>{{ tab.label }}</h3>
+        @if (tab.description) { <p class="description">{{ tab.description }}</p> }
+        @if (tab.hotelPlan && tab.hotelPlan !== tab.description) {
+          @if (tab.description) { <h4>{{ text('Detalles de este hotel', 'Details for this hotel') }}</h4> }
+          <p class="description">{{ tab.hotelPlan }}</p>
+        } @else if (!tab.description) {
+          <p class="description">{{ text('Consulta con tu asesor qué incluye este régimen y las condiciones de tu reserva.', 'Ask your adviser what this plan includes and about your booking conditions.') }}</p>
+        }
       }
     }
           </div>

@@ -40,3 +40,9 @@ test('public hotel copy waits for active-language reads and falls back per field
   assert.match(source,/copyPending = computed\(\(\)=>.*destinationCopyPending\(\) \|\| this\.hotelCopyPending\(\)/);
   assert.match(source,/loadLanguage\(language,'hotel'\)\.then\(resolve,\(\)=>resolve\(\{\}\)\)/);
 });
+
+test('hotel loader covers the entire content until both copy and hotel data are ready',()=>{
+  assert.match(read(page+'.ts'),/\(\(this\.mode==='hotel' \|\| this\.isCopyPreview\(\)\) && this\.loading\(\)\)/);
+  assert.match(read(page+'.scss'),/\.home-copy-pending\{visibility:hidden;opacity:0\}/);
+  assert.match(read(page+'.html'),/\[class\.home-copy-pending\]="copyPending\(\)"\s+\[inert\]="copyPending\(\)"/);
+});

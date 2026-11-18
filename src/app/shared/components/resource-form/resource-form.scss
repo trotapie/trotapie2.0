@@ -1,2 +1,9 @@
 .checkbox-field{display:flex;align-items:center;gap:10px;padding:14px;background:var(--muted-surface);border:1px solid var(--line);border-radius:14px;font-size:12px;grid-column:1/-1}.checkbox-field input{accent-color:var(--brand);width:18px;height:18px}
 .field-with-preview{display:grid;grid-template-columns:minmax(0,1fr) 42px;align-items:end;gap:8px;}.field-with-preview>button{margin-bottom:3px;}
+.svg-field-with-preview{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px;align-items:start}
+.svg-preview-button{margin-block-start:1.5rem}
+.svg-preview{display:none;padding:12px 14px;border:1px solid var(--line);border-radius:12px;color:var(--brand);background:var(--surface);box-shadow:0 6px 24px rgb(0 0 0 / 14%);font-size:12px}
+.svg-preview:popover-open{display:flex;align-items:center;gap:10px}
+@supports(position-area:bottom span-left){
+  .svg-preview{inset:auto;margin:8px 0;position-area:bottom span-left;position-try-fallbacks:flip-block,flip-inline}
+}

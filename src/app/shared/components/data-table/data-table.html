@@ -1,11 +1,14 @@
 <div class="table-scroll" [class.sticky-header]="stickyHeader()" [attr.tabindex]="stickyHeader()?0:null" [attr.role]="stickyHeader()?'region':null" [attr.aria-label]="stickyHeader()?'Listado de registros':null">
-  <table>
-    <thead><tr><th scope="col">{{title() | uiText}}</th>@for(c of columns();track c.key){<th scope="col" [class.column-details]="!!c.detailsKey">{{c.label | uiText}}</th>}<th scope="col">{{'Estado' | uiText}}</th>@if(actionable()){<th scope="col"><span class="sr-only">{{'Acciones' | uiText}}</span></th>}</tr></thead>
+  <table [class.truncated-table]="hasTruncatedColumn()">
+    <thead><tr><th scope="col" class="record-name">{{title() | uiText}}</th>@for(c of columns();track c.key){<th scope="col" [class.column-details]="!!c.detailsKey">{{c.label | uiText}}</th>}<th scope="col" class="record-status">{{'Estado' | uiText}}</th>@if(actionable()){<th scope="col" class="record-actions"><span class="sr-only">{{'Acciones' | uiText}}</span></th>}</tr></thead>
     <tbody>@for(r of records();track r.id){
       <tr class="record-row">
-        <td class="record-name"><div class="table-identity">@if(r.image){<img [src]="r.image" [alt]="r.title" loading="lazy" (error)="imageError($event)"/>}@else if(r.raw['icono']){<span class="table-initial"><tp-catalog-icon [value]="r.raw['icono']"/></span>}@else{<span class="table-initial">{{r.title.slice(0,1)}}</span>}<div><strong>{{r.title}}</strong><small>{{r.subtitle}}</small></div></div></td>
+        <td class="record-name"><div class="table-identity">@if(r.image){<img [src]="r.image" [alt]="r.title" loading="lazy" (error)="imageError($event)"/>}@else if(svgIcons().get(r.id); as icon){<span class="table-initial"><tp-svg-path-icon [icon]="icon"/></span>}@else if(r.raw['icono']){<span class="table-initial"><tp-catalog-icon [value]="r.raw['icono']"/></span>}@else{<span class="table-initial">{{r.title.slice(0,1)}}</span>}<div><strong>{{r.title}}</strong><small>{{r.subtitle}}</small></div></div></td>
         @for(c of columns();track c.key){
           <td [attr.data-label]="c.label | uiText" [class.column-details]="!!c.detailsKey">
+            @if(c.truncate){
+              <span class="cell-truncated" [attr.title]="r.raw[c.key] || null">{{r.raw[c.key] || '—'}}</span>
+            }@else{
             <span class="cell-with-details">
               @if(!c.detailsKey||details(r,c).length<=1){<span>{{c.key==='created_at' ? (r.raw[c.key] | date:'d MMMM yyyy':undefined:'es-MX') : r.raw[c.key] || '—'}}</span>}
               @if(details(r,c).length>1){
@@ -21,6 +24,7 @@
                 </ng-template>
               }
             </span>
+            }
           </td>
         }
         <td class="record-status" data-label="Estado"><tp-badge [label]="r.status"/></td>
