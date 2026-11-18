@@ -77,7 +77,8 @@ export class PublicPage implements OnInit, OnDestroy {
   search = signal('');
   type = signal<'NACIONAL' | 'INTERNACIONAL'>('NACIONAL');
   region=signal<number|null>(null);country=signal<number|null>(null);countries=signal<InternationalCountry[]>([]);
-  experience = signal(this.mode==='cabanas'?'cabanas':'');
+  featuredExperience: 'cabanas'|'promociones'|'' = this.mode==='cabanas'||this.mode==='promociones' ? this.mode : '';
+  experience = signal<string>(this.featuredExperience);
   comingSoon = computed(()=>this.experience()==='cabanas'||this.experience()==='promociones');
   experienceOptions = signal<Array<{id:number;slug:string;nombre:string;label:string}>>([]);
   experienceFilters = computed(()=>{
@@ -86,11 +87,11 @@ export class PublicPage implements OnInit, OnDestroy {
       ...this.experienceOptions()
         .filter(option=>!fixedNames.has(normalizeExperience(option.slug))&&!fixedNames.has(normalizeExperience(option.nombre)))
         .map(option=>({key:String(option.id),label:option.label})),
-      {key:'promociones',label:this.text('Promociones','Offers')},
+      {key:'cabanas',label:this.text('Cabañas','Cabins')},
     ];
   });
   experienceConfigured = signal(true);
-  selectedExperience = computed(()=>this.experience()==='cabanas'?this.text('Cabañas','Cabins'):this.experienceFilters().find(option=>option.key===this.experience())?.label||'');
+  selectedExperience = computed(()=>this.experience()==='promociones'?this.text('Promociones','Offers'):this.experienceFilters().find(option=>option.key===this.experience())?.label||'');
   returnUrl = this.route.snapshot.queryParamMap.get('volver') || '/hoteles';
   hotelFilters=signal<{search:string;starsMin:number|null;starsMax:number|null;regime:number|null}>({search:'',starsMin:null,starsMax:null,regime:null});
   hotelRegimes=signal<{value:number;label:string}[]>([]);
@@ -109,7 +110,7 @@ export class PublicPage implements OnInit, OnDestroy {
   hasMoreHotels=computed(()=>this.page().items.length<this.page().total);
   hotelDestinationName = signal('');
   homeSection=signal<'home'|'destinations'>('home');
-  activeSection=computed(()=>this.mode==='cabanas'?'cabins':this.mode==='home'?this.homeSection():this.mode==='circuitos'||this.mode==='circuito'?'circuits':'destinations');
+  activeSection=computed(()=>this.mode==='promociones'?'offers':this.mode==='home'?this.homeSection():this.mode==='circuitos'||this.mode==='circuito'?'circuits':'destinations');
   showBackToTop=signal(false);
   private isDestinationCatalog(){return this.mode==='home'||this.mode==='destinos'||(this.mode==='hoteles'&&!this.id);}
   updateActiveSection(){
@@ -205,7 +206,7 @@ export class PublicPage implements OnInit, OnDestroy {
     if (!(state && this.mode==='hoteles' && this.id))
       void this.load(state?.page.page ?? 0, !!state);
   }
-  private isBrowsePage() { return ['home','destinos','hoteles','circuitos','cabanas'].includes(this.mode); }
+  private isBrowsePage() { return ['home','destinos','hoteles','circuitos','cabanas','promociones'].includes(this.mode); }
   private saveBrowseState() {
     if (!this.isBrowsePage() || this.error()) return;
     this.browseStates.save(this.browseKey, {
@@ -290,7 +291,7 @@ export class PublicPage implements OnInit, OnDestroy {
         const experiences = await this.data.experienceOptions(this.type());
         if (generation !== this.generation) return;
         this.experienceOptions.set(experiences);
-        const automaticSelection = this.mode!=='cabanas'&&!this.experienceFilters().some(option=>option.key===this.experience());
+        const automaticSelection = !this.featuredExperience&&!this.experienceFilters().some(option=>option.key===this.experience());
         if (automaticSelection) {
           const beach = experiences.find(option=>
             ['playa','playas'].includes(normalizeExperience(option.slug)) || ['playa','playas'].includes(normalizeExperience(option.nombre)));

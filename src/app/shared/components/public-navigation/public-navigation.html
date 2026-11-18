@@ -10,7 +10,7 @@
         <a routerLink="/" [class.active]="activeSection()==='home'" [attr.aria-current]="activeSection()==='home'?'page':null" (click)="setMenu(false); homeSelected.emit($event)">{{ text('Inicio', 'Home') }}<tp-icon name="right" /></a>
         <a routerLink="/" fragment="destinos" [class.active]="activeSection()==='destinations'" [attr.aria-current]="activeSection()==='destinations'?'page':null" (click)="setMenu(false); destinationsSelected.emit($event)">{{ text('Destinos', 'Destinations') }}<tp-icon name="right" /></a>
         <a routerLink="/circuitos" [class.active]="activeSection()==='circuits'" [attr.aria-current]="activeSection()==='circuits'?'page':null" (click)="setMenu(false)">{{ text('Circuitos', 'Tours') }}<tp-icon name="right" /></a>
-        <a routerLink="/cabanas" [class.active]="activeSection()==='cabins'" [attr.aria-current]="activeSection()==='cabins'?'page':null" (click)="setMenu(false)">{{ text('Cabañas', 'Cabins') }}<tp-icon name="right" /></a>
+        <a routerLink="/promociones" [class.active]="activeSection()==='offers'" [attr.aria-current]="activeSection()==='offers'?'page':null" (click)="setMenu(false)">{{ text('Promociones', 'Offers') }}<tp-icon name="right" /></a>
       </nav>
     </section>
   </div>
@@ -22,7 +22,7 @@
     <a routerLink="/" [class.active]="activeSection()==='home'" [attr.aria-current]="activeSection()==='home'?'page':null" (click)="homeSelected.emit($event)">{{ text('Inicio', 'Home') }}</a>
     <a routerLink="/" fragment="destinos" [class.active]="activeSection()==='destinations'" [attr.aria-current]="activeSection()==='destinations'?'page':null" (click)="destinationsSelected.emit($event)">{{ text('Destinos', 'Destinations') }}</a>
     <a routerLink="/circuitos" [class.active]="activeSection()==='circuits'" [attr.aria-current]="activeSection()==='circuits'?'page':null">{{ text('Circuitos', 'Tours') }}</a>
-    <a routerLink="/cabanas" [class.active]="activeSection()==='cabins'" [attr.aria-current]="activeSection()==='cabins'?'page':null">{{ text('Cabañas', 'Cabins') }}</a>
+    <a routerLink="/promociones" [class.active]="activeSection()==='offers'" [attr.aria-current]="activeSection()==='offers'?'page':null">{{ text('Promociones', 'Offers') }}</a>
   </nav>
   <div class="public-tools">
     <tp-theme-toggle [english]="english()" />

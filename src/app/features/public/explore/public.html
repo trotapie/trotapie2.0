@@ -156,8 +156,8 @@
                   ? hotelDestinationName()
                   : mode === 'destino' || (mode === 'hoteles' && id)
                   ? text('Encuentra tu estancia', 'Find your stay')
-                   : mode === 'cabanas'
-                     ? text('Cabañas', 'Cabins')
+                    : featuredExperience
+                      ? selectedExperience()
                    : mode === 'circuitos'
                     ? text('Viajes para descubrir más', 'Journeys to discover more')
                     : mode === 'hoteles'
@@ -178,7 +178,7 @@
           </div>
           <span class="result-count">{{ page().total }} {{ text('opciones', 'options') }}</span>
         </div>
-        @if (mode !== 'destino' && mode !== 'circuitos' && mode !== 'cabanas' && !id) {
+        @if (mode !== 'destino' && mode !== 'circuitos' && !featuredExperience && !id) {
           <tp-quick-filters
             [title]="text('Selecciona experiencia', 'Choose an experience')"
             [options]="experienceFilters()"
