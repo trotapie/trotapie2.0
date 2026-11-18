@@ -9,7 +9,8 @@ import { DestinationFacts } from '../../destinations/components/destination-fact
 import { destinationPhotos } from '../../destinations/utils/destination-photos';
 import { PhotoCarousel } from '../../../shared/components/photo-carousel/photo-carousel';
 import { HotelSuggestions } from '../../hotels/components/hotel-suggestions/hotel-suggestions';
-import { Component, computed, inject, signal, OnInit, OnDestroy, ElementRef, viewChild, afterRenderEffect } from '@angular/core';
+import { Component, computed, effect, inject, input, signal, OnInit, OnDestroy, ElementRef, TemplateRef, viewChild, afterRenderEffect } from '@angular/core';
+import { NgTemplateOutlet } from '@angular/common';
 import { gsap } from 'gsap';
 import { Router, RouterLink, ActivatedRoute } from '@angular/router';
 import { PublicTravelService } from '../../../data/public/public-travel.service';
@@ -29,6 +30,22 @@ import { HotelInformation } from '../../hotels/components/hotel-information/hote
 import {InternationalFilters} from '../../../shared/components/international-filters/international-filters';
 import {InternationalCountry} from '../../../data/models/international-geography';
 import {appendHotelPage} from '../../../data/utils/append-hotel-page';
+import {QuoteCopyService} from '../../quotations/services/quote-copy.service';
+import {HOME_COPY} from '../../../../../supabase/functions/_shared/home-copy';
+import type {CopyBlock} from '../../../../../supabase/functions/_shared/quote-copy';
+
+type HomeGroup = keyof typeof HOME_COPY;
+type HomeKey<G extends HomeGroup> = keyof (typeof HOME_COPY)[G] & string;
+interface HomeField {
+  group: HomeGroup;
+  key: string;
+  fallback: string;
+  icon?: string;
+  variant?: 'primary'|'secondary';
+}
+const PREVIEW_DESTINATION: TravelRecord = {
+  id:'muestra',title:'Riviera Maya',subtitle:'Quintana Roo',image:'',status:'',raw:{},
+};
 const normalizeExperience = (value:string)=>value.normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().trim();
 @Component({
   selector: 'tp-public',
@@ -48,10 +65,11 @@ const normalizeExperience = (value:string)=>value.normalize('NFD').replace(/[\u0
     DestinationFacts,
     PhotoCarousel,
     HotelSuggestions,
-    LocationMap,
+    LocationMap, NgTemplateOutlet,
   ],
   templateUrl: './public.html',
   styleUrl: './public.scss',
+  host: {'[class.home-preview]':'!!homeEditor()'},
 })
 export class PublicPage implements OnInit, OnDestroy {
   data = inject(PublicTravelService);
@@ -61,7 +79,17 @@ export class PublicPage implements OnInit, OnDestroy {
   private startAtDestinations = (this.router.currentNavigation()?.extras.info as {publicSection?:string} | undefined)?.publicSection === 'destinations';
   private browseStates = inject(PublicBrowseStateService);
   private browseKey = '/' + this.route.snapshot.pathFromRoot.flatMap(route=>route.url.map(segment=>segment.path)).join('/');
-  mode = this.route.snapshot.data['mode'] || 'home';
+  readonly homeEditor = input<TemplateRef<HomeField>|null>(null);
+  get mode(){return this.homeEditor() ? 'home' : this.route.snapshot.data['mode'] || 'home';}
+  private readonly copyService = inject(QuoteCopyService);
+  private readonly homeSnapshot = signal<{language:string;textos:CopyBlock}|null>(null);
+  readonly homeCopyPending = computed(()=>!this.homeEditor() && this.mode==='home' &&
+    this.homeSnapshot()?.language!==this.data.language.language());
+  readonly previewFilters = [
+    {key:'playas',label:'Playas'}, {key:'ciudades',label:'Ciudades Coloniales'}, {key:'cabanas',label:'Cabañas'},
+  ];
+  readonly homeCards = computed(()=>
+    this.homeEditor()&&!this.loading()&&!this.page().items.length ? [PREVIEW_DESTINATION] : this.page().items);
   id = Number(this.route.snapshot.paramMap.get('id'));
   loading = signal(true);
   mobileMenuOpen = signal(false);
@@ -138,12 +166,21 @@ export class PublicPage implements OnInit, OnDestroy {
   private destinationSection = viewChild<ElementRef<HTMLElement>>('destinationSection');
   private catalogHeading = viewChild<ElementRef<HTMLElement>>('catalogHeading');
   constructor() {
+    effect(onCleanup=>{
+      if(this.homeEditor()||this.mode!=='home')return;
+      const language=this.data.language.language();
+      this.homeSnapshot.set(null);
+      let current=true;
+      onCleanup(()=>{current=false;});
+      const resolve=(textos:CopyBlock)=>{if(current)this.homeSnapshot.set({language,textos});};
+      void this.copyService.loadLanguage(language,'inicio').then(resolve,()=>resolve({}));
+    });
     afterRenderEffect(()=>{
       const top = this.pendingScroll();
       const destinations = this.pendingDestinations();
       const area = this.scrollArea()?.nativeElement;
       const section = this.destinationSection()?.nativeElement;
-      if ((!destinations && top===null) || this.loading() || !area || (destinations && !section)) return;
+      if ((!destinations && top===null) || this.loading() || this.homeCopyPending() || !area || (destinations && !section)) return;
       gsap.killTweensOf(area);
       area.scrollTop = destinations
         ? area.scrollTop + section!.getBoundingClientRect().top - area.getBoundingClientRect().top
@@ -180,6 +217,7 @@ export class PublicPage implements OnInit, OnDestroy {
     else gsap.to(area, { scrollTop: top, duration: 0.65, ease: 'power2.inOut', overwrite: true });
   }
   ngOnInit() {
+    if(this.homeEditor()){void this.load();return;}
     const state = this.isBrowsePage() ? this.browseStates.get(this.browseKey) : undefined;
     // An explicit header click wins over the previously saved homepage scroll.
     this.pendingDestinations.set(this.mode==='home'&&(this.startAtDestinations||(!state&&this.route.snapshot.fragment==='destinos')));
@@ -218,7 +256,7 @@ export class PublicPage implements OnInit, OnDestroy {
     });
   }
   ngOnDestroy() {
-    this.saveBrowseState();
+    if(!this.homeEditor())this.saveBrowseState();
     clearTimeout(this.timer);
     const area = this.scrollArea()?.nativeElement;
     if (area) gsap.killTweensOf(area);
@@ -378,6 +416,15 @@ export class PublicPage implements OnInit, OnDestroy {
   }
   text(es: string, en?: string) {
     return this.data.language.translateText(es, en);
+  }
+  homeField<G extends HomeGroup>(group:G,key:HomeKey<G>,icon?:string,variant?:HomeField['variant']):HomeField {
+    return {group,key,fallback:HOME_COPY[group][key] as string,icon,variant};
+  }
+  homeText<G extends HomeGroup>(group:G,key:HomeKey<G>,english:string) {
+    const fallback=this.homeField(group,key).fallback;
+    if(this.homeEditor())return fallback;
+    if(this.homeCopyPending())return '';
+    return (this.mode==='home' ? this.homeSnapshot()?.textos[group]?.[key] : undefined) || this.text(fallback,english);
   }
   imageError(event: Event) {
     (event.target as HTMLImageElement).src = '/brand/iso.png';

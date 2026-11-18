@@ -52,9 +52,10 @@ export const QUOTE_COPY = {
 export type CopyBlock = Record<string, Record<string, string>>;
 export const COPY_LANGUAGES = ['en', 'fr', 'de', 'pt'] as const;
 export const COPY_LIMIT = 300;
-export const COPY_GROUPS = Object.entries(QUOTE_COPY).map(([key, values]) => ({
+export const copyGroups = (defaults: CopyBlock) => Object.entries(defaults).map(([key, values]) => ({
   key, fields: Object.entries(values).map(([key, text]) => ({key, text})),
 }));
+export const COPY_GROUPS = copyGroups(QUOTE_COPY);
 const byDefault = new Map(COPY_GROUPS.flatMap(group => group.fields.map(
   field => [field.text, [group.key, field.key]] as const,
 )));
@@ -69,13 +70,13 @@ export const validCopyText = (value: unknown): value is string =>
   typeof value === 'string' && !!value.trim() && value.length <= COPY_LIMIT && !/[{}]/.test(value);
 
 // Only known keys and plain, non-empty text; omitted keys use the app's defaults.
-export function cleanCopy(value: unknown): CopyBlock {
+export function cleanCopy(value: unknown, defaults: CopyBlock = QUOTE_COPY): CopyBlock {
   if (!object(value)) throw new Error('El bloque de textos no es válido.');
   const result: CopyBlock = {};
   for (const [group, fields] of Object.entries(value)) {
-    if (!Object.hasOwn(QUOTE_COPY, group) || !object(fields)) throw new Error('Hay un grupo de textos desconocido.');
+    if (!Object.hasOwn(defaults, group) || !object(fields)) throw new Error('Hay un grupo de textos desconocido.');
     for (const [key, text] of Object.entries(fields)) {
-      if (!Object.hasOwn(QUOTE_COPY[group as keyof typeof QUOTE_COPY], key) || !validCopyText(text))
+      if (!Object.hasOwn(defaults[group], key) || !validCopyText(text))
         throw new Error('Hay un texto vacío, demasiado largo o con variables.');
       (result[group] ??= {})[key] = text.trim();
     }

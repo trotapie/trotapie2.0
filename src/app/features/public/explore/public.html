@@ -1,46 +1,46 @@
 <div class="public-shell">
+  @if(!homeEditor()){
   <tp-public-navigation [english]="data.language.language() === 'en'" [activeSection]="activeSection()" (homeSelected)="navigateHome($event)" (destinationsSelected)="navigateDestinations($event)" (languageChanged)="load()" (menuChanged)="mobileMenuOpen.set($event)" />
+  }
   <div class="public-scroll-region" [inert]="mobileMenuOpen()">
-  <main #scrollArea id="main-content" [class.catalog-scroll-area]="mode==='home'||mode==='destinos'||mode==='hoteles'" (scroll)="updateActiveSection()">
+  @if(homeCopyPending() || (homeEditor() && loading())){
+    <div class="home-copy-loader" aria-busy="true"><tp-state mode="loading"/></div>
+  }
+  <div #scrollArea class="public-main" [attr.id]="homeEditor()?null:'main-content'" [attr.role]="homeEditor()?'region':'main'"
+    [attr.aria-label]="homeEditor()?'Vista editable de Inicio':null" [attr.lang]="homeEditor()?'es':data.language.language()"
+    [class.catalog-scroll-area]="mode==='home'||mode==='destinos'||mode==='hoteles'"
+    [class.home-copy-pending]="homeCopyPending() || (homeEditor() && loading())"
+    [inert]="homeCopyPending() || (homeEditor() && loading())" (scroll)="updateActiveSection()">
     @if (mode !== 'home' && mode !== 'destino' && mode !== 'hotel') {
       <tp-back-button [label]="text('Regresar', 'Back')" />
     }
     @if (mode === 'home') {
       <section class="public-hero">
         <div class="public-hero-copy">
-          <span class="eyebrow">{{
-            text('Viajar se siente diferente con Trotapie', 'Travel feels different with Trotapie')
-          }}</span>
-          <h1>{{ text('Hay lugares que se quedan contigo.', 'Some places stay with you.') }}</h1>
-          <p>
-            {{
-              text(
-                'Encuentra tu próxima escapada entre playas, ciudades y experiencias que merecen vivirse. Nosotros te ayudamos a llegar.',
-                'Find your next getaway among beaches, cities and experiences worth living. We help you get there.'
-              )
-            }}
-          </p>
-          <a tpButton variant="primary" icon="globe" href="/#destinos" (click)="navigateDestinations($event)">{{
-            text('Encuentra tu próximo viaje', 'Find your next trip')
-          }}</a>
+          <span class="eyebrow"><ng-container *ngTemplateOutlet="homeCopy; context:{group:'principal',key:'antetitulo',en:'Travel feels different with Trotapie'}"/></span>
+          <h1><ng-container *ngTemplateOutlet="homeCopy; context:{group:'principal',key:'titulo',en:'Some places stay with you.'}"/></h1>
+          <p><ng-container *ngTemplateOutlet="homeCopy; context:{group:'principal',key:'descripcion',en:'Find your next getaway among beaches, cities and experiences worth living. We help you get there.'}"/></p>
+          @if(homeEditor(); as editor){
+            <span class="preview-hero-action"><ng-container *ngTemplateOutlet="editor; context:homeField('principal','boton','globe','primary')"/></span>
+          } @else {
+            <a tpButton variant="primary" icon="globe" href="/#destinos" (click)="navigateDestinations($event)">{{homeText('principal','boton','Find your next trip')}}</a>
+          }
           <div class="hero-small-note">
-            <tp-icon name="heart" /><span>{{
-              text(
-                'Destinos para cada forma de viajar.',
-                'Destinations for every way of travelling.'
-              )
-            }}</span>
+            <tp-icon name="heart" /><span><ng-container *ngTemplateOutlet="homeCopy; context:{group:'principal',key:'nota',en:'Destinations for every way of travelling.'}"/></span>
           </div>
         </div>
         <div class="public-hero-photo">
           <tp-photo-carousel
             variant="hero"
             [shuffle]="true"
+            [autoplay]="!homeEditor()"
             [intervalMs]="3000"
             [photos]="heroPhotos()"
             [label]="text('Destinos que inspiran', 'Inspiring destinations')"
-            [eyebrow]="text('Tu próxima historia', 'Your next story')"
-            [headline]="text('Un destino. Mil recuerdos.', 'One destination. A thousand memories.')"
+            [eyebrow]="homeText('carrusel','antetitulo','Your next story')"
+            [headline]="homeText('carrusel','titulo','One destination. A thousand memories.')"
+            [eyebrowTemplate]="homeEditor()?carouselEyebrow:null"
+            [headlineTemplate]="homeEditor()?carouselHeadline:null"
             [english]="data.language.language() === 'en'"
           />
         </div>
@@ -147,11 +147,11 @@
       <section #destinationSection id="destinos" class="public-catalog">
         <div class="public-section-heading">
           <div>
-            <span class="eyebrow">{{
-              text('Escapadas que inspiran', 'Getaways that inspire')
-            }}</span>
+            <span class="eyebrow"><ng-container *ngTemplateOutlet="homeCopy; context:{group:'destinos',key:'antetitulo',en:'Getaways that inspire'}"/></span>
             <h2 #catalogHeading tabindex="-1" [class.hotel-destination-title]="mode === 'hoteles' && id && hotelDestinationName()">
-              {{
+              @if(mode==='home'){
+                <ng-container *ngTemplateOutlet="homeCopy; context:{group:'destinos',key:'titulo',en:'Your next destination'}"/>
+              } @else { {{
                 mode === 'hoteles' && id && hotelDestinationName()
                   ? hotelDestinationName()
                   : mode === 'destino' || (mode === 'hoteles' && id)
@@ -163,29 +163,32 @@
                     : mode === 'hoteles'
                       ? text('¿A dónde quieres ir?', 'Where would you like to go?')
                       : text('Tu próximo destino', 'Your next destination')
-              }}
+              }} }
             </h2>
             <p>
-              {{
-                mode === 'hoteles' && id
-                  ? text('Encuentra tu estancia en este destino.', 'Find your stay in this destination.')
-                  : text(
-                  'Elige un lugar. Lo demás lo planeamos contigo.',
-                  'Choose a place. We will plan the rest with you.'
-                )
-              }}
+              @if(mode==='hoteles' && id){
+                {{text('Encuentra tu estancia en este destino.', 'Find your stay in this destination.')}}
+              } @else {
+                <ng-container *ngTemplateOutlet="homeCopy; context:{group:'destinos',key:'descripcion',en:'Choose a place. We will plan the rest with you.'}"/>
+              }
             </p>
           </div>
           <span class="result-count">{{ page().total }} {{ text('opciones', 'options') }}</span>
         </div>
         @if (mode !== 'destino' && mode !== 'circuitos' && !featuredExperience && !id) {
           <tp-quick-filters
-            [title]="text('Selecciona experiencia', 'Choose an experience')"
-            [options]="experienceFilters()"
-            [selected]="experience()"
+            [title]="homeText('filtros','experiencia','Choose an experience')"
+            [titleTemplate]="homeEditor()?experienceTitle:null"
+            [options]="homeEditor()?previewFilters:experienceFilters()"
+            [selected]="homeEditor()?'playas':experience()"
             (changed)="changeExperience($event)"
           />
-          @if(!comingSoon() || !experienceOptions().length){<tp-filter-bar
+           @if(homeEditor(); as editor){
+             <tp-filter-bar [showSearch]="false">
+               <ng-container *ngTemplateOutlet="editor; context:homeField('filtros','mexico','pin','primary')"/>
+               <ng-container *ngTemplateOutlet="editor; context:homeField('filtros','mundo','globe','secondary')"/>
+             </tp-filter-bar>
+           } @else if(!comingSoon() || !experienceOptions().length){<tp-filter-bar
             [showSearch]="false"
             [search]="search()"
             [placeholder]="text('Busca un destino…', 'Find a destination…')"
@@ -196,14 +199,14 @@
               icon="pin"
               (click)="changeType('NACIONAL')"
             >
-              {{ text('México', 'Mexico') }}</button
+               {{ homeText('filtros','mexico','Mexico') }}</button
             ><button
               tpButton
               [variant]="type() === 'INTERNACIONAL' ? 'primary' : 'secondary'"
               icon="globe"
               (click)="changeType('INTERNACIONAL')"
             >
-              {{ text('El mundo', 'The world') }}
+               {{ homeText('filtros','mundo','The world') }}
             </button></tp-filter-bar
           >}
           @if(type()==='INTERNACIONAL'&&!comingSoon()){
@@ -212,13 +215,13 @@
         }
         @if(mode==='hoteles'&&id){<div class="hotel-filter-toolbar"><button tpButton icon="filter" (click)="openHotelFilters()">{{text('Filtros','Filters')}}@if(hotelFilterCount()){<span class="filter-count">{{hotelFilterCount()}}</span>}</button>@if(hotelFilterCount()){<button tpButton icon="close" variant="quiet" (click)="clearHotelFilters()">{{text('Limpiar filtros','Clear filters')}}</button>}</div>}
 
-        @if (loading()) {
+        @if (loading() && !homeEditor()) {
           <tp-state mode="loading" />
-        } @else if (error()) {
+        } @else if (error() && !homeEditor()) {
           <tp-state mode="error" [message]="error()" (retry)="load()" />
-        } @else if (!experienceConfigured() && !id && mode !== 'circuitos') {
+        } @else if (!experienceConfigured() && !id && mode !== 'circuitos' && !homeEditor()) {
           <tp-state [title]="selectedExperience() + ' · ' + text('Próximamente', 'Coming soon')" [message]="text('Estamos preparando nuevas experiencias para tu próximo viaje.', 'We are preparing new experiences for your next trip.')" />
-        } @else if (!page().items.length) {
+        } @else if (!homeCards().length) {
           <tp-state
             [title]="
               mode==='hoteles'&&id ? text('No se encontraron resultados', 'No results found') : text('El próximo destino está por llegar', 'Your next destination is on its way')
@@ -228,8 +231,8 @@
             "
           />
         } @else {
-          <div class="card-grid" id="public-catalog-results" [attr.aria-busy]="loadingMoreHotels()">
-            @for (record of page().items; track record.id) {
+          <div class="card-grid" [attr.id]="homeEditor()?null:'public-catalog-results'" [attr.aria-busy]="loadingMoreHotels()">
+            @for (record of homeCards(); track record.id) {
               <tp-image-card
                 class="responsive-photo-card"
                 [record]="record"
@@ -245,8 +248,9 @@
                 [label]="
                   mode === 'destino' || (mode === 'hoteles' && id)
                     ? text('Ver hotel', 'View hotel')
-                    : text('Descubrir destino', 'Discover destination')
+                    : homeText('destinos','enlace','Discover destination')
                 "
+                [labelTemplate]="homeEditor()?destinationLabel:null"
               />
             }
           </div>
@@ -258,7 +262,7 @@
                 <button tpButton type="button" variant="primary" aria-controls="public-catalog-results" [busy]="loadingMoreHotels()" (click)="loadMoreHotels()">{{loadingMoreHotels()?text('Cargando hoteles…','Loading hotels…'):moreHotelsError()?text('Reintentar','Try again'):text('Ver más hoteles','Show more hotels')}}</button>
               }
             </div>
-          } @else {
+          } @else if(!homeEditor()){
           <div class="pagination">
             <span>{{ page().total }} {{ text('registros', 'results') }}</span>
             <div class="pagination-actions">
@@ -287,13 +291,22 @@
     } @else if (mode === 'hotel' && error()) {
       <tp-state mode="error" [message]="error()" (retry)="load()" />
     }
-  </main>
-  @if(showBackToTop()){
+  </div>
+  @if(showBackToTop()&&!homeEditor()&&!homeCopyPending()){
     <button tpButton type="button" class="back-to-top" icon="chevron-up" aria-controls="main-content" (click)="backToTop()">{{text('Volver arriba','Back to top')}}</button>
   }
   </div>
-  <tp-public-footer [english]="data.language.language() === 'en'" [inert]="mobileMenuOpen()" />
+  @if(!homeEditor()){<tp-public-footer [english]="data.language.language() === 'en'" [inert]="mobileMenuOpen()" />}
 </div>
+<ng-template #homeCopy let-group="group" let-key="key" let-en="en">
+  @if(homeEditor(); as editor){<ng-container *ngTemplateOutlet="editor; context:homeField(group,key)"/>}
+  @else { {{homeText(group,key,en)}} }
+</ng-template>
+<ng-template #carouselEyebrow><ng-container *ngTemplateOutlet="homeEditor(); context:homeField('carrusel','antetitulo')"/></ng-template>
+<ng-template #carouselHeadline><ng-container *ngTemplateOutlet="homeEditor(); context:homeField('carrusel','titulo')"/></ng-template>
+<ng-template #experienceTitle><ng-container *ngTemplateOutlet="homeEditor(); context:homeField('filtros','experiencia')"/></ng-template>
+<ng-template #destinationLabel><ng-container *ngTemplateOutlet="homeEditor(); context:homeField('destinos','enlace')"/></ng-template>
+@if(!homeEditor()){
 <tp-location-map
   [open]="mapOpen()"
   [location]="detail()?.ubicacion || ''"
@@ -304,3 +317,4 @@
 />
 
 <tp-dialog [open]="hotelFiltersOpen()" [title]="text('Filtrar hoteles','Filter hotels')" placement="adaptive" (closed)="hotelFiltersOpen.set(false)"><div class="hotel-filters-dialog"><tp-input [label]="text('Buscar hotel','Find a hotel')" [placeholder]="text('Nombre del hotel…','Hotel name…')" [ngModel]="hotelFilterDraft().search" (ngModelChange)="changeHotelFilter('search',$event)"/><fieldset class="star-range"><legend>{{text('Rango de estrellas','Star range')}}</legend><div class="star-range-inputs"><tp-range-slider [min]="0.5" [max]="5" [step]="0.5" [label]="text('Rango de estrellas','Star range')" [lowerLabel]="text('Estrellas mínimas','Minimum stars')" [upperLabel]="text('Estrellas máximas','Maximum stars')" [lower]="hotelFilterDraft().starsMin" [upper]="hotelFilterDraft().starsMax" (changed)="changeHotelFilter('starsMin',$event.lower);changeHotelFilter('starsMax',$event.upper)"/></div>@if(!hotelStarRangeValid()){<p class="range-error" role="alert">{{text('El mínimo no puede ser mayor que el máximo.','The minimum cannot exceed the maximum.')}}</p>}</fieldset><tp-select-search [label]="text('Régimen de hospedaje','Stay plan')" [placeholder]="text('Todos los regímenes','All plans')" [options]="hotelRegimes()" [ngModel]="hotelFilterDraft().regime" (ngModelChange)="changeHotelFilter('regime',$event)"/></div><div class="dialog-actions"><button tpButton icon="refresh" (click)="resetHotelDraft()">{{text('Limpiar','Clear')}}</button><button tpButton (click)="hotelFiltersOpen.set(false)">{{text('Cancelar','Cancel')}}</button><button tpButton icon="check" variant="primary" [disabled]="!hotelStarRangeValid()" (click)="applyHotelFilters()">{{text('Aplicar filtros','Apply filters')}}</button></div></tp-dialog>
+}

@@ -61,6 +61,7 @@
 .carousel-eyebrow { display:block;margin-bottom:12px;font-size:11px; }
 .hero-carousel .carousel-caption { padding:70px 32px 84px; }
 .hero-carousel .carousel-caption h2 { max-width:300px;font-size:38px;line-height:1.15;letter-spacing:-.04em; }
+.editable-caption > *{pointer-events:auto}
 .carousel-caption p {
   color: white;
   font-size: 12px;

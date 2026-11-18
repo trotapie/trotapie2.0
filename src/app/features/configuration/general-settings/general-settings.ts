@@ -13,13 +13,21 @@ import {RouterLink} from '@angular/router';
 import {HotelSettingsService} from '../services/hotel-settings.service';
 import {HotelHorarios} from '../../../data/models/hotel-estancia.interface';
 import {HOTEL_TIME_FIELDS} from '../../hotels/models/hotel-editor-model';
-import {QuoteCopyService, type QuoteCopySnapshot} from '../../quotations/services/quote-copy.service';
-import {COPY_GROUPS, validCopyText, type CopyBlock} from '../../../../../supabase/functions/_shared/quote-copy';
+import {QuoteCopyService, type CopySection, type QuoteCopySnapshot} from '../../quotations/services/quote-copy.service';
+import {COPY_GROUPS, copyGroups, validCopyText, type CopyBlock} from '../../../../../supabase/functions/_shared/quote-copy';
+import {HOME_COPY} from '../../../../../supabase/functions/_shared/home-copy';
 import {QuoteCopyPreview} from '../quote-copy-preview/quote-copy-preview';
+import {PublicPage} from '../../public/explore/public';
+import {InlineCopy} from '../inline-copy/inline-copy';
+
+const TEXT_GROUPS = {cotizacion: COPY_GROUPS, inicio: copyGroups(HOME_COPY)};
+const TEXT_SECTIONS = ['cotizacion', 'inicio'] as const;
+type TextDraft = {saved: QuoteCopySnapshot|null; textos: CopyBlock; error: string};
+const emptyDraft = (): TextDraft => ({saved: null, textos: {}, error: ''});
 
 @Component({
   selector:'tp-general-settings',
-  imports:[FormsModule, RouterLink, PageHeader, Button, Field, State, QuoteCopyPreview],
+  imports:[FormsModule, RouterLink, PageHeader, Button, Field, State, QuoteCopyPreview, PublicPage, InlineCopy],
   templateUrl:'./general-settings.html',
   styleUrl:'./general-settings.scss',
 })
@@ -30,32 +38,42 @@ export class GeneralSettings implements OnInit {
   private readonly hotelSettings=inject(HotelSettingsService);
   private readonly quoteCopy=inject(QuoteCopyService);
   readonly tab=signal<'quotes'|'hotels'|'texts'>('quotes');
-  readonly textGroups=COPY_GROUPS;
-  readonly textScreen=signal('cotizacion');
+  readonly textScreen=signal<CopySection>('cotizacion');
   readonly textScreens=[
     {key:'cotizacion',label:'Cotizaciones',icon:'quote'},
-  ];
-  readonly textError=signal('');
-  readonly savedTexts=signal<QuoteCopySnapshot|null>(null);
-  readonly texts=signal<CopyBlock>({});
-  readonly textDirty=computed(()=>!!this.savedTexts()&&this.textGroups.some(group=>group.fields.some(field=>
-    this.textValue(group.key,field.key,field.text)!==(this.savedTexts()?.textos[group.key]?.[field.key]??field.text))));
-  readonly textValid=computed(()=>this.textGroups.every(group=>group.fields.every(field=>
+    {key:'inicio',label:'Inicio',icon:'home'},
+  ] as const;
+  private readonly textDrafts=signal({cotizacion:emptyDraft(),inicio:emptyDraft()});
+  readonly textError=computed(()=>this.textDrafts()[this.textScreen()].error);
+  readonly savedTexts=computed(()=>this.textDrafts()[this.textScreen()].saved);
+  readonly texts=computed(()=>this.textDrafts()[this.textScreen()].textos);
+  readonly textDirty=computed(()=>this.isTextDirty(this.textScreen()));
+  readonly anyTextDirty=computed(()=>TEXT_SECTIONS.some(section=>this.isTextDirty(section)));
+  readonly textValid=computed(()=>TEXT_GROUPS[this.textScreen()].every(group=>group.fields.every(field=>
     validCopyText(this.textValue(group.key,field.key,field.text)))));
+  isTextDirty(section:CopySection){
+    const {saved,textos}=this.textDrafts()[section];
+    return !!saved&&TEXT_GROUPS[section].some(group=>group.fields.some(({key,text})=>
+      (textos[group.key]?.[key]??text)!==(saved.textos[group.key]?.[key]??text)));
+  }
+  private updateTextDraft(section:CopySection, patch:Partial<TextDraft>){
+    this.textDrafts.update(drafts=>({...drafts,[section]:{...drafts[section],...patch}}));
+  }
   textValue(group:string,key:string,fallback:string){return this.texts()[group]?.[key]??fallback;}
   setText(group:string,key:string,value:string){
-    this.texts.update(texts=>({...texts,[group]:{...texts[group],[key]:value}}));
+    const textos=this.texts();
+    this.updateTextDraft(this.textScreen(),{textos:{...textos,[group]:{...textos[group],[key]:value}}});
   }
   private textOverrides():CopyBlock{
     const result:CopyBlock={};
-    for(const group of this.textGroups) for(const field of group.fields){
+    for(const group of TEXT_GROUPS[this.textScreen()]) for(const field of group.fields){
       const value=this.textValue(group.key,field.key,field.text).trim();
       if(value!==field.text)(result[group.key]??={})[field.key]=value;
     }
     return result;
   }
-  private applyTexts(snapshot:QuoteCopySnapshot){
-    this.savedTexts.set(snapshot);this.texts.set(snapshot.textos);
+  private applyTexts(section:CopySection,snapshot:QuoteCopySnapshot){
+    this.updateTextDraft(section,{saved:snapshot,textos:snapshot.textos,error:''});
   }
   readonly timeFields=HOTEL_TIME_FIELDS;
   readonly hotelError=signal('');
@@ -75,7 +93,7 @@ export class GeneralSettings implements OnInit {
   readonly maxPeoplePerRoom=signal<number|null>(null);
   readonly valid=computed(()=>[this.maxRooms(),this.maxPeoplePerRoom()].every(value=>value!==null&&Number.isInteger(value)&&value>=1&&value<=2147483647));
   readonly quoteDirty=computed(()=>!!this.saved()&&(this.maxRooms()!==this.saved()!.maxRooms||this.maxPeoplePerRoom()!==this.saved()!.maxPeoplePerRoom));
-  readonly dirty=computed(()=>this.quoteDirty()||this.hotelDirty()||this.textDirty());
+  readonly dirty=computed(()=>this.quoteDirty()||this.hotelDirty()||this.anyTextDirty());
   private readonly pending=protectUnsavedChanges(()=>this.dirty(),()=>this.saving());
   canDeactivate(){return this.pending.confirm();}
   ngOnInit(){void this.load();}
@@ -83,11 +101,14 @@ export class GeneralSettings implements OnInit {
     if(this.saving())return;
     this.loading.set(true);this.error.set('');
     this.hotelError.set('');
-    this.textError.set('');
     await Promise.all([
       this.quoteDirty()?Promise.resolve():this.settings.load().then(limits=>this.apply(limits)).catch(error=>this.error.set(error instanceof Error?error.message:'No pudimos cargar la configuración general.')),
       this.hotelDirty()?Promise.resolve():this.hotelSettings.load().then(hours=>this.applyHours(hours)).catch(error=>this.hotelError.set(error instanceof Error?error.message:'No pudimos cargar los horarios generales.')),
-      this.textDirty()?Promise.resolve():this.quoteCopy.loadOriginal().then(snapshot=>this.applyTexts(snapshot)).catch(error=>this.textError.set(error instanceof Error?error.message:'No pudimos cargar los textos.')),
+      ...TEXT_SECTIONS.filter(section=>!this.isTextDirty(section)).map(async section=>{
+        this.updateTextDraft(section,{error:''});
+        try{this.applyTexts(section,await this.quoteCopy.loadOriginal(section));}
+        catch(error){this.updateTextDraft(section,{error:error instanceof Error?error.message:'No pudimos cargar los textos.'});}
+      }),
     ]);
     this.loading.set(false);
   }
@@ -98,18 +119,19 @@ export class GeneralSettings implements OnInit {
   setHour(key:keyof HotelHorarios,value:string){this.hours.set({...this.hours(),[key]:value});}
   reset(){
     if(this.saving())return;
-    if(this.tab()==='texts'&&this.savedTexts()){this.applyTexts(this.savedTexts()!);this.textError.set('');}
+    if(this.tab()==='texts'&&this.savedTexts())this.applyTexts(this.textScreen(),this.savedTexts()!);
     else if(this.tab()==='hotels'&&this.savedHours()){this.applyHours(this.savedHours()!);this.hotelError.set('');}
     else if(this.tab()==='quotes'&&this.saved()){this.apply(this.saved()!);this.error.set('');}
   }
   async save(){
     if(this.loading()||this.saving()||!this.activeDirty()||!this.activeValid()||!this.auth.hasPermission('configuracion.manage'))return;
     this.saving.set(true);this.error.set('');this.pending.sync();
+    const section=this.textScreen();
     try{
       if(this.tab()==='texts'){
-        this.textError.set('');
-        this.applyTexts(await this.quoteCopy.save({version:this.savedTexts()!.version,textos:this.textOverrides()}));
-        this.toast.success('Textos de Cotizaciones guardados.');
+        this.updateTextDraft(section,{error:''});
+        this.applyTexts(section,await this.quoteCopy.save({version:this.savedTexts()!.version,textos:this.textOverrides()},section));
+        this.toast.success(`Textos de ${section==='inicio'?'Inicio':'Cotizaciones'} guardados.`);
         return;
       }else if(this.tab()==='hotels'){
         this.hotelError.set('');
@@ -118,7 +140,11 @@ export class GeneralSettings implements OnInit {
         this.apply(await this.settings.save({maxRooms:this.maxRooms()!,maxPeoplePerRoom:this.maxPeoplePerRoom()!}));
       }
       this.toast.success('Configuración de '+(this.tab()==='hotels'?'hoteles':'cotizaciones')+' guardada.');
-    }catch(error){(this.tab()==='texts'?this.textError:this.tab()==='hotels'?this.hotelError:this.error).set(error instanceof Error?error.message:'No pudimos guardar la configuración general.');}
+    }catch(error){
+      const message=error instanceof Error?error.message:'No pudimos guardar la configuración general.';
+      if(this.tab()==='texts')this.updateTextDraft(section,{error:message});
+      else (this.tab()==='hotels'?this.hotelError:this.error).set(message);
+    }
     finally{this.saving.set(false);this.pending.sync();}
   }
 }

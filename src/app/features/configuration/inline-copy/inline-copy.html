@@ -1,0 +1,10 @@
+@if(editing(); as field){
+  <textarea #editor rows="1" aria-label="Editar texto" [attr.aria-invalid]="!valid(field.value)"
+    [maxLength]="limit" [value]="field.value" (input)="update(editor.value)" (blur)="finish()" (keydown)="onKey($event)"></textarea>
+} @else if(variant(); as style){
+  <button tpButton type="button" class="copy-action" [variant]="style" [icon]="icon()" [disabled]="busy()"
+    [attr.aria-label]="'Editar: '+(value() || 'Texto requerido')" (click)="edit()">{{value() || 'Texto requerido'}}</button>
+} @else {
+  <button type="button" class="copy-text" [disabled]="busy()"
+    [attr.aria-label]="'Editar: '+(value() || 'Texto requerido')" (click)="edit()">{{value() || 'Texto requerido'}}</button>
+}

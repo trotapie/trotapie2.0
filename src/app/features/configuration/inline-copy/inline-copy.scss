@@ -1,0 +1,7 @@
+:host{display:inline;min-width:0;max-width:100%;overflow-wrap:anywhere}
+.copy-text,.btn.copy-action{text-decoration:underline dotted;text-underline-offset:.2em;text-decoration-color:color-mix(in srgb,currentColor 65%,transparent);max-width:100%;white-space:normal}
+.copy-text{padding:0;border:0;background:none;color:inherit;font:inherit;letter-spacing:inherit;text-align:inherit;text-transform:inherit;vertical-align:baseline;cursor:pointer}
+.copy-text:hover{text-decoration-color:currentColor}
+.copy-text:focus-visible,.copy-action:focus-visible{outline:2px solid currentColor;outline-offset:3px}
+textarea{display:inline-block;field-sizing:content;min-inline-size:min(7ch,100%);max-inline-size:100%;padding:.1em .25em;vertical-align:baseline;border:1px solid var(--brand);border-radius:4px;background:var(--surface);color:var(--ink);font:inherit;letter-spacing:inherit;line-height:inherit;resize:none}
+textarea[aria-invalid=true]{border-color:var(--danger,#ad2929)}

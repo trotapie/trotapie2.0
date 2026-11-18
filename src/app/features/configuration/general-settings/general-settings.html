@@ -1,4 +1,4 @@
-<tp-page-header [showBack]="false" title="Configuración general" description="Administra los límites y textos de cotizaciones y los horarios predeterminados de los hoteles." eyebrow="Trotapie / Administración / Configuración"/>
+<tp-page-header [showBack]="false" title="Configuración general" description="Administra los textos del sitio, los límites de cotizaciones y los horarios predeterminados de los hoteles." eyebrow="Trotapie / Administración / Configuración"/>
 <div class="settings-header-actions">
   <a tpButton variant="back" icon="left" routerLink="/admin">Regresar</a>
   <button tpButton type="button" variant="primary" icon="check" [busy]="saving()" [disabled]="loading()||saving()||!activeDirty()||!activeValid()" (click)="save()">Guardar cambios</button>
@@ -6,7 +6,7 @@
 <div class="settings-tabs filter-options" role="group" aria-label="Secciones de configuración">
   <button tpButton icon="quote" [variant]="tab()==='quotes'?'primary':'secondary'" [attr.aria-pressed]="tab()==='quotes'" [disabled]="saving()" (click)="tab.set('quotes')">Cotizaciones @if(quoteDirty()){<span aria-label="Cambios sin guardar">•</span>}</button>
   <button tpButton icon="clock" [variant]="tab()==='hotels'?'primary':'secondary'" [attr.aria-pressed]="tab()==='hotels'" [disabled]="saving()" (click)="tab.set('hotels')">Hoteles @if(hotelDirty()){<span aria-label="Cambios sin guardar">•</span>}</button>
-  <button tpButton icon="edit" [variant]="tab()==='texts'?'primary':'secondary'" [attr.aria-pressed]="tab()==='texts'" [disabled]="saving()" (click)="tab.set('texts')">Textos @if(textDirty()){<span aria-label="Cambios sin guardar">•</span>}</button>
+  <button tpButton icon="edit" [variant]="tab()==='texts'?'primary':'secondary'" [attr.aria-pressed]="tab()==='texts'" [disabled]="saving()" (click)="tab.set('texts')">Textos @if(anyTextDirty()){<span aria-label="Cambios sin guardar">•</span>}</button>
 </div>
 @if(tab()==='texts'){
   <div class="settings-screen-selector">
@@ -14,7 +14,7 @@
       @for(screen of textScreens;track screen.key){
         <button tpButton type="button" [icon]="screen.icon" [variant]="textScreen()===screen.key?'primary':'secondary'"
           [attr.aria-pressed]="textScreen()===screen.key" [disabled]="saving()" (click)="textScreen.set(screen.key)">
-          {{screen.label}}
+           {{screen.label}} @if(isTextDirty(screen.key)){<span aria-label="Cambios sin guardar">•</span>}
         </button>
       }
     </div>
@@ -41,10 +41,16 @@
         </fieldset>
         @if(!valid()){<p class="error-banner" role="alert">Completa ambos límites con números enteros válidos.</p>}
       } @else if(tab()==='texts'){
-        @if(textScreen()==='cotizacion'){
-          <tp-quote-copy-preview [texts]="texts()" [busy]="saving()" (textChanged)="setText($event.group,$event.key,$event.value)"/>
-        }
-        @if(!textValid()){<p id="quote-copy-error" class="error-banner" role="alert">Completa los textos sin usar llaves ni variables.</p>}
+         @if(textScreen()==='cotizacion'){
+           <tp-quote-copy-preview [texts]="texts()" [busy]="saving()" (textChanged)="setText($event.group,$event.key,$event.value)"/>
+         } @else {
+           <ng-template #editHomeText let-group="group" let-key="key" let-fallback="fallback" let-icon="icon" let-variant="variant">
+             <tp-inline-copy [value]="textValue(group,key,fallback)" [busy]="saving()" [icon]="icon" [variant]="variant"
+               (valueChanged)="setText(group,key,$event)"/>
+           </ng-template>
+           <tp-public [homeEditor]="editHomeText"/>
+         }
+         @if(!textValid()){<p class="error-banner" role="alert">Completa los textos sin usar llaves ni variables.</p>}
       } @else {
         <div class="panel-heading"><div><h2>Horarios generales de hoteles</h2><p>Define los horarios predeterminados para las fichas públicas de los hoteles.</p></div></div>
         <div class="settings-note"><strong>Los horarios propios de cada hotel tienen prioridad.</strong><p>Si un hotel no tiene un horario específico, usará el valor general de ese campo. Deja un campo vacío si no deseas establecer un horario predeterminado.</p></div>
