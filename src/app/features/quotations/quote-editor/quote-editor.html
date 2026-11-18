@@ -2,19 +2,26 @@
  <div class="request-navigation"><tp-public-navigation [english]="data.language.language() === 'en'" (menuChanged)="mobileMenuOpen.set($event)" /></div>
 }
 <div class="quote-editor-shell" [class.public-request]="publicRequest" [attr.lang]="data.language.language()" [inert]="mobileMenuOpen()">
- <tp-page-header [title]="text(publicRequest?'Tu viaje empieza aquí':multiple?'Nueva comparativa':'Nueva cotización')" [description]="text(publicRequest?'Cuéntanos cómo quieres viajar. Te ayudaremos a encontrar tu estancia.':'Una propuesta clara, desde el primer detalle.')" [eyebrow]="text('Trotapie / Cotizaciones')"><a tpButton variant="back" icon="left" [historyBack]="!publicRequest" [routerLink]="publicRequest ? (destinationId ? '/hoteles/'+destinationId : '/hoteles') : (preview ? '/vista-previa/cotizaciones' : '/admin/cotizaciones')">{{text(publicRequest?'Regresar al catálogo':'Regresar')}}</a></tp-page-header>
- @if(loading()){<tp-state mode="loading" [title]="text('Un momento, estamos preparando todo.')" [message]="text('Preparando tu siguiente paso…')"/>}@else if(publicRequest && whatsappUrl()){
-  <section class="panel" aria-live="polite">
-   @if(busy()){
-    <tp-state mode="loading" [title]="text('Guardando tu solicitud')" [message]="text('Abrimos WhatsApp en otra pestaña. Mantén esta página abierta hasta que termine el guardado.')"/>
-   }@else if(error()){
-    <div class="error-banner" role="alert">{{text('No pudimos guardar tu solicitud:')}} {{text(error())}} {{text('Si ya enviaste el mensaje en WhatsApp, no necesitas enviarlo de nuevo.')}}</div>
-    <button tpButton variant="primary" icon="refresh" type="button" (click)="save()">{{text('Reintentar guardado')}}</button>
-   }@else if(success()){
-    <tp-state [title]="text('Solicitud guardada')" [message]="text(success())"/>
-   }
-   <a tpButton icon="arrow" [href]="whatsappUrl()" target="_blank" rel="noopener noreferrer">{{text('Abrir WhatsApp')}}</a>
-   @if(success()){<a tpButton icon="globe" routerLink="/destinos">{{text('Explorar más destinos')}}</a>}
+ <tp-page-header [showBack]="!success()" [title]="text(publicRequest?'Tu viaje empieza aquí':multiple?'Nueva comparativa':'Nueva cotización')" [description]="text(publicRequest?'Cuéntanos cómo quieres viajar. Te ayudaremos a encontrar tu estancia.':'Una propuesta clara, desde el primer detalle.')" [eyebrow]="text('Trotapie / Cotizaciones')">
+  @if(!success()){
+   <a tpButton variant="back" icon="left" [historyBack]="!publicRequest" [routerLink]="publicRequest ? (destinationId ? '/hoteles/'+destinationId : '/hoteles') : (preview ? '/vista-previa/cotizaciones' : '/admin/cotizaciones')">{{text(publicRequest?'Regresar al catálogo':'Regresar')}}</a>
+  }
+ </tp-page-header>
+ @if(loading()){<tp-state mode="loading" [title]="text('Un momento, estamos preparando todo.')" [message]="text('Preparando tu siguiente paso…')"/>}@else if(success()){
+  <section class="panel">
+   <tp-state [title]="text('¡Solicitud registrada correctamente!')" [message]="text('Un asesor se pondrá en contacto contigo para dar seguimiento a tu cotización.')">
+    <div class="quote-success-actions">
+     @if(publicRequest){
+      <a tpButton variant="primary" icon="globe" routerLink="/destinos">{{text('Explorar más destinos')}}</a>
+      <a tpButton [routerLink]="destinationId ? '/hoteles/'+destinationId : '/hoteles'">{{text('Regresar al catálogo')}}</a>
+     }@else{
+      @if(savedQuoteSegment(); as segment){
+       <a tpButton variant="primary" icon="arrow" [routerLink]="['/admin/cotizaciones',segment]" [queryParams]="{tipo:multiple?'comparativa':'individual'}">{{text('Ver cotización')}}</a>
+      }
+      <a tpButton routerLink="/admin/cotizaciones" [queryParams]="{tipo:multiple?'comparativa':'individual'}">{{text('Ver listado de cotizaciones')}}</a>
+     }
+    </div>
+   </tp-state>
   </section>
  }@else{
  @if(preview){<div class="preview-notice">{{text('Vista previa del flujo. Inicia sesión para registrar una propuesta.')}}</div>}
@@ -50,7 +57,7 @@
  </div>@if(multiple){<tp-field [label]="text('Precio de la opción (MXN)')" [forId]="'price-'+hotel.id"><input [id]="'price-'+hotel.id" [name]="'price-'+hotel.id" type="number" min="0" [(ngModel)]="hotelPrices[hotel.id]"/></tp-field>}</div>}</article>}@empty{<tp-state [title]="text('Elige un destino para ver sus hoteles')" [message]="text('Tu selección se conserva mientras preparas la propuesta.')"/>}</div>@if(!publicRequest&&(hotelPage+1)*24<hotelTotal){<button tpButton icon="plus" type="button" (click)="loadHotels(true)">{{text('Ver más hoteles')}}</button>}}
  }
  @if(step()===2){<div class="panel-heading"><div><h2>{{text('Todo listo para el siguiente paso')}}</h2><p>{{text('Revisa la información antes de registrar la solicitud.')}}</p></div><tp-icon name="check"/></div><dl class="meta-grid"><div><dt>{{text('Cliente')}}</dt><dd>{{name}}</dd></div><div><dt>{{text('Contacto')}}</dt><dd>{{phone}}<br/>{{email}}</dd></div><div><dt>{{text('Estancia')}}</dt><dd>{{start}} → {{end}}</dd></div><div><dt>{{text('Distribución')}}</dt><dd>{{text(nightCount()===1?'{count} noche':'{count} noches',{count:nightCount()})}} · {{text(rooms().length===1?'{count} habitación':'{count} habitaciones',{count:rooms().length})}}</dd></div></dl><div class="review-hotels">@for(h of selectedHotels();track h.id){<div><tp-icon name="hotel"/><strong>{{h.title}}</strong><span>{{hotelPrices[h.id] ? '$'+hotelPrices[h.id]+' MXN':text('Precio por confirmar')}}</span></div>}</div><tp-field [label]="text('Peticiones especiales')" forId="quote-notes" [hint]="text('Comparte necesidades de accesibilidad o detalles que debamos considerar.')"><textarea id="quote-notes" name="notes" [(ngModel)]="notes"></textarea></tp-field>}
-   <div class="dialog-actions">@if(step()>0){<button tpButton icon="left" type="button" [disabled]="busy()" (click)="step.set(step()-1)">{{text('Anterior')}}</button>}@if(step()<2){<button tpButton icon="right" variant="primary" type="button" [disabled]="form.invalid || !configuredRoomsValid() || (step()===1 && !regimesReady())" (click)="next()">{{text('Continuar')}}</button>}@else{<button tpButton icon="check" variant="primary" type="submit" [busy]="busy()" [disabled]="busy()||preview||!configuredRoomsValid()">{{text(busy()?'Registrando…':publicRequest?'Continuar en WhatsApp':'Crear propuesta')}}</button>}</div>
+    <div class="dialog-actions">@if(step()>0){<button tpButton icon="left" type="button" [disabled]="busy()" (click)="step.set(step()-1)">{{text('Anterior')}}</button>}@if(step()<2){<button tpButton icon="right" variant="primary" type="button" [disabled]="form.invalid || !configuredRoomsValid() || (step()===1 && !regimesReady())" (click)="next()">{{text('Continuar')}}</button>}@else{<button tpButton icon="check" variant="primary" type="submit" [busy]="busy()" [disabled]="busy()||preview||!configuredRoomsValid()">{{text(busy()?'Registrando…':publicRequest?'Enviar solicitud':'Crear propuesta')}}</button>}</div>
   </section><aside class="panel quote-summary"><span class="eyebrow">{{text('Tu propuesta')}}</span><h2>{{text(multiple?'Más opciones. Mejores decisiones.':'Un viaje a su medida.')}}</h2>
   @if(publicRequest && selectedHotels().length){
     <section class="request-hotel" [attr.aria-label]="text('Hotel seleccionado')" aria-live="polite">

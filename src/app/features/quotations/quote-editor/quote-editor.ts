@@ -1,20 +1,18 @@
-import {quoteAdminSegment} from '../models/quote-route';
 import {QuoteSettingsService} from '../services/quote-settings.service';
+import {quoteAdminSegment} from '../models/quote-route';
 import {DEFAULT_ROOM_LIMITS} from '../models/room';
 import {PublicNavigation} from '../../../shared/components/public-navigation/public-navigation';
 import {RoomType,validRoomConfiguration} from '../models/room-configuration';
-import {quoteWhatsAppUrl} from '../models/quote-whatsapp';
-import {construirNombreClienteVisible} from '../../../data/utils/cliente-nombre.util';
 import {ChangeTracker} from '../../../core/utils/change-snapshot';
 import {protectUnsavedChanges} from '../../../core/guards/unsaved-changes.guard';
 import {TpSelectSearchComponent,TpSelectSearchOption} from '../../../shared/components/tp-select-search/tp-select-search.component';
 import {DateRangeFilterComponent} from '../../../shared/components/date-range-filter/date-range-filter.component';
 import {DateRangeFilterValue} from '../../../shared/components/date-range-filter/date-range-filter.model';
-import {TpToastService} from '../../../shared/services/tp-toast.service';
-import {Component,inject,signal,computed,OnInit} from '@angular/core';import {Router,RouterLink,ActivatedRoute} from '@angular/router';import {FormsModule} from '@angular/forms';import {TravelDataService,TravelRecord} from '../../../data/facades/travel-data.service';import {QuoteWorkflowService} from '../services/quote-workflow.service';import {Room,nights,validRooms} from '../models/room';import {PageHeader} from '../../../shared/components/page-header/page-header';import {Field} from '../../../shared/components/field/field';import {Button} from '../../../shared/components/button/button';import {Icon} from '../../../shared/components/icon/icon';import {RoomPicker} from '../components/room-picker/room-picker';import {State} from '../../../shared/components/state/state';
+import {Component,inject,signal,computed,OnInit} from '@angular/core';import {RouterLink,ActivatedRoute} from '@angular/router';import {FormsModule} from '@angular/forms';import {TravelDataService,TravelRecord} from '../../../data/facades/travel-data.service';import {QuoteWorkflowService} from '../services/quote-workflow.service';import {Room,nights,validRooms} from '../models/room';import {PageHeader} from '../../../shared/components/page-header/page-header';import {Field} from '../../../shared/components/field/field';import {Button} from '../../../shared/components/button/button';import {Icon} from '../../../shared/components/icon/icon';import {RoomPicker} from '../components/room-picker/room-picker';import {State} from '../../../shared/components/state/state';
  @Component({selector:'tp-quote-editor',imports:[PublicNavigation,TpSelectSearchComponent,DateRangeFilterComponent,RouterLink,FormsModule,PageHeader,Field,Button,Icon,State,RoomPicker],templateUrl:'./quote-editor.html',styleUrl:'./quote-editor.scss'})
-export class QuoteEditor implements OnInit {toast=inject(TpToastService);
+ export class QuoteEditor implements OnInit {
   mobileMenuOpen = signal(false);
+  savedQuoteSegment = signal('');
   private stayRange: DateRangeFilterValue = {start:null,end:null};
   get stayDates(): DateRangeFilterValue { return this.stayRange; }
   set stayDates(value: DateRangeFilterValue) { this.stayRange=value || {start:null,end:null};this.start=value?.start || '';this.end=value?.end || ''; }
@@ -27,7 +25,7 @@ export class QuoteEditor implements OnInit {toast=inject(TpToastService);
  private draft(){return {name:this.name,treatmentId:this.treatmentId,email:this.email,phone:this.phone,start:this.start,end:this.end,notes:this.notes,destinationId:this.destinationId,employeeId:this.employeeId,rooms:this.rooms(),hotels:this.selectedHotels().map(h=>h.id),regimes:this.hotelRegimes,prices:this.hotelPrices};}
  private pendingChanges=protectUnsavedChanges(()=>!this.success()&&this.changes.hasChanges(this.draft()),()=>this.busy());
  canDeactivate(){return this.pendingChanges.confirm();}
- data=inject(TravelDataService);workflow=inject(QuoteWorkflowService);route=inject(ActivatedRoute);router=inject(Router);publicRequest=!!this.route.snapshot.data['public'];preview=!!this.route.snapshot.data['preview'];multiple=this.route.snapshot.queryParamMap.get('tipo')==='comparativa';hotelId=Number(this.route.snapshot.paramMap.get('hotelId'));step=signal(0);busy=signal(false);loading=signal(true);loadingHotels=signal(false);error=signal('');success=signal('');destinations=signal<TravelRecord[]>([]);hotels=signal<TravelRecord[]>([]);selectedHotels=signal<TravelRecord[]>([]);regimeOptions=signal<Record<string,TpSelectSearchOption[]>>({});regimeLoading=signal<Record<string,boolean>>({});regimeErrors=signal<Record<string,string>>({});employees=signal<any[]>([]);rooms=signal<Room[]>([{adults:2,children:0,childAges:[]}]);ages=Array.from({length:18},(_,i)=>i);today=new Intl.DateTimeFormat('en-CA',{timeZone:'America/Mexico_City'}).format(new Date());name='';email='';phone='';start='';end='';notes='';destinationId:number|null=null;employeeId:number|null=null;hotelRegimes:Record<string,number|null>={};hotelPrices:Record<string,number|null>={};hotelPage=0;hotelTotal=0;roomValidity=computed(()=>validRooms(this.rooms()));nightCount(){return nights(this.start,this.end);}
+  data=inject(TravelDataService);workflow=inject(QuoteWorkflowService);route=inject(ActivatedRoute);publicRequest=!!this.route.snapshot.data['public'];preview=!!this.route.snapshot.data['preview'];multiple=this.route.snapshot.queryParamMap.get('tipo')==='comparativa';hotelId=Number(this.route.snapshot.paramMap.get('hotelId'));step=signal(0);busy=signal(false);loading=signal(true);loadingHotels=signal(false);error=signal('');success=signal(false);destinations=signal<TravelRecord[]>([]);hotels=signal<TravelRecord[]>([]);selectedHotels=signal<TravelRecord[]>([]);regimeOptions=signal<Record<string,TpSelectSearchOption[]>>({});regimeLoading=signal<Record<string,boolean>>({});regimeErrors=signal<Record<string,string>>({});employees=signal<any[]>([]);rooms=signal<Room[]>([{adults:2,children:0,childAges:[]}]);ages=Array.from({length:18},(_,i)=>i);today=new Intl.DateTimeFormat('en-CA',{timeZone:'America/Mexico_City'}).format(new Date());name='';email='';phone='';start='';end='';notes='';destinationId:number|null=null;employeeId:number|null=null;hotelRegimes:Record<string,number|null>={};hotelPrices:Record<string,number|null>={};hotelPage=0;hotelTotal=0;roomValidity=computed(()=>validRooms(this.rooms()));nightCount(){return nights(this.start,this.end);}
  destinationOptions=computed<TpSelectSearchOption[]>(()=>this.destinations().map(destination=>({value:Number(destination.id),label:destination.title})));
   employeeOptions=computed<TpSelectSearchOption[]>(()=>this.employees().map(employee=>({value:employee.id,label:employee.nombre})));
   treatmentId:number|null=null;
@@ -38,8 +36,6 @@ export class QuoteEditor implements OnInit {toast=inject(TpToastService);
     {value:'',label:this.text('Sin prefijo')},
     ...this.treatments().map(treatment=>({value:treatment.id,label:`${treatment.abreviacion} — ${treatment.nombre}`})),
   ]);
-  clientDisplayName(){return construirNombreClienteVisible({nombreCompleto:this.name,tratamientoAbreviacion:this.treatments().find(treatment=>treatment.id===this.treatmentId)?.abreviacion});}
-  advisorName(){return this.employees().find(employee=>employee.id===this.employeeId)?.nombre||'Equipo Trotapie';}
  totalGuests=(n:number,r:Room)=>n+r.adults+r.children;
   async ngOnInit(){try{
    const limits=await this.settings.load();
@@ -90,43 +86,22 @@ export class QuoteEditor implements OnInit {toast=inject(TpToastService);
  updateRoom(index:number,key:'adults'|'children',value:any){this.rooms.update(rooms=>rooms.map((r,i)=>i===index?{...r,[key]:Number(value),childAges:key==='children'?Array.from({length:Number(value)},(_,j)=>r.childAges[j]??null):r.childAges}:r));}
  updateAge(index:number,child:number,age:any){this.rooms.update(rooms=>rooms.map((r,i)=>i===index?{...r,childAges:r.childAges.map((a,j)=>j===child?(age===null?null:Number(age)):a)}:r));}
   next(){this.error.set('');if(this.step()===0&&!this.employees().some(employee=>employee.id===this.employeeId)){this.error.set('Selecciona un asesor para tu solicitud.');return;}if(this.step()===0&&(!this.name.trim()||!this.phone.trim()||!this.nightCount()||!this.roomValidity())){this.error.set('Completa el nombre, teléfono, fechas y las edades de los menores.');return;}if(this.step()===0&&!this.roomConfigurationValidity()){this.error.set('Selecciona un tipo de habitación válido y revisa las camas elegidas, si las indicaste.');return;}if(this.step()===1&&!this.regimesReady()){this.error.set('Revisa el régimen de alojamiento de cada hotel.');return;}if(this.step()===1&&!this.selectedHotels().length){this.error.set('Selecciona al menos un hotel.');return;}this.step.update(s=>Math.min(2,s+1));}
-  whatsappUrl = signal('');
-  async save(){
-    if(this.busy()||this.success()||!this.configuredRoomsValid())return;
+   async save(){
+     if(this.preview||this.busy()||this.success()||!this.configuredRoomsValid())return;
     this.busy.set(true);
     this.error.set('');
     try{
       const destinationName=this.destinations().find(r=>Number(r.id)===this.destinationId)?.title||this.selectedHotels()[0]?.subtitle||'';
-      if(this.publicRequest&&!this.whatsappUrl()){
-        const url=quoteWhatsAppUrl({
-          name:this.clientDisplayName(),phone:this.phone,email:this.email,destination:destinationName,
-          start:this.start,end:this.end,nights:this.nightCount(),rooms:this.rooms(),notes:this.notes,
-          advisor:this.advisorName(),
-          hotels:this.selectedHotels().map(hotel=>({
-            name:hotel.title,
-            regime:String(this.regimeOptions()[hotel.id]?.find(option=>option.value===this.hotelRegimes[hotel.id])?.label||'Por confirmar'),
-          })),
-        });
-        this.whatsappUrl.set(url);
-        // Keep this page alive to save, and open WhatsApp while the click is still active.
-        // The explicit link remains available if the browser blocks the new tab.
-        try{window.open(url,'_blank','noopener,noreferrer');}catch{}
-      }
-      const result=await this.workflow.create({name:this.name,treatmentId:this.treatmentId,email:this.email,phone:this.phone,start:this.start,end:this.end,destinationId:this.destinationId||0,destinationName,rooms:this.rooms(),notes:this.notes,multiple:this.multiple,employeeId:this.employeeId,language:this.data.language.language(),hotels:this.selectedHotels().map(h=>({id:Number(h.id),name:h.title,regimeId:this.hotelRegimes[h.id]??null,price:this.hotelPrices[h.id]??null}))},this.publicRequest);
-      this.changes.capture(this.draft());
-      this.busy.set(false);
-      if(this.publicRequest){
-        this.success.set('Tu solicitud quedó guardada. Envía el mensaje en WhatsApp para continuar con tu asesor.');
-        this.pendingChanges.sync();
-      }else{
-        this.pendingChanges.sync();
-        this.toast.success('Cotización creada correctamente.');
-        await this.router.navigate(['/admin/cotizaciones',this.multiple?result.public_id:quoteAdminSegment(result.id,result.public_id)],{queryParams:{tipo:this.multiple?'comparativa':'individual'}});
-      }
-    }catch(e){
-      if(this.publicRequest)this.error.set(e instanceof Error?e.message:'No pudimos guardar la solicitud.');
-      else this.toast.error(e instanceof Error?e.message:'No pudimos guardar la solicitud.');
-    }finally{this.busy.set(false);}
+       const result=await this.workflow.create({name:this.name,treatmentId:this.treatmentId,email:this.email,phone:this.phone,start:this.start,end:this.end,destinationId:this.destinationId||0,destinationName,rooms:this.rooms(),notes:this.notes,multiple:this.multiple,employeeId:this.employeeId,language:this.data.language.language(),hotels:this.selectedHotels().map(h=>({id:Number(h.id),name:h.title,regimeId:this.hotelRegimes[h.id]??null,price:this.hotelPrices[h.id]??null}))},this.publicRequest);
+       if(!this.publicRequest)this.savedQuoteSegment.set(this.multiple?result.public_id:quoteAdminSegment(result.id,result.public_id));
+       this.changes.capture(this.draft());
+       this.success.set(true);
+     }catch(e){
+       this.error.set(e instanceof Error?e.message:'No pudimos guardar la solicitud.');
+     }finally{
+       this.busy.set(false);
+       this.pendingChanges.sync();
+     }
   }
  removeRoom(i:number){if(this.rooms().length>1)this.rooms.update(r=>r.filter((_,index)=>i!==index));}addRoom(){if(this.limitsReady()&&this.rooms().length<this.roomLimits().maxRooms)this.rooms.update(r=>[...r,{adults:Math.min(2,this.roomLimits().maxPeoplePerRoom),children:0,childAges:[]}]);}
 }

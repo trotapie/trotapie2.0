@@ -2004,11 +2004,11 @@ export const UI_TRANSLATIONS: Record<string, Record<string, string>> = {
     "de": "Wird gesendet…",
     "pt": "Enviando…"
   },
-  "Continuar en WhatsApp": {
-    "en": "Continue on WhatsApp",
-    "fr": "Continuer sur WhatsApp",
-    "de": "Auf WhatsApp fortfahren",
-    "pt": "Continuar no WhatsApp"
+  "Enviar solicitud": {
+    "en": "Submit request",
+    "fr": "Envoyer la demande",
+    "de": "Anfrage senden",
+    "pt": "Enviar solicitação"
   },
   "Crear propuesta": {
     "en": "Create proposal",
@@ -2052,17 +2052,17 @@ export const UI_TRANSLATIONS: Record<string, Record<string, string>> = {
     "de": "Erneut speichern",
     "pt": "Tentar salvar novamente"
   },
-  "Solicitud guardada": {
-    "en": "Request saved",
-    "fr": "Demande enregistrée",
-    "de": "Anfrage gespeichert",
-    "pt": "Solicitação salva"
+  "¡Solicitud registrada correctamente!": {
+    "en": "Your request was submitted successfully!",
+    "fr": "Votre demande a bien été enregistrée !",
+    "de": "Ihre Anfrage wurde erfolgreich erfasst!",
+    "pt": "Sua solicitação foi registrada com sucesso!"
   },
-  "Tu solicitud quedó guardada. Envía el mensaje en WhatsApp para continuar con tu asesor.": {
-    "en": "Your request has been saved. Send the WhatsApp message to continue with your advisor.",
-    "fr": "Votre demande a été enregistrée. Envoyez le message sur WhatsApp pour continuer avec votre conseiller.",
-    "de": "Ihre Anfrage wurde gespeichert. Senden Sie die WhatsApp-Nachricht, um mit Ihrem Reiseberater fortzufahren.",
-    "pt": "Sua solicitação foi salva. Envie a mensagem no WhatsApp para continuar com seu consultor."
+  "Un asesor se pondrá en contacto contigo para dar seguimiento a tu cotización.": {
+    "en": "A travel advisor will contact you to follow up on your quote.",
+    "fr": "Un conseiller vous contactera au sujet de votre devis.",
+    "de": "Ein Reiseberater wird Sie wegen Ihres Angebots kontaktieren.",
+    "pt": "Um consultor entrará em contato com você para dar continuidade à sua cotação."
   },
   "Abrir WhatsApp": {
     "en": "Open WhatsApp",
@@ -2075,6 +2075,18 @@ export const UI_TRANSLATIONS: Record<string, Record<string, string>> = {
     "fr": "Explorer d’autres destinations",
     "de": "Weitere Reiseziele entdecken",
     "pt": "Explorar mais destinos"
+  },
+  "Ver cotización": {
+    "en": "View quote",
+    "fr": "Voir le devis",
+    "de": "Angebot ansehen",
+    "pt": "Ver cotação"
+  },
+  "Ver listado de cotizaciones": {
+    "en": "View all quotes",
+    "fr": "Voir tous les devis",
+    "de": "Alle Angebote ansehen",
+    "pt": "Ver todas as cotações"
   },
   "Selecciona un asesor para tu solicitud.": {
     "en": "Select an advisor for your request.",
