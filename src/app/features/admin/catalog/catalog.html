@@ -30,6 +30,9 @@
       -->
     }
   } @else if (preview || canEdit()) {
+    @if(kind==='catalogos' && catalog()==='actividades' && !preview){
+      <a tpButton icon="grid" [routerLink]="[base,'catalogos','grupos_amenidades']">Grupos de amenidades</a>
+    }
     <button tpButton icon="plus" variant="primary" (click)="open(null)">
       {{'Crear' | uiText}} {{ definition().singular | uiText }}
     </button>

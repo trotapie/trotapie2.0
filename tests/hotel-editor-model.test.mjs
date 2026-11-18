@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {hotelEditorDraft,hotelDetailPayload,hotelDraftValidation,hotelIds,hotelContentValue,setHotelContentValue} from '../src/app/features/hotels/models/hotel-editor-model.ts';
+import {hotelEditorDraft,hotelDetailPayload,hotelDraftValidation,hotelIds,hotelContentValue,setHotelContentValue,newHotelEditorDraft} from '../src/app/features/hotels/models/hotel-editor-model.ts';
 
 const detail=()=>({
   id:10,nombre_hotel:'Hotel Playa',descripcion:'Junto al mar',catalogo_destino_id:5,regimen_id:2,
@@ -72,8 +72,17 @@ test('primary regime must be included in the available regimes',()=>{
   assert.equal(hotelDraftValidation(hotelEditorDraft(detail())),'');
 });
 
-test('the existing compact creation form can still choose a single primary regime',()=>{
-  const model={nombre_hotel:'Nuevo hotel',regimen_id:4};
+test('the shared editor initializes all tabs for a new hotel and prefills the destination',()=>{
+  const draft=newHotelEditorDraft('15');
+  assert.equal(draft.catalogo_destino_id,15);
+  assert.equal(newHotelEditorDraft('no válido').catalogo_destino_id,null);
+  assert.equal(draft.orden,0);
+  assert.deepEqual(draft.horarios,{});
+  assert.deepEqual(draft.activityIds,[]);
+  assert.deepEqual(draft.roomTypeIds,[]);
+  assert.deepEqual(draft.imagenes,[]);
+  assert.deepEqual(draft.traducciones,[]);
+  const model={...draft,nombre_hotel:'Nuevo hotel',regimeIds:[4],regimen_id:4};
   assert.equal(hotelDraftValidation(model),'');
   assert.deepEqual(hotelDetailPayload(model).regimen_ids,[4]);
 });

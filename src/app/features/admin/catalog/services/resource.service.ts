@@ -7,18 +7,26 @@ import {hotelEditorDraft,hotelDetailPayload,hotelDraftValidation} from '../../..
 @Injectable({providedIn:'root'})
 export class ResourceService {
  data=inject(TravelDataService);
-  async options(fields:FieldDefinition[]){return Promise.all(fields.map(async f=>{if(!f.ref)return f;const rows=await this.data.cached('options:'+f.ref,async()=>{
+  async options(fields:FieldDefinition[]){return Promise.all(fields.map(async f=>{if(!f.ref)return f;if(f.ref==='amenity-group-members')return {...f,options:await this.amenityOptions()};const rows=await this.data.cached('options:'+f.ref,async()=>{
   if(f.ref==='bed-types')return this.data.catalogs.obtenerCatalogoAdmin('tipos_cama');
   switch(f.ref){case 'hotel-destinations':return [];case 'destinations':{const r=await this.data.backend.client.from('catalogo_destinos').select('id,nombre').eq('activo',true).order('nombre');if(r.error)throw r.error;return r.data||[];}case 'areas':return this.data.destinations.obtenerConfiguracionGeografica('divisiones-area');case 'tour-types':return this.data.destinations.obtenerTiposTuristicosCatalogo(true);case 'continents':return this.data.destinations.continentes().then(r=>{if(r.error)throw r.error;return r.data||[];});case 'regimes':return this.data.legacy.obtenerRegimenesAdmin();case 'company-roles':return this.data.employees.rolesEmpresaAdmin().then(r=>{if(r.error)throw r.error;return r.data||[];});case 'employee-status':return this.data.employees.obtenerEstatusEmpleadoAdmin();case 'treatments':return this.data.legacy.obtenerTratamientosActivos();case 'activities':return this.data.catalogs.obtenerCatalogoAdmin('actividades');case 'room-types':return this.data.catalogs.obtenerCatalogoAdmin('tipos_habitacion');default:return [];}
-  },300_000);return{...f,options:rows.map((r:any)=>({value:r.id,label:r.nombre||r.descripcion||r.rol||r.nombre_habitacion||String(r.id)}))};}));}
+   },300_000);return{...f,options:rows.map((r:any)=>({value:r.id,label:r.nombre||r.descripcion||r.rol||r.nombre_habitacion||String(r.id)}))};}));}
+  async amenityOptions(activeOnly=false){
+    const rows=await this.data.catalogs.obtenerCatalogoAdmin('actividades');
+    return rows.filter(row=>!activeOnly||row.activo!==false).map(row=>({
+      value:Number(row.id),
+      label:(row.traducciones_preview?.es?.descripcion||row.descripcion||`Amenidad #${row.id}`)+(row.activo===false?' (inactiva)':''),
+    }));
+  }
  async detail(kind:string,record:TravelRecord):Promise<Row>{
  if(kind==='destinos')return await this.data.destinations.obtenerCatalogoDestinoAdmin(Number(record.id))||record.raw;
  if(kind==='hoteles'){const d:any=await this.data.hotels.infoHotel(Number(record.id),'es');if(!d)throw new Error('No encontramos este hotel.');return hotelEditorDraft({...d,catalogo_destino_id:d.catalogo_destino_id||record.raw['catalogo_destino_id_resuelto']});}
  if(kind==='circuitos')return await this.data.circuits.infoCircuito(Number(record.id),'es')||record.raw;
  return{...record.raw};}
- async save(def:ResourceDefinition,v:Row,id:string|null,catalog='idiomas'){
- if(!this.data.auth.hasPermission(def.permission))throw new Error('Tu rol no permite guardar estos cambios.');
- const num=(x:any)=>x===''||x==null?null:Number(x),txt=(x:any)=>String(x||'').trim(),n=Number(id);
+  async save(def:ResourceDefinition,v:Row,id:string|null,catalog='idiomas'){
+   if(!this.data.auth.hasPermission(def.permission))throw new Error('Tu rol no permite guardar estos cambios.');
+   const num=(x:any)=>x===''||x==null?null:Number(x),txt=(x:any)=>String(x||'').trim(),n=Number(id);
+   let createdHotelId:number|undefined;
  switch(def.kind){
   case 'destinos':{
     const payload=destinationCatalogPayload(v);
@@ -26,7 +34,7 @@ export class ResourceService {
     else await this.data.destinations.crearCatalogoDestinoAdmin({...payload,slug:destinationSlug(payload.nombre)});
     break;
   }
- case 'hoteles':{const validation=hotelDraftValidation(v);if(validation)throw new Error(validation);const payload=hotelDetailPayload(v);if(id)await this.data.legacy.actualizarHotelDetalleAdmin({...payload,hotelId:n});else await this.data.legacy.crearHotelDetalleAdmin(payload);break;}
+  case 'hoteles':{const validation=hotelDraftValidation(v);if(validation)throw new Error(validation);const payload=hotelDetailPayload(v);if(id)await this.data.legacy.actualizarHotelDetalleAdmin({...payload,hotelId:n});else createdHotelId=await this.data.legacy.crearHotelDetalleAdmin(payload);break;}
  case 'clientes':{const payload={nombre:txt(v['nombre']),nombre_completo:txt(v['nombre_completo'])||txt(v['nombre']),tratamiento_id:num(v['tratamiento_id']),email:txt(v['email'])||null,telefono:txt(v['telefono']),recibir_ofertas:!!v['recibir_ofertas']};if(id){const r=await this.data.backend.client.from('clientes').update(payload).eq('id',n).select('id').single();if(r.error)throw r.error;}else await this.data.legacy.upsertCliente(payload);break;}
   case 'empleados':{const p={nombre:txt(v['nombre']),cargo_id:num(v['cargo_id']),telefono:txt(v['telefono']),email:txt(v['email']),mostrar_en_cotizaciones:v['mostrar_en_cotizaciones']===true};if(id){await this.data.employees.actualizarEmpleadoAdmin(n,p);if(v['estatus_id'])await this.data.employees.actualizarEstatusEmpleadoAdmin(n,Number(v['estatus_id']));}else await this.data.employees.crearEmpleadoAdmin(p);break;}
  case 'circuitos':{const p={nombre:txt(v['nombre']),descripcion:txt(v['descripcion']),precio_total:Number(v['precio_total'])||0,duracion_dias:Number(v['duracion_dias'])||1,duracion_noches:Number(v['duracion_noches'])||0,imagen_principal:txt(v['imagen_principal']),activo:v['activo']!==false,destinos:v['destinos']||[],hoteles:v['hoteles']||[],actividades:v['actividades']||[],imagenes:v['imagenes']||[],traducciones:v['traducciones']||[]};if(id)await this.data.circuits.actualizarCircuito(n,p);else await this.data.circuits.crearCircuito(p);break;}
@@ -41,7 +49,7 @@ export class ResourceService {
  }
  if(id)await this.data.catalogs.actualizarCatalogoAdmin(key,n,payload);else await this.data.catalogs.crearCatalogoAdmin(key,payload);break;
  }
- }this.data.invalidate();}
+  }this.data.invalidate();return createdHotelId;}
   async remove(def:ResourceDefinition,record:TravelRecord,catalog='idiomas'){
  if(!this.data.auth.hasPermission(def.permission))throw new Error('Tu rol no permite esta acción.');
   const id=Number(record.id);switch(def.kind){case 'destinos':await this.data.destinations.desactivarCatalogoDestinoAdmin(id);break;case 'hoteles':await this.data.hotels.eliminarHotelAdmin(id);break;case 'empleados':await this.data.employees.eliminarEmpleadoAdmin(id);break;case 'circuitos':await this.data.circuits.eliminarCircuito(id);break;case 'configuracion':await this.data.employees.eliminarRolAdmin(id);break;case 'atracciones':case 'catalogos':await this.data.catalogs.eliminarCatalogoAdmin((def.kind==='atracciones'?'atracciones':catalog) as CatalogoAdminKey,id);break;default:throw new Error('Este registro conserva su historial.');}this.data.invalidate();}

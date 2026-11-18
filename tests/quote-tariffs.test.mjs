@@ -1,6 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {quoteTariffRooms,quoteTariffPayload,quoteTariffTotal,quoteTariffValidation} from '../src/app/features/quotations/models/quote-tariffs.ts';
+import {tariffRoomTypeOptions} from '../src/app/features/quotations/models/room-configuration.ts';
 
 test('loads legacy prices and prepares each requested room without copying the first price',()=>{
   const quote={habitaciones:{es:'2 habitaciones'},tipo_habitacion:7,precios:[{tipo:'sin_seguro',precio:1250,condiciones:[{id:1,descripcion:'No reembolsable'}]},{tipo:'con_seguro',precio:1500,condiciones:[]},{tipo:'a_meses',precio:1800,condiciones:[{id:2,tipoPoliticas:'apartado'}]}]};
@@ -67,5 +68,30 @@ test('detects numbered rooms and their occupants from the original request text'
   assert.equal(rooms.length,2);
   assert.equal(rooms[0].detalle,'2 adultos · 1 niño');
   assert.equal(rooms[1].detalle,'3 adultos');
+  assert.deepEqual(rooms.map(room=>room.occupancy),[3,3]);
   assert.equal(rooms[1].precio,null);
+});
+
+test('tariffs use the general room catalog filtered by adults and children in each room',()=>{
+  const rooms=quoteTariffRooms({habitaciones:{
+    es:'Habitación 1: 1 adulto\nHabitación 2: 1 adulto',
+    distribucion:[{adultos:2,menores:2},{adultos:1,menores:0}],
+  }});
+  const types=[
+    {id:1,nombre_habitacion:'Individual',capacidad_maxima:1,camas:[]},
+    {id:2,nombre_habitacion:'Familiar',capacidad_maxima:4,camas:[]},
+    {id:3,nombre_habitacion:'Sin capacidad',capacidad_maxima:null,camas:[]},
+  ];
+  assert.deepEqual(rooms.map(room=>room.occupancy),[4,1]);
+  assert.deepEqual(tariffRoomTypeOptions(types,rooms[0].occupancy,null,[]).map(option=>option.value),[2]);
+  assert.deepEqual(tariffRoomTypeOptions(types,rooms[1].occupancy,null,[]).map(option=>option.value),[1,2]);
+});
+
+test('a saved room type outside the eligible catalog stays visible without becoming a new choice',()=>{
+  const rooms=quoteTariffRooms({habitaciones:{distribucion:[{adultos:3,menores:1}]},cotizacion_multiple:[{tipo_habitacion_id:7}]});
+  const historical=[{id:7,nombre_habitacion:'Habitación histórica'}];
+  assert.deepEqual(tariffRoomTypeOptions([],rooms[0].occupancy,7,historical),[
+    {value:7,label:'Habitación histórica (selección guardada)',disabled:true},
+  ]);
+  assert.equal(quoteTariffPayload(rooms,{}).cotizacionMultiple[0].tipo_habitacion_id,7);
 });

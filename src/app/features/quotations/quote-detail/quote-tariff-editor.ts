@@ -4,11 +4,13 @@ import {FormsModule} from '@angular/forms';
 import {TpSelectSearchComponent} from '../../../shared/components/tp-select-search/tp-select-search.component';
 import {TpMultiselectComponent,TpMultiselectOption} from '../../../shared/components/tp-multiselect/tp-multiselect.component';
 import {QUOTE_TARIFFS,QuoteData,QuoteTariffDefinition,quoteTariffTotal} from '../models/quote-tariffs';
+import {tariffRoomTypeOptions,type RoomType} from '../models/room-configuration';
 
 @Component({selector:'tp-quote-tariff-editor',imports:[FormsModule,CurrencyPipe,TpSelectSearchComponent,TpMultiselectComponent],templateUrl:'./quote-tariff-editor.html',styleUrl:'./quote-tariff-editor.scss'})
 export class QuoteTariffEditor{
   rooms=model<QuoteData[]>([]);
-  roomTypes=input<QuoteData[]>([]);
+  roomTypes=input<RoomType[]>([]);
+  historicalRoomTypes=input<Pick<RoomType,'id'|'nombre_habitacion'>[]>([]);
   origins=input<QuoteData[]>([]);
   policies=input<Record<string,QuoteData[]>>({});
   disabled=input(false);
@@ -18,11 +20,7 @@ export class QuoteTariffEditor{
   private readonly selectionCache=new WeakMap<QuoteData,Map<string,{policies:any[];ids:Array<string|number>}>>();
   total(key:string){return quoteTariffTotal(this.rooms(),key);}
   roomOptions(room:QuoteData,tariff:QuoteTariffDefinition){
-    const people=Number(room.detalle.match(/(\d+)\s*adultos?/i)?.[1]||0)+Number(room.detalle.match(/(\d+)\s*(?:niños?|menores?)/i)?.[1]||0);
-    const options=this.roomTypes().filter(type=>!people||!Number(type.capacidad_maxima)||Number(type.capacidad_maxima)>=people).map(type=>({value:Number(type.id),label:type.nombre_habitacion}));
-    const id=room[tariff.roomKey]?.id;
-    if(id!=null&&!options.some(option=>option.value===Number(id)))options.push({value:Number(id),label:`Habitación #${id}`});
-    return options;
+    return tariffRoomTypeOptions(this.roomTypes(),room['occupancy'],room[tariff.roomKey]?.id,this.historicalRoomTypes());
   }
   originOptions(room:QuoteData,tariff:QuoteTariffDefinition){
     const options=this.origins().map(origin=>({value:Number(origin.id),label:origin.clave||origin.nombre_cotizador}));

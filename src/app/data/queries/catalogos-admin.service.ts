@@ -6,11 +6,13 @@ import { generateImageTypeKey } from '../utils/image-type-key';
 import { normalizeImageTypeName } from '../utils/image-type-name';
 import {roomCatalogRecord} from '../utils/room-catalog-record';
 import type {RoomType} from '../../features/quotations/models/room-configuration';
+import type {AmenityGroup} from '../models/amenity-group';
 
 const ES_ID = 1;
 
 export type CatalogoAdminKey =
   | 'actividades'
+  | 'grupos_amenidades'
   | 'conceptos'
   | 'continentes'
   | 'descuentos'
@@ -45,6 +47,36 @@ export class CatalogosAdminService {
 
   private get client() {
     return this.supabase.getClient();
+  }
+
+  async obtenerGruposAmenidadesAdmin(soloActivos = false): Promise<AmenityGroup[]> {
+    const query = this.client.from('grupos_amenidades')
+      .select('id, nombre, activo, miembros:grupos_amenidades_actividades(actividad_id)')
+      .order('nombre').order('id');
+    if (soloActivos) query.eq('activo', true);
+    const {data, error} = await query;
+    if (error) throw new Error(error.message);
+
+    return (data ?? []).map(({id, nombre, activo, miembros}) => ({
+      id: Number(id), nombre, activo,
+      actividad_ids: miembros.map(miembro => Number(miembro.actividad_id)).sort((a, b) => a - b),
+      amenity_count: miembros.length,
+    }));
+  }
+
+  private async guardarGrupoAmenidades(id: number | null, payload: Record<string, any>) {
+    const nombre = String(payload['nombre'] ?? '').trim();
+    const ids = [...new Set((Array.isArray(payload['actividad_ids']) ? payload['actividad_ids'] : [])
+      .map(Number).filter(id => Number.isSafeInteger(id) && id > 0))];
+    if (!nombre || !ids.length) throw new Error('Escribe un nombre y selecciona al menos una amenidad.');
+
+    const {data, error} = await this.client.rpc('guardar_grupo_amenidades', {
+      p_id: id, p_nombre: nombre, p_activo: payload['activo'] !== false, p_actividad_ids: ids,
+    });
+    if (error?.code === '23505') throw new Error('Ya existe un grupo con ese nombre.');
+    if (error?.code === '23503') throw new Error('Una amenidad ya no está disponible. Vuelve a abrir el grupo y revisa la selección.');
+    if (error) throw new Error(error.message);
+    return data;
   }
 
   async obtenerTiposHabitacionCamas(idioma='es'):Promise<RoomType[]> {
@@ -164,6 +196,7 @@ export class CatalogosAdminService {
 
   async obtenerCatalogoAdmin(catalogo: CatalogoAdminKey): Promise<any[]> {
     switch (catalogo) {
+      case 'grupos_amenidades': return this.obtenerGruposAmenidadesAdmin();
       case 'actividades': {
         const pageSize = 1000;
         const select = `
@@ -575,6 +608,7 @@ export class CatalogosAdminService {
 
     const tablaPorCatalogo: Record<CatalogoAdminKey, string | null> = {
       actividades: 'actividades',
+      grupos_amenidades: null,
       conceptos: null,
       continentes: null,
       descuentos: null,
@@ -620,6 +654,7 @@ export class CatalogosAdminService {
 
   async crearCatalogoAdmin(catalogo: CatalogoAdminKey, payload: Record<string, any>) {
     switch (catalogo) {
+      case 'grupos_amenidades': return this.guardarGrupoAmenidades(null, payload);
       case 'regimen_hotel': {
         const descripcion = String(payload.descripcion ?? '').trim();
         const traducciones = await this.prepararTraduccionesRegimen(descripcion);
@@ -963,6 +998,12 @@ export class CatalogosAdminService {
 
   async eliminarCatalogoAdmin(catalogo: CatalogoAdminKey, id: number) {
     switch (catalogo) {
+      case 'grupos_amenidades': {
+        const {data, error} = await this.client.from('grupos_amenidades').delete().eq('id', id).select('id').maybeSingle();
+        if (error) throw new Error(error.message);
+        if (!data) throw new Error('No se pudo eliminar el grupo. Verifica tus permisos o si aún existe.');
+        return {deleted: 1};
+      }
       case 'regimen_hotel': {
         const { data, error } = await this.client.rpc('eliminar_regimen_hotel', { p_regimen_id: id });
         if (error) throw error;
@@ -1146,6 +1187,7 @@ export class CatalogosAdminService {
     payload: Record<string, any>
   ) {
     switch (catalogo) {
+      case 'grupos_amenidades': return this.guardarGrupoAmenidades(id, payload);
       case 'actividades': {
         const { data, error } = await this.client
           .from('actividades')

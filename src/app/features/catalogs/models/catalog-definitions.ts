@@ -30,4 +30,11 @@ catalogFields['tipos_habitacion']=[
 catalogFields['tipos_cama']=[{...name,label:'Nombre en español',textPreview:true,hint:'El nombre y la descripción se traducen automáticamente al guardar.'},{...desc,label:'Descripción en español'},active];
 catalogLabels['tipos_cama']='Tipos de cama';
 catalogOverviewKeys.push('tipos_cama');
-export function catalogDefinition(key:string,attractions=false):ResourceDefinition{const resolved=catalogKey(key);return{kind:attractions?'atracciones':'catalogos',title:attractions?'Atracciones y experiencias':catalogLabels[key]||'Catálogos',description:attractions?'Administra las experiencias que se muestran en los destinos.':'Administra la información que tu agencia utiliza para construir viajes.',singular:resolved==='meses_disponibles'?'plazo':'registro',icon:'grid',permission:'destinos.edit',fields:resolved==='meses_disponibles'?monthTermFields:resolved==='codigos_pais'?countryCodeFields:catalogFields[resolved]||[name],columns:resolved==='tipos_habitacion'?[{key:'camas_configuradas',label:'Camas configuradas',detailsKey:'camas_detalle'}]:[]};}
+catalogLabels['grupos_amenidades']='Grupos de amenidades';
+catalogFields['grupos_amenidades']=[
+  name,
+  {key:'actividad_ids',label:'Amenidades del grupo',type:'multiselect',ref:'amenity-group-members',required:true,hint:'Solo las amenidades activas se aplican al crear un hotel.'},
+  {...active,hint:'Los grupos inactivos no se ofrecen al crear hoteles.'},
+];
+catalogOverviewKeys.push('grupos_amenidades');
+export function catalogDefinition(key:string,attractions=false):ResourceDefinition{const resolved=catalogKey(key);return{kind:attractions?'atracciones':'catalogos',title:attractions?'Atracciones y experiencias':catalogLabels[key]||'Catálogos',description:attractions?'Administra las experiencias que se muestran en los destinos.':resolved==='grupos_amenidades'?'Configura plantillas para crear hoteles. Cambiar un grupo no modifica los hoteles que ya guardaste.':'Administra la información que tu agencia utiliza para construir viajes.',singular:resolved==='meses_disponibles'?'plazo':resolved==='grupos_amenidades'?'grupo':'registro',icon:'grid',permission:'destinos.edit',fields:resolved==='meses_disponibles'?monthTermFields:resolved==='codigos_pais'?countryCodeFields:catalogFields[resolved]||[name],columns:resolved==='grupos_amenidades'?[{key:'amenity_count',label:'Amenidades'}]:resolved==='tipos_habitacion'?[{key:'camas_configuradas',label:'Camas configuradas',detailsKey:'camas_detalle'}]:[]};}

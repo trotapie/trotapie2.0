@@ -19,6 +19,14 @@ export function tariffNumber(value: unknown): number | null {
   return Number.isFinite(n)?n:null;
 }
 function roomId(value:any):number|null{return tariffNumber(value?.id??value);}
+function tariffOccupancy(distribution:QuoteData|undefined,detail:string):number {
+  const guests=(value:unknown)=>value==null||value===''?null:Number(value);
+  const adults=guests(distribution?.['adultos']);
+  const children=guests(distribution?.['menores']??0);
+  if(adults!==null&&children!==null&&Number.isSafeInteger(adults)&&adults>0&&Number.isSafeInteger(children)&&children>=0)return adults+children;
+  const occupancy=detail.split(/[·,]\s*(?:tipo|camas)\s*:/i)[0];
+  return Number(occupancy.match(/(\d+)\s*adultos?/i)?.[1]||0)+Number(occupancy.match(/(\d+)\s*(?:niños?|menores?)/i)?.[1]||0);
+}
 export function quoteTariffRooms(quote:QuoteData):QuoteData[]{
   let saved=quote.cotizacion_multiple;
   if(typeof saved==='string'){try{saved=JSON.parse(saved);}catch{saved=[];}}
@@ -27,11 +35,13 @@ export function quoteTariffRooms(quote:QuoteData):QuoteData[]{
   const normalized=text.replace(/\r?\n/g,' ').replace(/\s+/g,' ').trim();
   const segments=Array.from(normalized.matchAll(/habitaci[oó]n\s*(\d+)\s*:\s*(.*?)(?=habitaci[oó]n\s*\d+\s*:|$)/gi),match=>match[2].trim());
   const details=segments.length?segments:text.split(/\r?\n/).map((line:string)=>line.trim()).filter((line:string)=>/\d+\s*(?:adultos?|niños?|menores?)/i.test(line));
-  const count=Math.max(hasSaved?saved.length:1,details.length,Number(text.match(/(\d+)\s*habitaciones\b/i)?.[1])||1);
+  const distribution=Array.isArray(quote.habitaciones?.distribucion)?quote.habitaciones.distribucion:[];
+  const count=Math.max(hasSaved?saved.length:1,details.length,distribution.length,Number(text.match(/(\d+)\s*habitaciones\b/i)?.[1])||1);
   return Array.from({length:count},(_,index)=>{
     const source=hasSaved?saved[index]||{}:index===0?quote:{};
     const baseRoom=roomId(source.tipo_habitacion_id??source.tipo_habitacion??source.tipoHabitacion??quote.tipo_habitacion_id??quote.tipo_habitacion);
-    const room:QuoteData={source:hasSaved?structuredClone(source):{},detalle:source.detalle_habitacion||source.detalleHabitacion||details[index]||(count===1?text:''),tipoTarifa:source.tipo_tarifa??source.tipoTarifa??quote.tipo_tarifa??'no_reembolsable'};
+    const detail=String(source.detalle_habitacion||source.detalleHabitacion||details[index]||(count===1?text:''));
+    const room:QuoteData={source:hasSaved?structuredClone(source):{},detalle:detail,occupancy:tariffOccupancy(distribution[index],detail),tipoTarifa:source.tipo_tarifa??source.tipoTarifa??quote.tipo_tarifa??'no_reembolsable'};
     for(const [i,tariff] of QUOTE_TARIFFS.entries()){
       const price=(!hasSaved&&index===0?quote.precios?.find((item:QuoteData)=>item.tipo===tariff.type):null);
       const priceColumn=['precio','precio_con_seguro','precio_a_meses'][i];
