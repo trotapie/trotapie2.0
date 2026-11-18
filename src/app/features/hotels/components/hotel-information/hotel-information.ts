@@ -1,10 +1,15 @@
-import { Component, computed, input, output, signal, inject, afterNextRender, DestroyRef, ElementRef, Injector } from '@angular/core';
+import { Component, computed, input, output, signal, inject, afterNextRender, DestroyRef, ElementRef, Injector, TemplateRef } from '@angular/core';
+import { NgTemplateOutlet } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { HotelHorarios, HotelPlanTodoIncluido } from '../../../../data/models/hotel-estancia.interface';
 import { Button } from '../../../../shared/components/button/button';
 import { Icon } from '../../../../shared/components/icon/icon';
 import { TpToastService } from '../../../../shared/services/tp-toast.service';
 import { LanguageService } from '../../../../core/services/language.service';
+import type { PublicCopyField } from '../../../../shared/models/public-copy-editor';
+import { HOTEL_COPY } from '../../../../../../supabase/functions/_shared/hotel-copy';
+
+type InformationKey = keyof typeof HOTEL_COPY.informacion;
 
 export interface HotelInformationData {
   id: number;
@@ -19,13 +24,15 @@ export interface HotelInformationData {
 
 @Component({
   selector: 'tp-hotel-information',
-  imports: [Button, Icon, RouterLink],
+  imports: [Button, Icon, RouterLink, NgTemplateOutlet],
   templateUrl: './hotel-information.html',
   styleUrl: './hotel-information.scss',
 })
 export class HotelInformation {
   hotel = input.required<HotelInformationData>();
   english = input(false);
+  readonly copy = input<Readonly<Record<string,string>>>({});
+  readonly copyEditor = input<TemplateRef<PublicCopyField>|null>(null);
   locationRequested = output<void>();
   selected = signal<number | null>(null);
   sharing = signal(false);
@@ -52,7 +59,13 @@ export class HotelInformation {
     ];
   });
   private languageService = inject(LanguageService);
-  text(es: string, en?: string) { return this.languageService.translateText(es, en); }
+  text(es: string, en?: string) { return this.copyEditor() ? es : this.languageService.translateText(es, en); }
+  copyText(key: InformationKey, english: string) {
+    return this.copy()[key] ?? this.text(HOTEL_COPY.informacion[key],english);
+  }
+  copyField(key: InformationKey, icon?: string, variant?: PublicCopyField['variant']):PublicCopyField {
+    return {group:'informacion',key,fallback:HOTEL_COPY.informacion[key],icon,variant};
+  }
   tabId(index: number) { return `${this.instanceId}-tab-${index}`; }
   panelId(index: number) { return `${this.instanceId}-panel-${index}`; }
   private range(start?: string, end?: string) { return [start, end].filter(Boolean).join(' – '); }

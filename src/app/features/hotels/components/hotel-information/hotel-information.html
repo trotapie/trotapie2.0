@@ -1,6 +1,9 @@
 <section class="hotel-information" [attr.aria-label]="text('Información de tu estancia', 'Stay information')">
-  <div class="section-heading"><span class="eyebrow">{{ text('Todo para tu estancia', 'Everything for your stay') }}</span><h2>{{ text('Conoce tu hotel', 'Get to know your hotel') }}</h2></div>
-  <div class="hotel-tabs">
+  <div class="section-heading">
+    <span class="eyebrow"><ng-container *ngTemplateOutlet="label; context:{key:'antetitulo',en:'Everything for your stay'}"/></span>
+    <h2><ng-container *ngTemplateOutlet="label; context:{key:'titulo',en:'Get to know your hotel'}"/></h2>
+  </div>
+  <div class="hotel-tabs" [inert]="!!copyEditor()">
     @for (tab of tabs(); track $index) {
       <h3 class="accordion-heading" [style.grid-column]="$index + 1">
         <button type="button" [id]="tabId($index)" [attr.aria-expanded]="selected() === $index" [attr.aria-controls]="panelId($index)" [class.selected]="selected() === $index" (click)="select($index)" (keydown)="navigateTabs($event, $index)"><tp-icon [name]="tab.icon" /><span>{{ tab.label }}</span><tp-icon class="expand-icon" name="chevron-down" /></button>
@@ -36,8 +39,18 @@
     }
   </div>
   <div class="hotel-actions">
-    <button tpButton type="button" icon="pin" [disabled]="!hotel().ubicacion" (click)="locationRequested.emit()">{{ text('Ubicación', 'Location') }}</button>
-    <button tpButton type="button" icon="share" [disabled]="sharing()" (click)="share()">{{ text('Compartir hotel', 'Share hotel') }}</button>
-    <a tpButton variant="primary" icon="quote" [routerLink]="['/solicitar', hotel().id]">{{ text('Cotizar mi estancia', 'Request a quote') }}</a>
+    @if(copyEditor(); as editor){
+      <ng-container *ngTemplateOutlet="editor; context:copyField('ubicacion','pin','secondary')"/>
+      <ng-container *ngTemplateOutlet="editor; context:copyField('compartir','share','secondary')"/>
+      <span class="preview-quote-action"><ng-container *ngTemplateOutlet="editor; context:copyField('cotizar','quote','primary')"/></span>
+    } @else {
+      <button tpButton type="button" icon="pin" [disabled]="!hotel().ubicacion" (click)="locationRequested.emit()">{{ copyText('ubicacion', 'Location') }}</button>
+      <button tpButton type="button" icon="share" [disabled]="sharing()" (click)="share()">{{ copyText('compartir', 'Share hotel') }}</button>
+      <a tpButton variant="primary" icon="quote" [routerLink]="['/solicitar', hotel().id]">{{ copyText('cotizar', 'Request a quote') }}</a>
+    }
   </div>
 </section>
+<ng-template #label let-key="key" let-en="en">
+  @if(copyEditor(); as editor){<ng-container *ngTemplateOutlet="editor; context:copyField(key)"/>}
+  @else { {{copyText(key,en)}} }
+</ng-template>

@@ -7,8 +7,8 @@
     <div class="home-copy-loader" aria-busy="true"><tp-state mode="loading"/></div>
   }
   <div #scrollArea class="public-main" [attr.id]="isCopyPreview()?null:'main-content'" [attr.role]="isCopyPreview()?'region':'main'"
-    [attr.aria-label]="destinationEditor()?'Vista editable de Destinos':homeEditor()?'Vista editable de Inicio':null" [attr.lang]="isCopyPreview()?'es':data.language.language()"
-    [class.catalog-scroll-area]="mode==='home'||mode==='destinos'||mode==='hoteles'"
+    [attr.aria-label]="hotelEditor()?'Vista editable de Hoteles':destinationEditor()?'Vista editable de Destinos':homeEditor()?'Vista editable de Inicio':null" [attr.lang]="isCopyPreview()?'es':data.language.language()"
+    [class.catalog-scroll-area]="!isCopyPreview() && (mode==='home'||mode==='destinos'||mode==='hoteles')"
     [class.home-copy-pending]="copyPending()"
     [inert]="copyPending()" (scroll)="updateActiveSection()">
     @if (mode !== 'home' && mode !== 'destino' && mode !== 'hotel') {
@@ -47,14 +47,14 @@
       </section>
     }
     @if (mode === 'destino' || mode === 'hotel') {
-      @if(!destinationEditor()){<a
+      @if(!isCopyPreview()){<a
         tpButton
         icon="left"
         variant="back"
         [routerLink]="mode === 'hotel' ? returnUrl : '/destinos'"
         >{{ text('Volver al catálogo', 'Back to catalog') }}</a
       >}
-      @if ((destinationEditor() ? destinationPreviewDetail() : detail()); as record) {
+      @if (detailRecord(); as record) {
         <section class="detail-hero">
           <div class="detail-photo" [class.destination-composition]="mode==='destino'">
             @if (mode === 'destino') {
@@ -65,10 +65,10 @@
                  [autoplay]="!destinationEditor() && !mapOpen()"
                 [english]="data.language.language() === 'en'"
               />
-            } @else if (cover()?.url_imagen) {
+            } @else if (cover()?.url_imagen || hotelEditor()) {
               <img
-                [src]="cover().url_imagen"
-                [alt]="detail().nombre || detail().nombre_hotel"
+                [src]="cover()?.url_imagen || '/brand/iso.png'"
+                [alt]="record.nombre || record.nombre_hotel"
                 (error)="imageError($event)"
               />
             }
@@ -77,21 +77,27 @@
              <span class="eyebrow">
                @if(destinationEditor(); as editor){
                  <ng-container *ngTemplateOutlet="editor; context:destinationField('antetitulo')"/>
+               } @else if (mode === 'hotel') {
+                 <ng-container *ngTemplateOutlet="hotelLabel; context:{key:'antetitulo',en:'Experience it your way'}"/>
                } @else {
                  {{ destinationText('antetitulo', 'Experience it your way') }}
                }
              </span>
              <h1>{{ record.nombre || record.nombre_hotel }}</h1>
              @if (mode === 'destino') { <p>{{ record.detalle?.descripcion_corta || record.descripcion || '' }}</p> }
-            @else { <p>{{ text('Descubre los horarios, servicios y detalles para planear tu próxima estancia.', 'Explore times, services and details to plan your next stay.') }}</p> }
-            @if (mode === 'hotel') {
-              <a tpButton variant="primary" icon="quote" [routerLink]="['/solicitar', id]">{{
-                text('Solicitar cotización', 'Request a quote')
-              }}</a>
+             @else { <p><ng-container *ngTemplateOutlet="hotelLabel; context:{key:'descripcion',en:'Explore times, services and details to plan your next stay.'}"/></p> }
+             @if (mode === 'hotel') {
+               @if(hotelEditor(); as editor){
+                 <span class="preview-hotel-action"><ng-container *ngTemplateOutlet="editor; context:hotelField('cotizar')"/></span>
+               } @else {
+                 <a tpButton variant="primary" icon="quote" [routerLink]="['/solicitar', id]">{{hotelText('cotizar','Request a quote')}}</a>
+               }
             }
             <div class="detail-location">
                @if(destinationEditor(); as editor){
                  <span class="preview-location-action"><ng-container *ngTemplateOutlet="editor; context:destinationField('ubicacion')"/></span>
+               } @else if(hotelEditor(); as editor){
+                 <span class="preview-location-action"><ng-container *ngTemplateOutlet="editor; context:hotelField('ubicacion')"/></span>
                } @else if (record.ubicacion) {
                 <button
                   tpButton
@@ -100,7 +106,7 @@
                   type="button"
                   (click)="mapOpen.set(true)"
                 >
-                    {{ destinationText('ubicacion', 'View location') }}
+                     {{ mode === 'hotel' ? hotelText('ubicacion','View location') : destinationText('ubicacion', 'View location') }}
                 </button>
               } @else {
                 <tp-icon name="pin" /><span>{{
@@ -111,11 +117,12 @@
           </div>
         </section>
         @if (mode === 'hotel') {
-          <tp-hotel-information [hotel]="detail()" [english]="data.language.language() === 'en'" (locationRequested)="mapOpen.set(true)" />
+          <tp-hotel-information [hotel]="record" [english]="data.language.language() === 'en'" [copy]="hotelCopy().informacion || {}"
+            [copyEditor]="hotelEditor()" (locationRequested)="mapOpen.set(true)" />
         }
-        @if (mode === 'hotel' && detail().imagenes?.length) {
-          <section class="hotel-photo-gallery" aria-label="Galería del hotel">
-            <app-imagenes-carrusel [imagenesCargadas]="detail().imagenes" [hotel]="detail()" [soloClasificadas]="true" layout="grid"/>
+        @if (mode === 'hotel' && record.imagenes?.length) {
+          <section class="hotel-photo-gallery" aria-label="Galería del hotel" [inert]="!!hotelEditor()">
+            <app-imagenes-carrusel [imagenesCargadas]="record.imagenes" [hotel]="record" [soloClasificadas]="true" layout="grid"/>
           </section>
         }
          @if (mode === 'destino' && record.detalle?.descripcion_larga) {
@@ -296,9 +303,9 @@
           }
         }
       </section>
-    } @else if (mode === 'hotel' && loading()) {
+    } @else if (mode === 'hotel' && loading() && !hotelEditor()) {
       <tp-state mode="loading" />
-    } @else if (mode === 'hotel' && error()) {
+    } @else if (mode === 'hotel' && error() && !hotelEditor()) {
       <tp-state mode="error" [message]="error()" (retry)="load()" />
     }
   </div>
@@ -311,6 +318,10 @@
 <ng-template #homeCopy let-group="group" let-key="key" let-en="en">
   @if(homeEditor(); as editor){<ng-container *ngTemplateOutlet="editor; context:homeField(group,key)"/>}
   @else { {{homeText(group,key,en)}} }
+</ng-template>
+<ng-template #hotelLabel let-key="key" let-en="en">
+  @if(hotelEditor(); as editor){<ng-container *ngTemplateOutlet="editor; context:hotelField(key)"/>}
+  @else { {{hotelText(key,en)}} }
 </ng-template>
 <ng-template #carouselEyebrow><ng-container *ngTemplateOutlet="homeEditor(); context:homeField('carrusel','antetitulo')"/></ng-template>
 <ng-template #carouselHeadline><ng-container *ngTemplateOutlet="homeEditor(); context:homeField('carrusel','titulo')"/></ng-template>

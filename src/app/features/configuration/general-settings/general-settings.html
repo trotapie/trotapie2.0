@@ -48,10 +48,12 @@
              <tp-inline-copy [value]="textValue(group,key,fallback)" [busy]="saving()" [icon]="icon" [variant]="variant"
                (valueChanged)="setText(group,key,$event)"/>
            </ng-template>
-           @if(textScreen()==='inicio'){
-             <tp-public [homeEditor]="editPublicText"/>
-           } @else {
-             <tp-public [destinationEditor]="editPublicText"/>
+            @if(textScreen()==='inicio'){
+              <tp-public [homeEditor]="editPublicText"/>
+            } @else if(textScreen()==='destino'){
+              <tp-public [destinationEditor]="editPublicText"/>
+            } @else {
+              <tp-public [hotelEditor]="editPublicText"/>
            }
          }
          @if(!textValid()){<p class="error-banner" role="alert">Completa los textos sin usar llaves ni variables.</p>}

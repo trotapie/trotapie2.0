@@ -2,6 +2,9 @@ import {createClient} from 'npm:@supabase/supabase-js@2.56.0';
 import {changedCopy, cleanCopy, COPY_LANGUAGES, mergeCopyTranslations, QUOTE_COPY, type CopyBlock} from '../_shared/quote-copy.ts';
 import {HOME_COPY} from '../_shared/home-copy.ts';
 import {DESTINATION_COPY} from '../_shared/destination-copy.ts';
+import {HOTEL_COPY} from '../_shared/hotel-copy.ts';
+
+const sections = {cotizacion: QUOTE_COPY, inicio: HOME_COPY, destino: DESTINATION_COPY, hotel: HOTEL_COPY};
 
 const cors = {
   'Access-Control-Allow-Origin': '*',
@@ -28,15 +31,15 @@ Deno.serve(async (request) => {
 
   let next: CopyBlock;
   let version: number;
-  let section: 'cotizacion' | 'inicio' | 'destino';
+  let section: keyof typeof sections;
   let defaults: CopyBlock;
   try {
     const raw = await request.text();
     if (raw.length > 48_000) return reply(413, {error: 'El bloque de textos es demasiado grande.'});
     const body = JSON.parse(raw);
     section = body.seccion === undefined ? 'cotizacion' : body.seccion;
-    if (section !== 'cotizacion' && section !== 'inicio' && section !== 'destino') throw new Error('La sección no es válida.');
-    defaults = section === 'inicio' ? HOME_COPY : section === 'destino' ? DESTINATION_COPY : QUOTE_COPY;
+    if (typeof section !== 'string' || !Object.hasOwn(sections, section)) throw new Error('La sección no es válida.');
+    defaults = sections[section];
     if (!Number.isInteger(body.version) || body.version < 0) throw new Error('La versión no es válida.');
     version = body.version;
     next = cleanCopy(body.textos, defaults);

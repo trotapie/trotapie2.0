@@ -8,19 +8,20 @@ import {parseTemplate} from '@angular/compiler';
 import {COPY_GROUPS,copyGroups,validCopyText} from '../supabase/functions/_shared/quote-copy.ts';
 import {HOME_COPY} from '../supabase/functions/_shared/home-copy.ts';
 import {DESTINATION_COPY} from '../supabase/functions/_shared/destination-copy.ts';
+import {HOTEL_COPY,hotelInheritsDestinationCopy} from '../supabase/functions/_shared/hotel-copy.ts';
 
 const source=path=>readFileSync(new URL('../'+path,import.meta.url),'utf8');
 const classCode=(path,name)=>ts.transpile(source(path).slice(source(path).indexOf('export class '+name)).replace('export class','class'),{target:ts.ScriptTarget.ES2022});
 const signal=initial=>{let value=initial;return Object.assign(()=>value,{set:next=>value=next,update:fn=>value=fn(value)});};
 
-function editor({allowed=true,loadError=false,saveError=false,hotelLoadError=false,hotelSaveError=false,textSaveError=false}={}){
+function editor({allowed=true,loadError=false,saveError=false,hotelLoadError=false,hotelSaveError=false,textSaveError=false,published={}}={}){
   const writes=[];
   const hotelWrites=[];
   const settings={load:async()=>{if(loadError)throw new Error('No disponible');return {maxRooms:8,maxPeoplePerRoom:8};},save:async value=>{writes.push(value);if(saveError)throw new Error('Sin permiso');return value;}};
   const hotels={load:async()=>{if(hotelLoadError)throw new Error('Horarios no disponibles');return {check_in_desde:'15:00',check_out:'12:00'};},save:async value=>{hotelWrites.push(value);if(hotelSaveError)throw new Error('Error al guardar horarios');return normalizarHorarios(value)||{};}};
   const textWrites=[];
   const textSections=[];
-  const texts={loadOriginal:async section=>({version:{inicio:5,cotizacion:1,destino:9}[section],textos:{}}),save:async (value,section)=>{
+  const texts={loadOriginal:async section=>({version:{inicio:5,cotizacion:1,destino:9,hotel:3}[section],textos:published[section]??{}}),save:async (value,section)=>{
     textWrites.push(value);
     textSections.push(section);
     if(textSaveError)throw new Error('No se pudo traducir');
@@ -28,8 +29,8 @@ function editor({allowed=true,loadError=false,saveError=false,hotelLoadError=fal
   }};
   const dependencies=[settings,{hasPermission:()=>allowed},{success:()=>{}},hotels,texts];
   const code=classCode('src/app/features/configuration/general-settings/general-settings.ts','GeneralSettings');
-  const groups={cotizacion:COPY_GROUPS,inicio:copyGroups(HOME_COPY),destino:copyGroups(DESTINATION_COPY)};
-  const Editor=new Function('inject','signal','computed','protectUnsavedChanges','QuoteSettingsService','AuthService','TpToastService','HotelSettingsService','HOTEL_TIME_FIELDS','QuoteCopyService','TEXT_GROUPS','TEXT_SECTIONS','emptyDraft','validCopyText',`${code};return GeneralSettings;`)(()=>dependencies.shift(),signal,fn=>fn,(dirty,busy)=>({sync(){},confirm:()=>!busy()&&!dirty()}),null,null,null,null,HOTEL_TIME_FIELDS,null,groups,Object.keys(groups),()=>({saved:null,textos:{},error:''}),validCopyText);
+  const groups={cotizacion:COPY_GROUPS,inicio:copyGroups(HOME_COPY),destino:copyGroups(DESTINATION_COPY),hotel:copyGroups(HOTEL_COPY)};
+  const Editor=new Function('inject','signal','computed','protectUnsavedChanges','QuoteSettingsService','AuthService','TpToastService','HotelSettingsService','HOTEL_TIME_FIELDS','QuoteCopyService','TEXT_GROUPS','TEXT_SECTIONS','emptyDraft','validCopyText','hotelInheritsDestinationCopy',`${code};return GeneralSettings;`)(()=>dependencies.shift(),signal,fn=>fn,(dirty,busy)=>({sync(){},confirm:()=>!busy()&&!dirty()}),null,null,null,null,HOTEL_TIME_FIELDS,null,groups,Object.keys(groups),()=>({saved:null,textos:{},error:''}),validCopyText,hotelInheritsDestinationCopy);
   return {page:new Editor(),writes,hotelWrites,textWrites,textSections};
 }
 
@@ -89,6 +90,30 @@ test('Destinos publishes only its draft and keeps the Inicio changes pending',as
   assert.deepEqual(textWrites,[{version:9,textos:{hoteles:{tarjeta:'Conocer hotel'}}}]);
   assert.equal(page.savedTexts().version,10);
   assert.equal(page.isTextDirty('inicio'),true);
+});
+
+test('Hoteles inherits published Destinos text, not its draft, and publishes separately',async()=>{
+  const {page,textWrites,textSections}=editor({published:{destino:{ficha:{antetitulo:'Descubre Mazatlán'}}}});
+  await page.load();
+  page.tab.set('texts');
+  page.textScreen.set('destino');
+  page.setText('ficha','antetitulo','Destino sin publicar');
+  page.textScreen.set('hotel');
+  assert.equal(page.textValue('ficha','antetitulo',HOTEL_COPY.ficha.antetitulo),'Descubre Mazatlán');
+  assert.equal(page.textDirty(),false);
+  page.setText('informacion','titulo','Tu hotel');
+  await page.save();
+  page.setText('ficha','antetitulo','Descubre tu hotel');
+  await page.save();
+  page.setText('ficha','antetitulo','Descubre Mazatlán');
+  await page.save();
+  assert.deepEqual(textSections,['hotel','hotel','hotel']);
+  assert.deepEqual(textWrites,[
+    {version:3,textos:{informacion:{titulo:'Tu hotel'}}},
+    {version:4,textos:{ficha:{antetitulo:'Descubre tu hotel'},informacion:{titulo:'Tu hotel'}}},
+    {version:5,textos:{informacion:{titulo:'Tu hotel'}}},
+  ]);
+  assert.equal(page.isTextDirty('destino'),true);
 });
 
 test('general settings loads, saves both limits and clears the pending state',async()=>{
