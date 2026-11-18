@@ -7,6 +7,7 @@ import { normalizeImageTypeName } from '../utils/image-type-name';
 import {roomCatalogRecord} from '../utils/room-catalog-record';
 import type {RoomType} from '../../features/quotations/models/room-configuration';
 import type {AmenityGroup} from '../models/amenity-group';
+import {parseSvgPathIcon} from '../../shared/utils/svg-path-icon';
 
 const ES_ID = 1;
 
@@ -396,9 +397,12 @@ export class CatalogosAdminService {
           .from('regimen')
           .select(`
             id,
+            descripcion,
+            icono_svg,
             traducciones:regimen_traducciones (
               idioma_id,
-              descripcion
+              descripcion,
+              descripcion_general
             )
           `)
           .order('id', { ascending: true });
@@ -409,7 +413,9 @@ export class CatalogosAdminService {
           const traduccionEs = item?.traducciones?.find((x: any) => x.idioma_id === ES_ID);
           return {
             id: item.id,
-            descripcion: traduccionEs?.descripcion ?? `Regimen ${item.id}`
+            descripcion: traduccionEs?.descripcion ?? item.descripcion ?? `Régimen ${item.id}`,
+            descripcion_general: traduccionEs?.descripcion_general ?? '',
+            icono_svg: item.icono_svg ?? ''
           };
         });
       }
@@ -655,25 +661,7 @@ export class CatalogosAdminService {
   async crearCatalogoAdmin(catalogo: CatalogoAdminKey, payload: Record<string, any>) {
     switch (catalogo) {
       case 'grupos_amenidades': return this.guardarGrupoAmenidades(null, payload);
-      case 'regimen_hotel': {
-        const descripcion = String(payload.descripcion ?? '').trim();
-        const traducciones = await this.prepararTraduccionesRegimen(descripcion);
-        const { data: regimen, error } = await this.client
-          .from('regimen')
-          .insert({ descripcion })
-          .select('id')
-          .single();
-        if (error) throw error;
-
-        const { error: traduccionError } = await this.client
-          .from('regimen_traducciones')
-          .insert(traducciones.map((item) => ({ ...item, regimen_id: regimen.id })));
-        if (traduccionError) {
-          await this.client.from('regimen').delete().eq('id', regimen.id);
-          throw traduccionError;
-        }
-        return { id: regimen.id, descripcion };
-      }
+      case 'regimen_hotel': return this.guardarRegimenHotel(null, payload);
       case 'actividades': {
         const { data: ultimoRegistro, error: ultimoError } = await this.client
           .from('actividades')
@@ -1371,21 +1359,7 @@ export class CatalogosAdminService {
         });
         return data;
       }
-      case 'regimen_hotel': {
-        const descripcion = String(payload.descripcion ?? '').trim();
-        const traducciones = await this.prepararTraduccionesRegimen(descripcion);
-        const { error: regimenError } = await this.client
-          .from('regimen')
-          .update({ descripcion })
-          .eq('id', id);
-        if (regimenError) throw regimenError;
-        const { data, error } = await this.client
-          .from('regimen_traducciones')
-          .upsert(traducciones.map((item) => ({ ...item, regimen_id: id })), { onConflict: 'regimen_id,idioma_id' })
-          .select('regimen_id');
-        if (error) throw error;
-        return data;
-      }
+      case 'regimen_hotel': return this.guardarRegimenHotel(id, payload);
       case 'tarifas': {
         const { data, error } = await this.client
           .from('tarifas')
@@ -1537,21 +1511,31 @@ export class CatalogosAdminService {
     if (insertError) throw insertError;
   }
 
-  private async prepararTraduccionesRegimen(descripcion: string): Promise<Array<{ idioma_id: number; descripcion: string }>> {
-    if (!descripcion) throw new Error('La descripción del régimen es obligatoria.');
+  private async guardarRegimenHotel(id: number | null, payload: Record<string, unknown>) {
+    const nombre = String(payload['descripcion'] ?? '').trim();
+    const descripcion = String(payload['descripcion_general'] ?? '').trim();
+    const icono = String(payload['icono_svg'] ?? '').trim();
+    if (!nombre) throw new Error('El nombre del régimen es obligatorio.');
+    if (icono && !parseSvgPathIcon(icono)) throw new Error('El SVG no es válido o contiene elementos no admitidos.');
 
     const [traducciones, idiomas] = await Promise.all([
-      this.supabase.traducirDesdeEspanol({ title: '', description: descripcion }),
+      this.supabase.traducirDesdeEspanol({ title: nombre, description: descripcion }),
       this.supabase.obtenerIdiomasPreviewAdmin()
     ]);
 
-    return idiomas.map((idioma) => {
-      const texto = idioma.codigo === 'es'
-        ? descripcion
-        : String(traducciones?.[idioma.codigo]?.description ?? '').trim();
-      if (!texto) throw new Error(`No se pudo generar la traducción del régimen a ${idioma.nombre}.`);
-      return { idioma_id: idioma.id, descripcion: texto };
+    const textos = idiomas.map((idioma) => {
+      const es = idioma.id === ES_ID;
+      const traduccion = traducciones?.[idioma.codigo];
+      const titulo = es ? nombre : String(traduccion?.title ?? '').trim();
+      const detalle = es ? descripcion : String(traduccion?.description ?? '').trim();
+      if (!titulo || (descripcion && !detalle)) throw new Error(`No se pudo generar la traducción del régimen a ${idioma.nombre}.`);
+      return { idioma_id: idioma.id, descripcion: titulo, descripcion_general: descripcion ? detalle : null };
     });
+    const {data, error} = await this.client.rpc('guardar_contenido_regimen_hotel', {
+      p_id: id, p_nombre: nombre, p_icono_svg: icono || null, p_traducciones: textos,
+    });
+    if (error) throw error;
+    return {id: data, descripcion: nombre, descripcion_general: descripcion, icono_svg: icono};
   }
 
   async obtenerTraduccionesRegimenHotel(regimenId: number): Promise<Array<{ codigo: string; nombre: string; descripcion: string }>> {

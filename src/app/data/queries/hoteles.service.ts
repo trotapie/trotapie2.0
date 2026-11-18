@@ -5,6 +5,7 @@ import { SupabaseService } from './supabase.service';
 import { getDefaultLang } from '../../core/utils/lang.utils';
 import { LanguageService as TranslocoService } from '../../core/services/language.service';
 import { normalizarHorarios, normalizarPlan, resolverHorarios } from '../models/hotel-estancia.interface';
+import { hotelRegimeDetails } from '../utils/hotel-regime-details';
 
 const ES_ID = 1;
 
@@ -411,12 +412,23 @@ export class HotelesService {
       )
     ),
 
+    regimen_principal:regimen_id (
+      id,
+      descripcion,
+      icono_svg,
+      muestra_plan_todo_incluido,
+      traducciones:regimen_traducciones (idioma_id, descripcion, descripcion_general)
+    ),
     regimenes:regimen_hotel!regimen_hotel_hotel_id_fkey (
       regimen:regimen!regimen_hotel_regimen_id_fkey (
         id,
+        descripcion,
+        icono_svg,
+        muestra_plan_todo_incluido,
         traducciones:regimen_traducciones (
           idioma_id,
-          descripcion
+          descripcion,
+          descripcion_general
         )
       )
     ),
@@ -458,18 +470,10 @@ export class HotelesService {
 
     const traducida = tLang ?? null;
 
-    const regimenesTraducidos = (data?.regimenes ?? []).flatMap((x: any) => {
-      const r = x.regimen;
-      const tLang = r?.traducciones?.find((t: any) => t.idioma_id === idiomaId);
-
-      const tEs = r?.traducciones?.find(
-        (t: any) => t.idioma_id === 1
-      );
-      const traduccion = tLang ?? tEs;
-      return traduccion?.descripcion
-        ? [{ id: r.id, descripcion: traduccion.descripcion, es: tEs?.descripcion }]
-        : [];
-    });
+    const regimenesAsignados = (data.regimenes ?? []).map(item => primerRegistro(item.regimen));
+    const regimenPrincipal = primerRegistro(data.regimen_principal) ??
+      regimenesAsignados.find(regimen => regimen?.id === data.regimen_id) ?? null;
+    const regimenesTraducidos = hotelRegimeDetails(regimenPrincipal, regimenesAsignados, idiomaId);
 
     const tiposHabitacionIds = (data?.tipos_habitacion ?? [])
       .map((x: any) => Number(x.tipo_habitacion?.id))

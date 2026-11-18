@@ -393,7 +393,7 @@
 }
 
 .detail-photo.destination-composition{height:auto;aspect-ratio:16/10;align-self:start}
-.home-copy-pending{visibility:hidden}
+.home-copy-pending{visibility:hidden;opacity:0}
 .home-copy-loader{position:absolute;inset:0;display:grid;place-items:center}
 :host(.home-preview){height:auto;overflow:visible;container-type:inline-size}
 :host(.home-preview) .public-shell{height:auto;width:100%;margin:0 auto;padding:16px clamp(16px,4cqw,48px);box-shadow:none;border:1px solid var(--line)}

@@ -102,7 +102,7 @@ export class PublicPage implements OnInit, OnDestroy {
   readonly hotelCopyPending = computed(()=>this.usesHotelCopy() &&
     this.hotelSnapshot()?.language!==this.data.language.language());
   readonly copyPending = computed(()=>this.homeCopyPending() || this.destinationCopyPending() || this.hotelCopyPending() ||
-    (this.isCopyPreview() && this.loading()));
+    ((this.mode==='hotel' || this.isCopyPreview()) && this.loading()));
   readonly previewFilters = [
     {key:'playas',label:'Playas'}, {key:'ciudades',label:'Ciudades Coloniales'}, {key:'cabanas',label:'Cabañas'},
   ];
