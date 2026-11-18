@@ -5,6 +5,7 @@ import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {QuoteTariffEditor} from './quote-tariff-editor';
 import {QuoteTariffList} from './quote-tariff-list';
 import {QUOTE_TARIFFS,QuoteData,quoteTariffRooms,quoteTariffPayload,quoteTariffValidation} from '../models/quote-tariffs';
+import type {RoomType} from '../models/room-configuration';
 import {TpSelectSearchComponent} from '../../../shared/components/tp-select-search/tp-select-search.component';
 import {QUOTE_STATUS_OPTIONS} from '../models/quote-status';
 import {ImagenesCarruselComponent} from '../../../shared/components/imagenes-carrusel/imagenes-carrusel.component';
@@ -24,7 +25,8 @@ export class QuoteDetail implements OnInit {toast=inject(TpToastService);
  adviser=signal<EmpleadoFirma|null>(null);
  readonly statusOptions=QUOTE_STATUS_OPTIONS;
  readonly tariffRooms=signal<QuoteData[]>([]);
- readonly roomTypes=signal<QuoteData[]>([]);
+  readonly roomTypes=signal<Pick<RoomType,'id'|'nombre_habitacion'>[]>([]);
+  readonly tariffRoomTypes=signal<RoomType[]>([]);
  readonly origins=signal<QuoteData[]>([]);
  readonly catalogTariffs=signal<QuoteData[]>([]);
  readonly policyCatalog=signal<any[]>([]);
@@ -35,14 +37,13 @@ export class QuoteDetail implements OnInit {toast=inject(TpToastService);
   if(this.policyLoading())return;
   this.policyLoading.set(true);this.policyError.set('');
   try{
-   const hotelId=this.record()?.hotel_id||await this.data.quotes.obtenerHotelIdPorCotizacionPublica(this.id);
-   const [policies,tariffs,origins,types]=await Promise.all([
-    this.data.catalogs.obtenerPoliticasDisponiblesTarifa(),this.data.catalogs.obtenerCatalogoAdmin('tarifas'),
-    this.data.catalogs.obtenerCatalogoAdmin('origen_reservacion'),hotelId?this.data.quotes.tiposHabitacionPorHotel(hotelId):Promise.resolve([])
+    const [policies,tariffs,origins,types]=await Promise.all([
+     this.data.catalogs.obtenerPoliticasDisponiblesTarifa(),this.data.catalogs.obtenerCatalogoAdmin('tarifas'),
+     this.data.catalogs.obtenerCatalogoAdmin('origen_reservacion'),this.data.catalogs.obtenerTiposHabitacionCamas(this.data.language.language())
    ]);
    this.policyCatalog.set(policies);this.catalogTariffs.set(tariffs.filter((tariff:any)=>tariff.activo));
     this.origins.update(current=>[...current.filter(item=>!origins.some((origin:any)=>Number(origin.id)===Number(item.id))),...origins]);
-    this.roomTypes.update(current=>[...current.filter(item=>!types.some((type:any)=>Number(type.id)===Number(item.id))),...types]);
+     this.tariffRoomTypes.set(types);
   }
   catch(error){this.policyError.set(error instanceof Error?error.message:'No pudimos cargar los catálogos de tarifas, políticas y habitaciones.');}
   finally{this.policyLoading.set(false);}

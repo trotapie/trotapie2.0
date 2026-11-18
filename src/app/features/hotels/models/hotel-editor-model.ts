@@ -35,9 +35,15 @@ export function hotelEditorDraft(detail:HotelData):HotelData {
     planDescripcion:spanish?.['plan_todo_incluido']?.descripcion||'',
     activityIds:hotelIds(detail['actividad_ids']??detail['actividades']?.map((item:HotelData)=>item['id'])),
     regimeIds:hotelIds([...(detail['regimen_ids']??detail['regimenes']?.map((item:HotelData)=>item['id'])??[]),detail['regimen_id']]),
+    // Keep historical hotel links when saving; new quotes use the general catalog.
     roomTypeIds:hotelIds(detail['tipos_habitacion_ids']),
     galleryUrls:(detail['imagenes']||[]).map((item:HotelData)=>item['url_imagen']).join('\n'),
   };
+}
+
+export function newHotelEditorDraft(destination:unknown):HotelData {
+  const [destinationId]=hotelIds([destination]);
+  return hotelEditorDraft({catalogo_destino_id:destinationId??null,orden:0,imagenes:[]});
 }
 
 export function hotelDraftValidation(model:HotelData):string {

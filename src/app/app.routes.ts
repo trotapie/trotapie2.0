@@ -5,6 +5,7 @@ const publicPage=()=>import('./features/public/explore/public').then(m=>m.Public
 const dashboard=()=>import('./features/admin/dashboard/dashboard').then(m=>m.Dashboard);
 const catalog=()=>import('./features/admin/catalog/catalog').then(m=>m.Catalog);
 const catalogOverview=()=>import('./features/admin/catalog-overview/catalog-overview').then(m=>m.CatalogOverview);
+const hotelEditor=()=>import('./features/hotels/editor/hotel-editor').then(m=>m.HotelEditor);
 const catalogRoutes=(preview=false):Routes=>[
  ...(preview?[{path:'componentes',loadComponent:()=>import('./features/common/shared-showcase/shared-showcase').then(m=>m.SharedShowcase),data:{preview:true}}]:[]),
  {path:'',pathMatch:'full',redirectTo:'dashboard'},
@@ -18,7 +19,8 @@ const catalogRoutes=(preview=false):Routes=>[
  {path:'catalogos',loadComponent:catalogOverview,data:{preview},canActivate:preview?[]:[authGuard]},
  {path:'catalogos/:catalog',loadComponent:catalog,data:{kind:'catalogos',preview,permission:'destinos.edit'},canActivate:preview?[reusedRouteChangesGuard]:[authGuard,reusedRouteChangesGuard],canDeactivate:[unsavedChangesGuard]},
   {path:'destinos/:id/contenido',loadComponent:()=>import('./features/destinations/editor/destination-editor').then(m=>m.DestinationEditor),data:{permission:'destinos.edit'},canActivate:[authGuard],canDeactivate:[unsavedChangesGuard]},
-  {path:'hoteles/:id/editar',loadComponent:()=>import('./features/hotels/editor/hotel-editor').then(m=>m.HotelEditor),data:{permission:'hoteles.edit'},canActivate:[authGuard],canDeactivate:[unsavedChangesGuard]},
+   ...(!preview?[{path:'hoteles/nuevo',loadComponent:hotelEditor,data:{permission:'hoteles.edit'},canActivate:[authGuard],canDeactivate:[unsavedChangesGuard]}]:[]),
+   {path:'hoteles/:id/editar',loadComponent:hotelEditor,data:{permission:'hoteles.edit'},canActivate:[authGuard],canDeactivate:[unsavedChangesGuard]},
  {path:'destinos/:destinationId/hoteles',loadComponent:catalog,data:{kind:'hoteles',preview,permission:'hoteles.view'},canActivate:preview?[]:[authGuard],canDeactivate:[unsavedChangesGuard]},
  {path:'cotizaciones/nueva',loadComponent:()=>import('./features/quotations/quote-editor/quote-editor').then(m=>m.QuoteEditor),data:{permission:'cotizaciones.create',preview},canActivate:preview?[]:[authGuard],canDeactivate:[unsavedChangesGuard]},
  {path:'cotizaciones/:id',loadComponent:()=>import('./features/quotations/quote-detail/quote-detail').then(m=>m.QuoteDetail),data:{permission:'cotizaciones.view',preview},canActivate:preview?[]:[authGuard]},
