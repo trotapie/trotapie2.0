@@ -213,9 +213,11 @@
   font-size: 14px;
 }
 .detail-copy .btn,
+.preview-hotel-action,
 .preview-location-action {
   margin-top: 28px;
 }
+.preview-hotel-action { display: inline-block; }
 .detail-location {
   display: flex;
   align-items: center;
@@ -394,8 +396,8 @@
 .home-copy-pending{visibility:hidden}
 .home-copy-loader{position:absolute;inset:0;display:grid;place-items:center}
 :host(.home-preview){height:auto;overflow:visible;container-type:inline-size}
-:host(.home-preview) .public-shell{height:auto;width:100%;margin:0;padding:16px clamp(16px,4cqw,48px);box-shadow:none;border:1px solid var(--line)}
-:host(.home-preview) .public-main.catalog-scroll-area{padding:0;overflow:visible;scrollbar-gutter:auto}
+:host(.home-preview) .public-shell{height:auto;width:100%;margin:0 auto;padding:16px clamp(16px,4cqw,48px);box-shadow:none;border:1px solid var(--line)}
+:host(.home-preview) .public-main{padding:0;overflow:visible;scrollbar-gutter:auto}
 :host(.home-preview) .home-copy-pending{min-height:240px}
 .preview-hero-action{display:block;margin-top:32px}
 :host(.home-preview) .public-hero-copy h1{font-size:clamp(30px,5cqw,68px)}

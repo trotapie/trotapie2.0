@@ -5,6 +5,7 @@ import ts from 'typescript';
 import {parseTemplate} from '@angular/compiler';
 import {HOME_COPY} from '../supabase/functions/_shared/home-copy.ts';
 import {DESTINATION_COPY} from '../supabase/functions/_shared/destination-copy.ts';
+import {HOTEL_COPY} from '../supabase/functions/_shared/hotel-copy.ts';
 import {changedCopy,cleanCopy,COPY_LANGUAGES,copyGroups,mergeCopyTranslations,QUOTE_COPY,validCopyText} from '../supabase/functions/_shared/quote-copy.ts';
 
 const read=path=>readFileSync(new URL('../'+path,import.meta.url),'utf8');
@@ -74,10 +75,11 @@ test('the inline editor commits the draft on Enter and restores the previous val
 for (const [section,group,updatedKey,sharedGroup,sharedKey] of [
   ['inicio','principal','titulo','destinos','enlace'],
   ['destino','ficha','antetitulo','hoteles','tarjeta'],
+  ['hotel','ficha','descripcion','informacion','cotizar'],
 ]) {
 test(`the Edge Function publishes ${section} in one batch, or leaves it unchanged on failure`,async()=>{
   const source=read('supabase/functions/guardar-textos-cotizacion/index.ts');
-  const code=ts.transpile(source.slice(source.indexOf('const cors')), {target:ts.ScriptTarget.ES2022});
+  const code=ts.transpile(source.slice(source.indexOf('const sections')), {target:ts.ScriptTarget.ES2022});
   let handler, allowed=true, incomplete=false;
   const reads=[], batches=[], publishes=[];
   const old={[group]:{[updatedKey]:'Texto anterior'},[sharedGroup]:{[sharedKey]:'Texto compartido'}};
@@ -98,8 +100,8 @@ test(`the Edge Function publishes ${section} in one batch, or leaves it unchange
       COPY_LANGUAGES.filter(lang=>!incomplete||lang!=='de').map(lang=>[lang,{[group]:{[updatedKey]:`${lang}: Un nuevo viaje`}}])
     )});
   };
-  new Function('Deno','createClient','fetch','changedCopy','cleanCopy','COPY_LANGUAGES','mergeCopyTranslations','QUOTE_COPY','HOME_COPY','DESTINATION_COPY',code)(
-    deno,(_url,_key,options)=>options?user:backend,translate,changedCopy,cleanCopy,COPY_LANGUAGES,mergeCopyTranslations,QUOTE_COPY,HOME_COPY,DESTINATION_COPY,
+  new Function('Deno','createClient','fetch','changedCopy','cleanCopy','COPY_LANGUAGES','mergeCopyTranslations','QUOTE_COPY','HOME_COPY','DESTINATION_COPY','HOTEL_COPY',code)(
+    deno,(_url,_key,options)=>options?user:backend,translate,changedCopy,cleanCopy,COPY_LANGUAGES,mergeCopyTranslations,QUOTE_COPY,HOME_COPY,DESTINATION_COPY,HOTEL_COPY,
   );
   const save=(textos=next)=>handler(new Request('http://localhost',{method:'POST',headers:{Authorization:'Bearer mock'},body:JSON.stringify({seccion:section,version:3,textos})}));
   assert.equal((await save()).status,200);

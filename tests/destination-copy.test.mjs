@@ -26,6 +26,6 @@ test('Public destination and hotel details wait for the shared texts in the acti
   assert.match(source,/this\.destinationSnapshot\(\)\?\.language!==this\.data\.language\.language\(\)/);
   const template=read(page+'.html');
   assert.match(template,/\{\{\s*destinationText\('antetitulo', 'Experience it your way'\)\s*\}\}/);
-  assert.match(template,/\(click\)="mapOpen\.set\(true\)"\s*>\s*\{\{\s*destinationText\('ubicacion', 'View location'\)\s*\}\}/);
+  assert.match(template,/\(click\)="mapOpen\.set\(true\)"\s*>\s*\{\{\s*mode === 'hotel' \? hotelText\('ubicacion','View location'\) : destinationText\('ubicacion', 'View location'\)\s*\}\}/);
   assert.match(read(hotels+'.html'),/\[routerLink\]="\['\/hoteles', destinationId\(\)\]"/);
 });

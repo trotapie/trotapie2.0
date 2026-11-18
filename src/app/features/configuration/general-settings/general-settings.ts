@@ -17,12 +17,13 @@ import {QuoteCopyService, type CopySection, type QuoteCopySnapshot} from '../../
 import {COPY_GROUPS, copyGroups, validCopyText, type CopyBlock} from '../../../../../supabase/functions/_shared/quote-copy';
 import {HOME_COPY} from '../../../../../supabase/functions/_shared/home-copy';
 import {DESTINATION_COPY} from '../../../../../supabase/functions/_shared/destination-copy';
+import {HOTEL_COPY, hotelInheritsDestinationCopy} from '../../../../../supabase/functions/_shared/hotel-copy';
 import {QuoteCopyPreview} from '../quote-copy-preview/quote-copy-preview';
 import {PublicPage} from '../../public/explore/public';
 import {InlineCopy} from '../inline-copy/inline-copy';
 
-const TEXT_GROUPS = {cotizacion: COPY_GROUPS, inicio: copyGroups(HOME_COPY), destino: copyGroups(DESTINATION_COPY)};
-const TEXT_SECTIONS = ['cotizacion', 'inicio', 'destino'] as const;
+const TEXT_GROUPS = {cotizacion: COPY_GROUPS, inicio: copyGroups(HOME_COPY), destino: copyGroups(DESTINATION_COPY), hotel: copyGroups(HOTEL_COPY)};
+const TEXT_SECTIONS = ['cotizacion', 'inicio', 'destino', 'hotel'] as const;
 type TextDraft = {saved: QuoteCopySnapshot|null; textos: CopyBlock; error: string};
 const emptyDraft = (): TextDraft => ({saved: null, textos: {}, error: ''});
 
@@ -44,8 +45,9 @@ export class GeneralSettings implements OnInit {
     {key:'cotizacion',label:'Cotizaciones',icon:'quote'},
     {key:'inicio',label:'Inicio',icon:'home'},
     {key:'destino',label:'Destinos',icon:'map'},
+    {key:'hotel',label:'Hoteles',icon:'hotel'},
   ] as const;
-  private readonly textDrafts=signal({cotizacion:emptyDraft(),inicio:emptyDraft(),destino:emptyDraft()});
+  private readonly textDrafts=signal({cotizacion:emptyDraft(),inicio:emptyDraft(),destino:emptyDraft(),hotel:emptyDraft()});
   readonly textError=computed(()=>this.textDrafts()[this.textScreen()].error);
   readonly savedTexts=computed(()=>this.textDrafts()[this.textScreen()].saved);
   readonly texts=computed(()=>this.textDrafts()[this.textScreen()].textos);
@@ -55,22 +57,35 @@ export class GeneralSettings implements OnInit {
     validCopyText(this.textValue(group.key,field.key,field.text)))));
   isTextDirty(section:CopySection){
     const {saved,textos}=this.textDrafts()[section];
-    return !!saved&&TEXT_GROUPS[section].some(group=>group.fields.some(({key,text})=>
-      (textos[group.key]?.[key]??text)!==(saved.textos[group.key]?.[key]??text)));
+    return !!saved&&TEXT_GROUPS[section].some(group=>group.fields.some(({key,text})=>{
+      const fallback=this.textFallback(section,group.key,key,text);
+      return (textos[group.key]?.[key]??fallback)!==(saved.textos[group.key]?.[key]??fallback);
+    }));
   }
   private updateTextDraft(section:CopySection, patch:Partial<TextDraft>){
     this.textDrafts.update(drafts=>({...drafts,[section]:{...drafts[section],...patch}}));
   }
-  textValue(group:string,key:string,fallback:string){return this.texts()[group]?.[key]??fallback;}
+  private textFallback(section:CopySection,group:string,key:string,fallback:string){
+    return section==='hotel' && hotelInheritsDestinationCopy(group,key)
+      ? this.textDrafts().destino.saved?.textos[group]?.[key]??fallback : fallback;
+  }
+  textValue(group:string,key:string,fallback:string){
+    return this.texts()[group]?.[key]??this.textFallback(this.textScreen(),group,key,fallback);
+  }
   setText(group:string,key:string,value:string){
     const textos=this.texts();
     this.updateTextDraft(this.textScreen(),{textos:{...textos,[group]:{...textos[group],[key]:value}}});
   }
   private textOverrides():CopyBlock{
     const result:CopyBlock={};
-    for(const group of TEXT_GROUPS[this.textScreen()]) for(const field of group.fields){
+    const section=this.textScreen();
+    for(const group of TEXT_GROUPS[section]) for(const field of group.fields){
       const value=this.textValue(group.key,field.key,field.text).trim();
-      if(value!==field.text)(result[group.key]??={})[field.key]=value;
+      const fallback=this.textFallback(section,group.key,field.key,field.text);
+      // Keep a saved override even if Destinos later publishes the same text.
+      const unchangedInheritedOverride=section==='hotel' && hotelInheritsDestinationCopy(group.key,field.key)
+        && this.savedTexts()?.textos[group.key]?.[field.key]===value;
+      if(value!==fallback||unchangedInheritedOverride)(result[group.key]??={})[field.key]=value;
     }
     return result;
   }

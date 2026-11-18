@@ -30,8 +30,8 @@ h3 { margin:0 0 20px; font-size:20px; letter-spacing:-.03em; }
 .amenity-grid li { display:flex; gap:10px; align-items:flex-start; font-size:14px; line-height:1.6; }
 .amenity-grid tp-icon { color:var(--brand); flex-shrink:0; }
 .hotel-actions { border-top:1px solid var(--line); margin-top:20px; padding-top:20px; display:flex; gap:10px; flex-wrap:wrap; }
-.hotel-actions a { margin-left:auto; }
-@media(max-width:700px) { .hotel-information { padding:20px; border-radius:22px; } .hotel-tabs { display:flex; flex-direction:column; } .accordion-heading { border-radius:16px !important; } .accordion-heading:not(:first-child) { margin-top:8px; } .hotel-tabs button { justify-content:flex-start; padding:12px; } .expand-icon { margin-left:auto; } .hotel-panel { padding:20px 0 12px; } .schedule-grid { grid-template-columns:1fr; gap:10px; } .schedule-grid article { padding:16px; } .schedule-grid strong { font-size:20px; } .amenity-grid { grid-template-columns:repeat(2,minmax(0,1fr)); } .hotel-actions>* { flex:1 1 130px; } .hotel-actions a { margin-left:0; flex-basis:100%; } }
+.hotel-actions :is(a,.preview-quote-action) { margin-left:auto; }
+@media(max-width:700px) { .hotel-information { padding:20px; border-radius:22px; } .hotel-tabs { display:flex; flex-direction:column; } .accordion-heading { border-radius:16px !important; } .accordion-heading:not(:first-child) { margin-top:8px; } .hotel-tabs button { justify-content:flex-start; padding:12px; } .expand-icon { margin-left:auto; } .hotel-panel { padding:20px 0 12px; } .schedule-grid { grid-template-columns:1fr; gap:10px; } .schedule-grid article { padding:16px; } .schedule-grid strong { font-size:20px; } .amenity-grid { grid-template-columns:repeat(2,minmax(0,1fr)); } .hotel-actions>* { flex:1 1 130px; } .hotel-actions :is(a,.preview-quote-action) { margin-left:0; flex-basis:100%; } }
 @media(max-width:380px) { .amenity-grid { grid-template-columns:1fr; } }
 @media(prefers-reduced-motion:reduce) { .hotel-panel-collapse,.expand-icon { transition:none; } }
 
