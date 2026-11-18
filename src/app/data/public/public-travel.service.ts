@@ -13,8 +13,8 @@ export class PublicTravelService {
   backend = inject(ClientService);
   language = inject(LanguageService);
   private injector = inject(Injector);
-  cached<T>(key: string, load: () => Promise<T>, ttl = 120_000) {
-    return this.backend.cache.get('public:' + this.language.language() + ':' + key, load, ttl);
+  cached<T>(key: string, load: () => Promise<T>, ttl = 120_000, language = this.language.language()) {
+    return this.backend.cache.get('public:' + language + ':' + key, load, ttl);
   }
   hotels = {
     infoHotel: async (id: number, lang: string) => {
@@ -180,7 +180,7 @@ export class PublicTravelService {
   }
 
   /** Cache the small ID pool; retrieve translated details for just the four chosen hotels. */
-  async featuredHotels(destinationId: number): Promise<Page> {
+  async featuredHotels(destinationId: number, language = this.language.language()): Promise<Page> {
     const statusAvailable=await this.hotelStatusAvailable();
     const ids = await this.backend.cache.get(
       'public:hotel-ids:' + destinationId,
@@ -214,7 +214,7 @@ export class PublicTravelService {
     if(statusAvailable)detailsQuery=detailsQuery.eq('activo',true);
     const [result, languageId] = await Promise.all([
       detailsQuery,
-      this.hotelLanguageId(),
+      this.hotelLanguageId(language),
     ]);
     if (result.error) throw result.error;
     const records = new Map(
@@ -230,20 +230,21 @@ export class PublicTravelService {
     };
   }
 
-  private hotelLanguageId() {
+  private hotelLanguageId(language = this.language.language()) {
     return this.cached(
       'language-id',
       async () => {
-        if (this.language.language() === 'es') return 1;
+        if (language === 'es') return 1;
         const result = await this.backend.client
           .from('idiomas')
           .select('id')
-          .eq('codigo', this.language.language())
+          .eq('codigo', language)
           .maybeSingle();
         if (result.error) throw result.error;
         return result.data?.id || 1;
       },
       300_000,
+      language,
     );
   }
 

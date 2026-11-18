@@ -4,7 +4,7 @@ import {ClientService} from '../../../core/services/client.service';
 import {COPY_LANGUAGES, type CopyBlock} from '../../../../../supabase/functions/_shared/quote-copy';
 
 export interface QuoteCopySnapshot {textos: CopyBlock; version: number}
-export type CopySection = 'cotizacion' | 'inicio';
+export type CopySection = 'cotizacion' | 'inicio' | 'destino';
 const section = 'cotizacion';
 const cachePrefix = 'quote-copy:';
 

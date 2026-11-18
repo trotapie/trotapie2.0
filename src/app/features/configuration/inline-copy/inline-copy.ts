@@ -12,7 +12,7 @@ export class InlineCopy {
   readonly value = input.required<string>();
   readonly busy = input(false);
   readonly icon = input('');
-  readonly variant = input<'primary'|'secondary'|undefined>();
+  readonly variant = input<'primary'|'secondary'|'quiet'|undefined>();
   readonly valueChanged = output<string>();
   readonly editing = signal<{previous:string; value:string}|null>(null);
   readonly limit = COPY_LIMIT;

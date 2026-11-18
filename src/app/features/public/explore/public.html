@@ -1,16 +1,16 @@
 <div class="public-shell">
-  @if(!homeEditor()){
+  @if(!isCopyPreview()){
   <tp-public-navigation [english]="data.language.language() === 'en'" [activeSection]="activeSection()" (homeSelected)="navigateHome($event)" (destinationsSelected)="navigateDestinations($event)" (languageChanged)="load()" (menuChanged)="mobileMenuOpen.set($event)" />
   }
   <div class="public-scroll-region" [inert]="mobileMenuOpen()">
-  @if(homeCopyPending() || (homeEditor() && loading())){
+  @if(copyPending()){
     <div class="home-copy-loader" aria-busy="true"><tp-state mode="loading"/></div>
   }
-  <div #scrollArea class="public-main" [attr.id]="homeEditor()?null:'main-content'" [attr.role]="homeEditor()?'region':'main'"
-    [attr.aria-label]="homeEditor()?'Vista editable de Inicio':null" [attr.lang]="homeEditor()?'es':data.language.language()"
+  <div #scrollArea class="public-main" [attr.id]="isCopyPreview()?null:'main-content'" [attr.role]="isCopyPreview()?'region':'main'"
+    [attr.aria-label]="destinationEditor()?'Vista editable de Destinos':homeEditor()?'Vista editable de Inicio':null" [attr.lang]="isCopyPreview()?'es':data.language.language()"
     [class.catalog-scroll-area]="mode==='home'||mode==='destinos'||mode==='hoteles'"
-    [class.home-copy-pending]="homeCopyPending() || (homeEditor() && loading())"
-    [inert]="homeCopyPending() || (homeEditor() && loading())" (scroll)="updateActiveSection()">
+    [class.home-copy-pending]="copyPending()"
+    [inert]="copyPending()" (scroll)="updateActiveSection()">
     @if (mode !== 'home' && mode !== 'destino' && mode !== 'hotel') {
       <tp-back-button [label]="text('Regresar', 'Back')" />
     }
@@ -47,21 +47,22 @@
       </section>
     }
     @if (mode === 'destino' || mode === 'hotel') {
-      <a
+      @if(!destinationEditor()){<a
         tpButton
         icon="left"
         variant="back"
         [routerLink]="mode === 'hotel' ? returnUrl : '/destinos'"
         >{{ text('Volver al catálogo', 'Back to catalog') }}</a
-      >
-      @if (detail()) {
+      >}
+      @if ((destinationEditor() ? destinationPreviewDetail() : detail()); as record) {
         <section class="detail-hero">
           <div class="detail-photo" [class.destination-composition]="mode==='destino'">
             @if (mode === 'destino') {
               <tp-photo-carousel
                 [photos]="destinationPhotos()"
-                [label]="detail().nombre"
-                [autoplay]="!mapOpen()"
+                 [label]="record.nombre"
+                 [inert]="!!destinationEditor()"
+                 [autoplay]="!destinationEditor() && !mapOpen()"
                 [english]="data.language.language() === 'en'"
               />
             } @else if (cover()?.url_imagen) {
@@ -73,11 +74,15 @@
             }
           </div>
           <div class="detail-copy">
-            <span class="eyebrow">{{
-              text('Para vivirlo a tu manera', 'Experience it your way')
-            }}</span>
-            <h1>{{ detail().nombre || detail().nombre_hotel }}</h1>
-            @if (mode === 'destino') { <p>{{ detail().detalle?.descripcion_corta || detail().descripcion || '' }}</p> }
+             <span class="eyebrow">
+               @if(destinationEditor(); as editor){
+                 <ng-container *ngTemplateOutlet="editor; context:destinationField('antetitulo')"/>
+               } @else {
+                 {{ destinationText('antetitulo', 'Experience it your way') }}
+               }
+             </span>
+             <h1>{{ record.nombre || record.nombre_hotel }}</h1>
+             @if (mode === 'destino') { <p>{{ record.detalle?.descripcion_corta || record.descripcion || '' }}</p> }
             @else { <p>{{ text('Descubre los horarios, servicios y detalles para planear tu próxima estancia.', 'Explore times, services and details to plan your next stay.') }}</p> }
             @if (mode === 'hotel') {
               <a tpButton variant="primary" icon="quote" [routerLink]="['/solicitar', id]">{{
@@ -85,7 +90,9 @@
               }}</a>
             }
             <div class="detail-location">
-              @if (detail().ubicacion) {
+               @if(destinationEditor(); as editor){
+                 <span class="preview-location-action"><ng-container *ngTemplateOutlet="editor; context:destinationField('ubicacion')"/></span>
+               } @else if (record.ubicacion) {
                 <button
                   tpButton
                   variant="quiet"
@@ -93,7 +100,7 @@
                   type="button"
                   (click)="mapOpen.set(true)"
                 >
-                  {{ text('Ver ubicación', 'View location') }}
+                    {{ destinationText('ubicacion', 'View location') }}
                 </button>
               } @else {
                 <tp-icon name="pin" /><span>{{
@@ -111,34 +118,37 @@
             <app-imagenes-carrusel [imagenesCargadas]="detail().imagenes" [hotel]="detail()" [soloClasificadas]="true" layout="grid"/>
           </section>
         }
-        @if (mode === 'destino' && detail().detalle?.descripcion_larga) {
+         @if (mode === 'destino' && record.detalle?.descripcion_larga) {
           <section class="detail-description">
             <h2>
               {{
-                detail().detalle.titulo_descripcion ||
+                 record.detalle.titulo_descripcion ||
                   text('Descubre el destino', 'Discover the destination')
               }}
             </h2>
-            <p>{{ detail().detalle.descripcion_larga }}</p>
+             <p>{{ record.detalle.descripcion_larga }}</p>
           </section>
         }
       }
     }
     @if (mode === 'destino') {
-      @if (loading()) {
+       @if (loading() && !destinationEditor()) {
         <tp-state mode="loading" />
-      } @else if (error()) {
+       } @else if (error() && !destinationEditor()) {
         <tp-state mode="error" [message]="error()" (retry)="load()" />
       } @else {
-        <tp-destination-facts
+         <tp-destination-facts
+           [inert]="!!destinationEditor()"
           [facts]="detail()?.datos_rapidos || []"
           [location]="detail()?.ubicacion || null"
           [english]="data.language.language() === 'en'"
         />
-        <tp-hotel-suggestions
-          [page]="page()"
-          [destinationId]="id"
-          [english]="data.language.language() === 'en'"
+         <tp-hotel-suggestions
+           [page]="suggestedHotels()"
+           [destinationId]="id"
+           [english]="data.language.language() === 'en'"
+           [copy]="destinationCopy()"
+           [copyEditor]="destinationEditor()"
           (selected)="open($event)"
         />
       }
@@ -292,11 +302,11 @@
       <tp-state mode="error" [message]="error()" (retry)="load()" />
     }
   </div>
-  @if(showBackToTop()&&!homeEditor()&&!homeCopyPending()){
+  @if(showBackToTop()&&!isCopyPreview()&&!copyPending()){
     <button tpButton type="button" class="back-to-top" icon="chevron-up" aria-controls="main-content" (click)="backToTop()">{{text('Volver arriba','Back to top')}}</button>
   }
   </div>
-  @if(!homeEditor()){<tp-public-footer [english]="data.language.language() === 'en'" [inert]="mobileMenuOpen()" />}
+  @if(!isCopyPreview()){<tp-public-footer [english]="data.language.language() === 'en'" [inert]="mobileMenuOpen()" />}
 </div>
 <ng-template #homeCopy let-group="group" let-key="key" let-en="en">
   @if(homeEditor(); as editor){<ng-container *ngTemplateOutlet="editor; context:homeField(group,key)"/>}
@@ -306,7 +316,7 @@
 <ng-template #carouselHeadline><ng-container *ngTemplateOutlet="homeEditor(); context:homeField('carrusel','titulo')"/></ng-template>
 <ng-template #experienceTitle><ng-container *ngTemplateOutlet="homeEditor(); context:homeField('filtros','experiencia')"/></ng-template>
 <ng-template #destinationLabel><ng-container *ngTemplateOutlet="homeEditor(); context:homeField('destinos','enlace')"/></ng-template>
-@if(!homeEditor()){
+@if(!isCopyPreview()){
 <tp-location-map
   [open]="mapOpen()"
   [location]="detail()?.ubicacion || ''"

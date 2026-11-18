@@ -44,11 +44,15 @@
          @if(textScreen()==='cotizacion'){
            <tp-quote-copy-preview [texts]="texts()" [busy]="saving()" (textChanged)="setText($event.group,$event.key,$event.value)"/>
          } @else {
-           <ng-template #editHomeText let-group="group" let-key="key" let-fallback="fallback" let-icon="icon" let-variant="variant">
+           <ng-template #editPublicText let-group="group" let-key="key" let-fallback="fallback" let-icon="icon" let-variant="variant">
              <tp-inline-copy [value]="textValue(group,key,fallback)" [busy]="saving()" [icon]="icon" [variant]="variant"
                (valueChanged)="setText(group,key,$event)"/>
            </ng-template>
-           <tp-public [homeEditor]="editHomeText"/>
+           @if(textScreen()==='inicio'){
+             <tp-public [homeEditor]="editPublicText"/>
+           } @else {
+             <tp-public [destinationEditor]="editPublicText"/>
+           }
          }
          @if(!textValid()){<p class="error-banner" role="alert">Completa los textos sin usar llaves ni variables.</p>}
       } @else {
