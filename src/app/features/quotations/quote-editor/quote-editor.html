@@ -1,8 +1,16 @@
 @if(publicRequest){
  <div class="request-navigation"><tp-public-navigation [english]="data.language.language() === 'en'" (menuChanged)="mobileMenuOpen.set($event)" /></div>
 }
-<div class="quote-editor-shell" [class.public-request]="publicRequest" [attr.lang]="data.language.language()" [inert]="mobileMenuOpen()">
- <tp-page-header [showBack]="!success()" [title]="text(publicRequest?'Tu viaje empieza aquí':multiple?'Nueva comparativa':'Nueva cotización')" [description]="text(publicRequest?'Cuéntanos cómo quieres viajar. Te ayudaremos a encontrar tu estancia.':'Una propuesta clara, desde el primer detalle.')" [eyebrow]="text('Trotapie / Cotizaciones')">
+@if(copyPending()){
+ <div [class.public-request]="publicRequest" [attr.lang]="data.language.language()" [inert]="mobileMenuOpen()" aria-busy="true">
+  <tp-state mode="loading"/>
+ </div>
+}
+<div class="quote-editor-shell" [class.public-request]="publicRequest" [attr.lang]="data.language.language()" [inert]="mobileMenuOpen()" [hidden]="copyPending()">
+ <tp-page-header [showBack]="!success()"
+  [title]="publicRequest ? sharedText('Nueva cotización','Tu viaje empieza aquí') : text(multiple?'Nueva comparativa':'Nueva cotización')"
+  [description]="publicRequest ? sharedText('Una propuesta clara, desde el primer detalle.','Cuéntanos cómo quieres viajar. Te ayudaremos a encontrar tu estancia.') : text('Una propuesta clara, desde el primer detalle.')"
+  [eyebrow]="text('Trotapie / Cotizaciones')">
   @if(!success()){
    <a tpButton variant="back" icon="left" [historyBack]="!publicRequest" [routerLink]="publicRequest ? (destinationId ? '/hoteles/'+destinationId : '/hoteles') : (preview ? '/vista-previa/cotizaciones' : '/admin/cotizaciones')">{{text(publicRequest?'Regresar al catálogo':'Regresar')}}</a>
   }
@@ -40,13 +48,13 @@
       <tp-field [label]="text('Teléfono')" forId="quote-phone" [required]="true"><input id="quote-phone" name="phone" type="tel" [(ngModel)]="phone" required autocomplete="tel"/></tp-field>
       <tp-field [label]="text('Correo electrónico')" forId="quote-email"><input id="quote-email" name="email" type="email" [(ngModel)]="email" email autocomplete="email"/></tp-field>
       <div class="quote-stay-row">
-        <app-date-range-filter class="quote-stay-field" [label]="text('Fechas del viaje')" startLabel="Fecha de entrada" endLabel="Fecha de salida" inputId="quote-stay" name="stayDates" [min]="today" [(ngModel)]="stayDates" [mostrarEstadia]="false" [minNights]="1" [required]="true" [disabled]="busy()"/>
+         <app-date-range-filter class="quote-stay-field" [label]="text('Fechas del viaje')" [startLabel]="text('Fecha de entrada')" [endLabel]="text('Fecha de salida')" [rangePlaceholder]="text('Seleccionar')" inputId="quote-stay" name="stayDates" [min]="today" [(ngModel)]="stayDates" [mostrarEstadia]="false" [minNights]="1" [required]="true" [disabled]="busy()"/>
         @if(start && end && nightCount()>0){
-          <output class="quote-nights" for="quote-stay" aria-live="polite"><tp-icon name="moon" aria-hidden="true"/><span>{{text(nightCount()===1?'{count} noche':'{count} noches',{count:nightCount()})}}</span></output>
+           <output class="quote-nights" for="quote-stay" aria-live="polite"><tp-icon name="moon" aria-hidden="true"/><span>{{countText(nightCount(),'noche','noches',nightCount()===1?'{count} noche':'{count} noches')}}</span></output>
         }
       </div>
     </div>
-    @if(limitsReady()){<div class="room-section"><h2>{{text('¿Quiénes viajan?')}}</h2><p>{{text('Indica la distribución y la edad de cada menor al viajar.')}}</p><tp-room-picker [rooms]="rooms()" [roomTypes]="roomTypes()" [maxRooms]="roomLimits().maxRooms" [maxPeoplePerRoom]="roomLimits().maxPeoplePerRoom" [showConfigurationHints]="!publicRequest" (roomsChange)="rooms.set($event)"/></div>}
+     @if(limitsReady()){<div class="room-section"><h2>{{text('¿Quiénes viajan?')}}</h2><p>{{text('Indica la distribución y la edad de cada menor al viajar.')}}</p><tp-room-picker [rooms]="rooms()" [roomTypes]="roomTypes()" [maxRooms]="roomLimits().maxRooms" [maxPeoplePerRoom]="roomLimits().maxPeoplePerRoom" [showConfigurationHints]="!publicRequest" [copy]="copy()" (roomsChange)="rooms.set($event)"/></div>}
   }
  @if(step()===1){<div class="panel-heading"><div><h2>{{text(multiple?'Opciones para comparar':'Encuentra la estancia ideal')}}</h2><p>{{text(multiple?'Selecciona dos o más hoteles para ofrecer alternativas.':'Elige un destino, hotel y régimen.')}}</p></div><tp-icon name="hotel"/></div>
  @if(!publicRequest){<app-tp-select-search [label]="text('Destino')" name="destinationId" [options]="destinationOptions()" [(ngModel)]="destinationId" (ngModelChange)="loadHotels()" [placeholder]="text('Seleccionar destino')" [searchPlaceholder]="text('Buscar destino')" [emptyMessage]="text('No encontramos destinos con ese nombre.')" [showClear]="false" [required]="true" [disabled]="busy() || loadingHotels()"/>}
@@ -56,15 +64,17 @@
  @else if(!regimeLoading()[hotel.id] && !regimeOptions()[hotel.id]?.length){<p class="regime-message">{{text('Este hotel no tiene regímenes configurados. Tu asesor confirmará las opciones.')}}</p>}
  </div>@if(multiple){<tp-field [label]="text('Precio de la opción (MXN)')" [forId]="'price-'+hotel.id"><input [id]="'price-'+hotel.id" [name]="'price-'+hotel.id" type="number" min="0" [(ngModel)]="hotelPrices[hotel.id]"/></tp-field>}</div>}</article>}@empty{<tp-state [title]="text('Elige un destino para ver sus hoteles')" [message]="text('Tu selección se conserva mientras preparas la propuesta.')"/>}</div>@if(!publicRequest&&(hotelPage+1)*24<hotelTotal){<button tpButton icon="plus" type="button" (click)="loadHotels(true)">{{text('Ver más hoteles')}}</button>}}
  }
- @if(step()===2){<div class="panel-heading"><div><h2>{{text('Todo listo para el siguiente paso')}}</h2><p>{{text('Revisa la información antes de registrar la solicitud.')}}</p></div><tp-icon name="check"/></div><dl class="meta-grid"><div><dt>{{text('Cliente')}}</dt><dd>{{name}}</dd></div><div><dt>{{text('Contacto')}}</dt><dd>{{phone}}<br/>{{email}}</dd></div><div><dt>{{text('Estancia')}}</dt><dd>{{start}} → {{end}}</dd></div><div><dt>{{text('Distribución')}}</dt><dd>{{text(nightCount()===1?'{count} noche':'{count} noches',{count:nightCount()})}} · {{text(rooms().length===1?'{count} habitación':'{count} habitaciones',{count:rooms().length})}}</dd></div></dl><div class="review-hotels">@for(h of selectedHotels();track h.id){<div><tp-icon name="hotel"/><strong>{{h.title}}</strong><span>{{hotelPrices[h.id] ? '$'+hotelPrices[h.id]+' MXN':text('Precio por confirmar')}}</span></div>}</div><tp-field [label]="text('Peticiones especiales')" forId="quote-notes" [hint]="text('Comparte necesidades de accesibilidad o detalles que debamos considerar.')"><textarea id="quote-notes" name="notes" [(ngModel)]="notes"></textarea></tp-field>}
-    <div class="dialog-actions">@if(step()>0){<button tpButton icon="left" type="button" [disabled]="busy()" (click)="step.set(step()-1)">{{text('Anterior')}}</button>}@if(step()<2){<button tpButton icon="right" variant="primary" type="button" [disabled]="form.invalid || !configuredRoomsValid() || (step()===1 && !regimesReady())" (click)="next()">{{text('Continuar')}}</button>}@else{<button tpButton icon="check" variant="primary" type="submit" [busy]="busy()" [disabled]="busy()||preview||!configuredRoomsValid()">{{text(busy()?'Registrando…':publicRequest?'Enviar solicitud':'Crear propuesta')}}</button>}</div>
+  @if(step()===2){<div class="panel-heading"><div><h2>{{text('Todo listo para el siguiente paso')}}</h2><p>{{text('Revisa la información antes de registrar la solicitud.')}}</p></div><tp-icon name="check"/></div><dl class="meta-grid"><div><dt>{{text('Cliente')}}</dt><dd>{{name}}</dd></div><div><dt>{{text('Contacto')}}</dt><dd>{{phone}}<br/>{{email}}</dd></div><div><dt>{{text('Estancia')}}</dt><dd>{{start}} → {{end}}</dd></div><div><dt>{{text('Distribución')}}</dt><dd>{{countText(nightCount(),'noche','noches',nightCount()===1?'{count} noche':'{count} noches')}} · {{countText(rooms().length,'habitacion','habitaciones',rooms().length===1?'{count} habitación':'{count} habitaciones')}}</dd></div></dl><div class="review-hotels">@for(h of selectedHotels();track h.id){<div><tp-icon name="hotel"/><strong>{{h.title}}</strong><span>{{hotelPrices[h.id] ? '$'+hotelPrices[h.id]+' MXN':text('Precio por confirmar')}}</span></div>}</div><tp-field [label]="text('Peticiones especiales')" forId="quote-notes" [hint]="text('Comparte necesidades de accesibilidad o detalles que debamos considerar.')"><textarea id="quote-notes" name="notes" [(ngModel)]="notes"></textarea></tp-field>}
+    <div class="dialog-actions">@if(step()>0){<button tpButton icon="left" type="button" [disabled]="busy()" (click)="step.set(step()-1)">{{text('Anterior')}}</button>}@if(step()<2){<button tpButton icon="right" variant="primary" type="button" [disabled]="form.invalid || !configuredRoomsValid() || (step()===1 && !regimesReady())" (click)="next()">{{text('Continuar')}}</button>}@else{<button tpButton icon="check" variant="primary" type="submit" [busy]="busy()" [disabled]="busy()||preview||!configuredRoomsValid()">{{busy() ? text('Registrando…') : publicRequest ? sharedText('Crear propuesta','Enviar solicitud') : text('Crear propuesta')}}</button>}</div>
   </section><aside class="panel quote-summary"><span class="eyebrow">{{text('Tu propuesta')}}</span><h2>{{text(multiple?'Más opciones. Mejores decisiones.':'Un viaje a su medida.')}}</h2>
   @if(publicRequest && selectedHotels().length){
     <section class="request-hotel" [attr.aria-label]="text('Hotel seleccionado')" aria-live="polite">
       @for(hotel of selectedHotels();track hotel.id){<strong>{{hotel.title}}</strong>}
     </section>
   }
- <div><tp-icon name="calendar"/><span>{{text(nightCount()===1?'{count} noche':'{count} noches',{count:nightCount()})}}</span></div><div><tp-icon name="people"/><span>{{text(rooms().reduce(totalGuests,0)===1?'{count} persona':'{count} personas',{count:rooms().reduce(totalGuests,0)})}}</span></div><div><tp-icon name="hotel"/><span>{{text(selectedHotels().length===1?'{count} hotel seleccionado':'{count} hoteles seleccionados',{count:selectedHotels().length})}}</span></div><p>{{text('Las cotizaciones son propuestas. Los precios se confirman con tu asesor.')}}</p></aside>
+  @let guests = rooms().reduce(totalGuests,0);
+  @let hotelsSelected = selectedHotels().length;
+  <div><tp-icon name="calendar"/><span>{{countText(nightCount(),'noche','noches',nightCount()===1?'{count} noche':'{count} noches')}}</span></div><div><tp-icon name="people"/><span>{{countText(guests,'persona','personas',guests===1?'{count} persona':'{count} personas')}}</span></div><div><tp-icon name="hotel"/><span>{{countText(hotelsSelected,'hotel','hoteles',hotelsSelected===1?'{count} hotel seleccionado':'{count} hoteles seleccionados')}}</span></div><p>{{text('Las cotizaciones son propuestas. Los precios se confirman con tu asesor.')}}</p></aside>
  </form>
  }
 </div>

@@ -5,3 +5,7 @@ major_version = 17
 
 [db.seed]
 enabled = false
+
+[functions.guardar-textos-cotizacion]
+# The function validates the access token with Auth and checks the admin role.
+verify_jwt = false

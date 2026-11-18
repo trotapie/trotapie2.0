@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import ts from 'typescript';
 import {validRooms} from '../src/app/features/quotations/models/room.ts';
+import {copyOverride} from '../supabase/functions/_shared/quote-copy.ts';
 
 const limits={maxRooms:8,maxPeoplePerRoom:8};
 const room=(adults,children)=>({adults,children,childAges:Array(children).fill(5)});
@@ -19,7 +20,7 @@ test('combined adults and children must fit the configured maximum',()=>{
 const source=readFileSync(new URL('../src/app/features/quotations/components/room-picker/room-picker.ts',import.meta.url),'utf8');
 const code=ts.transpile(source.slice(source.indexOf('export class')).replace('export class','class'),{target:ts.ScriptTarget.ES2022});
 const signal=initial=>{let value=initial;return Object.assign(()=>value,{set:next=>value=next,update:fn=>value=fn(value)});};
-const Picker=new Function('inject','LanguageService','model','input','computed','reconcileRoom',`${code};return RoomPicker;`)(()=>({formatText:text=>text}),null,signal,signal,fn=>fn,room=>room);
+const Picker=new Function('inject','LanguageService','model','input','computed','reconcileRoom','copyOverride',`${code};return RoomPicker;`)(()=>({formatText:text=>text}),null,signal,signal,fn=>fn,room=>room,copyOverride);
 test('picker offers only combinations within the configured capacity',()=>{
   const picker=new Picker();
   assert.equal(picker.childOptions(room(6,0)).at(-1).value,2);

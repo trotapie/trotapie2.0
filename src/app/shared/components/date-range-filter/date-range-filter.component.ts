@@ -37,6 +37,7 @@ export class DateRangeFilterComponent implements ControlValueAccessor, Validator
   @Input() label = 'Rango de fechas';
   @Input() startLabel = '';
   @Input() endLabel = '';
+  @Input() rangePlaceholder = '';
   @Input() mostrarEstadia = false;
   @Input() min: Date | string | null = null;
   @Input() max: Date | string | null = null;

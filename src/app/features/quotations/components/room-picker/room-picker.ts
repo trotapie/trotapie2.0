@@ -5,11 +5,17 @@ import {TpSelectSearchComponent} from '../../../../shared/components/tp-select-s
 import {Button} from '../../../../shared/components/button/button';
 import {Room} from '../../models/room';
 import {RoomType,availableRoomTypes,reconcileRoom,selectRoomType} from '../../models/room-configuration';
+import {copyOverride, type CopyBlock} from '../../../../../../supabase/functions/_shared/quote-copy';
 
 @Component({selector:'tp-room-picker',imports:[FormsModule,TpSelectSearchComponent,Button],templateUrl:'./room-picker.html',styleUrl:'./room-picker.scss'})
 export class RoomPicker {
   private language=inject(LanguageService);
-  text(es:string,params:Record<string,string|number>={}){return this.language.formatText(es,params);}
+  copy=input<CopyBlock>({});
+  text(es:string,params:Record<string,string|number>={}){return copyOverride(this.copy(),es)??this.language.formatText(es,params);}
+  numbered(key:'titulo'|'edad',fallback:string,number:number){
+    const override=this.copy()['habitaciones']?.[key];
+    return override?`${override} ${new Intl.NumberFormat(this.language.language()).format(number)}`:this.text(fallback,{number});
+  }
   rooms=model<Room[]>([{adults:2,children:0,childAges:[]}]);
   roomTypes=input<RoomType[]>([]);
   showConfigurationHints=input(false);

@@ -1,4 +1,7 @@
 import {QuoteSettingsService} from '../services/quote-settings.service';
+import {effect} from '@angular/core';
+import {QuoteCopyService} from '../services/quote-copy.service';
+import {copyOverride, type CopyBlock} from '../../../../../supabase/functions/_shared/quote-copy';
 import {quoteAdminSegment} from '../models/quote-route';
 import {DEFAULT_ROOM_LIMITS} from '../models/room';
 import {PublicNavigation} from '../../../shared/components/public-navigation/public-navigation';
@@ -20,13 +23,41 @@ import {Component,inject,signal,computed,OnInit} from '@angular/core';import {Ro
   roomLimits=signal({...DEFAULT_ROOM_LIMITS});
   limitsReady=signal(false);
   configuredRoomsValid=computed(()=>this.limitsReady()&&validRooms(this.rooms(),this.roomLimits()));
- text(es:string,params:Record<string,string|number>={}){return this.data.language.formatText(es,params);}
+  text(es:string,params:Record<string,string|number>={}){
+    return copyOverride(this.copy(),es) ?? this.data.language.formatText(es,params);
+  }
+  sharedText(es:string,fallback:string){
+    return copyOverride(this.copy(),es) ?? this.data.language.formatText(fallback);
+  }
+  countText(count:number,singular:string,plural:string,label:string){
+    const override=this.copy()['resumen']?.[count===1?singular:plural];
+    return override ? `${new Intl.NumberFormat(this.data.language.language()).format(count)} ${override}` : this.text(label,{count});
+  }
  private changes=new ChangeTracker();
  private draft(){return {name:this.name,treatmentId:this.treatmentId,email:this.email,phone:this.phone,start:this.start,end:this.end,notes:this.notes,destinationId:this.destinationId,employeeId:this.employeeId,rooms:this.rooms(),hotels:this.selectedHotels().map(h=>h.id),regimes:this.hotelRegimes,prices:this.hotelPrices};}
  private pendingChanges=protectUnsavedChanges(()=>!this.success()&&this.changes.hasChanges(this.draft()),()=>this.busy());
  canDeactivate(){return this.pendingChanges.confirm();}
   data=inject(TravelDataService);workflow=inject(QuoteWorkflowService);route=inject(ActivatedRoute);publicRequest=!!this.route.snapshot.data['public'];preview=!!this.route.snapshot.data['preview'];multiple=this.route.snapshot.queryParamMap.get('tipo')==='comparativa';hotelId=Number(this.route.snapshot.paramMap.get('hotelId'));step=signal(0);busy=signal(false);loading=signal(true);loadingHotels=signal(false);error=signal('');success=signal(false);destinations=signal<TravelRecord[]>([]);hotels=signal<TravelRecord[]>([]);selectedHotels=signal<TravelRecord[]>([]);regimeOptions=signal<Record<string,TpSelectSearchOption[]>>({});regimeLoading=signal<Record<string,boolean>>({});regimeErrors=signal<Record<string,string>>({});employees=signal<any[]>([]);rooms=signal<Room[]>([{adults:2,children:0,childAges:[]}]);ages=Array.from({length:18},(_,i)=>i);today=new Intl.DateTimeFormat('en-CA',{timeZone:'America/Mexico_City'}).format(new Date());name='';email='';phone='';start='';end='';notes='';destinationId:number|null=null;employeeId:number|null=null;hotelRegimes:Record<string,number|null>={};hotelPrices:Record<string,number|null>={};hotelPage=0;hotelTotal=0;roomValidity=computed(()=>validRooms(this.rooms()));nightCount(){return nights(this.start,this.end);}
- destinationOptions=computed<TpSelectSearchOption[]>(()=>this.destinations().map(destination=>({value:Number(destination.id),label:destination.title})));
+  destinationOptions=computed<TpSelectSearchOption[]>(()=>this.destinations().map(destination=>({value:Number(destination.id),label:destination.title})));
+  private readonly copyService=inject(QuoteCopyService);
+  private readonly loadedCopy=signal<{language:string;textos:CopyBlock}|null>(null);
+  readonly copyPending=computed(()=>!this.preview&&this.loadedCopy()?.language!==this.data.language.language());
+  readonly copy=computed<CopyBlock>(()=>{
+    const current=this.loadedCopy();
+    return current?.language===this.data.language.language()?current.textos:{};
+  });
+  constructor(){
+    if(this.preview)return;
+    effect(onCleanup=>{
+      const language=this.data.language.language();
+      this.loadedCopy.set(null);
+      let current=true;
+      onCleanup(()=>{current=false;});
+      void this.copyService.loadLanguage(language).then(textos=>{
+        if(current)this.loadedCopy.set({language,textos});
+      }).catch(()=>{if(current)this.loadedCopy.set({language,textos:{}});});
+    });
+  }
   employeeOptions=computed<TpSelectSearchOption[]>(()=>this.employees().map(employee=>({value:employee.id,label:employee.nombre})));
   treatmentId:number|null=null;
   roomTypes=signal<RoomType[]>([]);

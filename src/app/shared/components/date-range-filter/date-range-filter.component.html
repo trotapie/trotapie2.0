@@ -3,10 +3,10 @@
   <div [class.date-range-fields]="!single">
     <button #startTrigger type="button" [id]="inputId || labelId+'-start'" [class.date-trigger]="single" [class.placeholder]="single && !value.start" [disabled]="disabled" (click)="abierto ? close() : open('start')" [attr.aria-label]="text(single ? (label || 'Seleccionar fecha') : startLabel || (mostrarEstadia ? 'Fecha de entrada' : 'Fecha de inicio'))" [attr.aria-expanded]="abierto && (single || activeEndpoint==='start')" aria-haspopup="dialog" [attr.aria-controls]="abierto ? panelId : null">
       @if(!single){<small>{{text(startLabel || (mostrarEstadia ? 'Fecha de entrada' : 'Inicio del período'))}}</small>}
-      <span>{{value.start ? formatDate(value.start) : text(single ? 'dd/mm/aaaa' : 'Seleccionar')}}</span>
+       <span>{{value.start ? formatDate(value.start) : single ? text('dd/mm/aaaa') : rangePlaceholder || text('Seleccionar')}}</span>
       <tp-icon name="calendar"/>
     </button>
-    @if(!single){<button #endTrigger type="button" [disabled]="disabled" (click)="abierto ? close() : open('end')" [attr.aria-label]="text(endLabel || (mostrarEstadia ? 'Fecha de salida' : 'Fecha de fin'))" [attr.aria-expanded]="abierto && activeEndpoint==='end'" aria-haspopup="dialog" [attr.aria-controls]="abierto ? panelId : null"><small>{{text(endLabel || (mostrarEstadia ? 'Fecha de salida' : 'Fin'))}}</small><span>{{value.end ? formatDate(value.end) : text('Seleccionar')}}</span><tp-icon name="calendar"/></button>}
+     @if(!single){<button #endTrigger type="button" [disabled]="disabled" (click)="abierto ? close() : open('end')" [attr.aria-label]="text(endLabel || (mostrarEstadia ? 'Fecha de salida' : 'Fecha de fin'))" [attr.aria-expanded]="abierto && activeEndpoint==='end'" aria-haspopup="dialog" [attr.aria-controls]="abierto ? panelId : null"><small>{{text(endLabel || (mostrarEstadia ? 'Fecha de salida' : 'Fin'))}}</small><span>{{value.end ? formatDate(value.end) : rangePlaceholder || text('Seleccionar')}}</span><tp-icon name="calendar"/></button>}
   </div>
   @if(mostrarEstadia && value.start && value.end){<small class="stay-duration" aria-live="polite">{{text(nights(value)===1?'{count} noche':'{count} noches',{count:nights(value)})}}</small>}
 </div>

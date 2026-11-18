@@ -46,7 +46,7 @@ test('French quotation headings, controls, counters and validation use the selec
 test('room occupancy options recompute in the selected language without modifying the draft',()=>{
   const language=new Language();
   const source=read('../src/app/features/quotations/components/room-picker/room-picker.ts');
-  const Picker=new Function('inject','LanguageService','model','input','computed',`${classCode(source,'RoomPicker')};return RoomPicker;`)(()=>language,Language,signal,signal,fn=>fn);
+  const Picker=new Function('inject','LanguageService','model','input','computed','copyOverride',`${classCode(source,'RoomPicker')};return RoomPicker;`)(()=>language,Language,signal,signal,fn=>fn,copyOverride);
   const picker=new Picker();
   const before=structuredClone(picker.rooms());
   assert.equal(picker.adultOptions()[1].label,'2 adultos');
@@ -58,6 +58,10 @@ test('room occupancy options recompute in the selected language without modifyin
   language.language.set('de');
   assert.equal(picker.adultOptions()[1].label,'2 Erwachsene');
   assert.deepEqual(picker.rooms(),before);
+  assert.equal(picker.numbered('titulo','Habitación {number}',2),'Zimmer 2');
+  picker.copy.set({habitaciones:{titulo:'Suite',adultos:'Erwachsene ab 18'}});
+  assert.equal(picker.numbered('titulo','Habitación {number}',2),'Suite 2');
+  assert.equal(picker.text('Adultos'),'Erwachsene ab 18');
 });
 test('Spanish remains unchanged and translated parameters cannot corrupt user text',()=>{
   const language=new Language();
@@ -110,3 +114,4 @@ test('quotation nights appear as a compact output beside the dates, not a separa
   assert.doesNotMatch(template,/forId="quote-nights"|<input[^>]*id="quote-nights"/);
   assert.match(template,/nightCount\(\)===1\?'\{count\} noche':'\{count\} noches'/);
 });
+import {copyOverride} from '../supabase/functions/_shared/quote-copy.ts';

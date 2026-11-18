@@ -1,0 +1,182 @@
+<ng-template #editor let-slot="slot" let-field="field" let-icon="icon" let-variant="variant">
+  <span class="copy-editor" [class.btn]="icon" [class.btn-primary]="variant==='primary'">
+    @if(icon){<tp-icon [name]="icon" aria-hidden="true"/>}
+    <textarea #copyInput class="copy-input" rows="1" [attr.maxlength]="limit" [value]="field.value"
+      [disabled]="busy()" [attr.aria-label]="'Editar: '+(field.previous || field.key)"
+      [attr.aria-invalid]="!valid(field.value) || null"
+      [attr.aria-errormessage]="!valid(field.value) ? 'quote-copy-error' : null"
+      (input)="update(slot,copyInput.value)" (blur)="finish(slot)" (keydown)="onEditorKey($event,slot)"></textarea>
+  </span>
+</ng-template>
+<ng-template #copy let-group="group" let-key="key" let-icon="icon" let-variant="variant">
+  @let value = text(group,key);
+  @let field = editing();
+  <span class="copy-slot" #slot>
+    @if(icon){
+      <button tpButton type="button" class="copy-trigger" [attr.hidden]="field?.slot===slot ? '' : null"
+        [icon]="icon" [variant]="variant || 'secondary'" [disabled]="busy()" [attr.aria-label]="'Editar: '+(value || 'Texto requerido')"
+        (click)="edit(slot,group,key)">{{value || 'Texto requerido'}}</button>
+    } @else {
+      <button type="button" class="copy-target copy-trigger" [attr.hidden]="field?.slot===slot ? '' : null"
+        [disabled]="busy()" [attr.aria-label]="'Editar: '+(value || 'Texto requerido')" (click)="edit(slot,group,key)">{{value || 'Texto requerido'}}</button>
+    }
+    @if(field && field.slot===slot){
+      <ng-container *ngTemplateOutlet="editor;context:{slot,field,icon,variant}"/>
+    }
+  </span>
+</ng-template>
+<ng-template #sampleField let-group="group" let-key="key" let-placeholder="placeholder" let-value="value" let-required="required">
+  <div class="sample-field">
+    <div><ng-container *ngTemplateOutlet="copy;context:{group,key}"/>@if(required){<span class="required"> *</span>}</div>
+    <div class="sample-control" [class.sample-select]="placeholder || value" [class.sample-unavailable]="placeholder==='requiereTipo'">
+      @if(placeholder){<ng-container *ngTemplateOutlet="copy;context:{group,key:placeholder}"/>}
+      @else if(value){<span>{{value}}</span>}
+      @if(placeholder || value){<tp-icon name="chevron-down" aria-hidden="true"/>}
+    </div>
+  </div>
+</ng-template>
+
+<header class="page-heading">
+  <div>
+    <span class="eyebrow"><ng-container *ngTemplateOutlet="copy;context:{group:'encabezado',key:'contexto'}"/></span>
+    <h1><ng-container *ngTemplateOutlet="copy;context:{group:'encabezado',key:'titulo'}"/></h1>
+    <p><ng-container *ngTemplateOutlet="copy;context:{group:'encabezado',key:'descripcion'}"/></p>
+  </div>
+</header>
+
+  <ol class="quote-stepper" aria-label="Pantallas de cotización">
+    @for(key of ['cliente','destino','revision'];track key;let i=$index){
+      @let field = editing();
+      <li [class.is-current]="screen()===i" [class.is-complete]="screen()>i">
+         <button class="step-number" type="button" [attr.aria-current]="screen()===i?'step':null"
+           [attr.aria-label]="'Ver paso '+(i+1)+': '+text('pasos',key)" [title]="'Ver paso '+(i+1)"
+           (click)="screen.set(i)">{{i+1}}</button>
+         <div class="step-copy" #stepSlot>
+           <button class="copy-target copy-trigger step-label" type="button" [attr.hidden]="field?.slot===stepSlot ? '' : null"
+             [disabled]="busy()" [attr.aria-label]="'Editar: '+(text('pasos',key) || 'Texto requerido')"
+             (click)="edit(stepSlot,'pasos',key)">{{text('pasos',key) || 'Texto requerido'}}</button>
+          @if(field && field.slot===stepSlot){
+            <ng-container *ngTemplateOutlet="editor;context:{slot:stepSlot,field}"/>
+          }
+        </div>
+      </li>
+    }
+  </ol>
+
+  <div class="quote-workflow">
+    <section class="panel quote-main">
+      @switch(screen()){
+        @case(0){
+          <div class="panel-heading"><div>
+            <h2><ng-container *ngTemplateOutlet="copy;context:{group:'cliente',key:'titulo'}"/></h2>
+            <p><ng-container *ngTemplateOutlet="copy;context:{group:'cliente',key:'descripcion'}"/></p>
+          </div><tp-icon name="people"/></div>
+          <div class="form-grid">
+            <div class="quote-advisor-field"><ng-container *ngTemplateOutlet="sampleField;context:{group:'cliente',key:'asesor',placeholder:'seleccionarAsesor',required:true}"/></div>
+            <div class="quote-client-name">
+              <ng-container *ngTemplateOutlet="sampleField;context:{group:'cliente',key:'prefijo',placeholder:'sinPrefijo'}"/>
+              <ng-container *ngTemplateOutlet="sampleField;context:{group:'cliente',key:'nombre',required:true}"/>
+            </div>
+            <ng-container *ngTemplateOutlet="sampleField;context:{group:'cliente',key:'telefono',required:true}"/>
+            <ng-container *ngTemplateOutlet="sampleField;context:{group:'cliente',key:'correo'}"/>
+            <div class="quote-stay-row"><div class="quote-stay-field sample-field">
+              <div><ng-container *ngTemplateOutlet="copy;context:{group:'cliente',key:'fechas'}"/><span class="required"> *</span></div>
+              <div class="sample-control sample-dates">
+                @for(key of ['entrada','salida'];track key){
+                  <div><div><small><ng-container *ngTemplateOutlet="copy;context:{group:'cliente',key}"/></small><br><ng-container *ngTemplateOutlet="copy;context:{group:'cliente',key:'seleccionarFecha'}"/></div><tp-icon name="calendar" aria-hidden="true"/></div>
+                }
+              </div>
+            </div></div>
+          </div>
+          <div class="room-section">
+            <h2><ng-container *ngTemplateOutlet="copy;context:{group:'habitaciones',key:'seccion'}"/></h2>
+            <p><ng-container *ngTemplateOutlet="copy;context:{group:'habitaciones',key:'descripcion'}"/></p>
+            <div class="rooms">
+              <section class="room">
+                <header><h3><ng-container *ngTemplateOutlet="copy;context:{group:'habitaciones',key:'titulo'}"/> 1</h3></header>
+                <div class="form-grid">
+                  <ng-container *ngTemplateOutlet="sampleField;context:{group:'habitaciones',key:'adultos',value:'2 adultos'}"/>
+                  <ng-container *ngTemplateOutlet="sampleField;context:{group:'habitaciones',key:'menores',value:'0 menores'}"/>
+                  <ng-container *ngTemplateOutlet="sampleField;context:{group:'habitaciones',key:'tipo',placeholder:'seleccionar',required:true}"/>
+                  <ng-container *ngTemplateOutlet="sampleField;context:{group:'habitaciones',key:'camas',placeholder:'requiereTipo'}"/>
+                </div>
+              </section>
+              <ng-container *ngTemplateOutlet="copy;context:{group:'habitaciones',key:'agregar',icon:'plus'}"/>
+            </div>
+          </div>
+        }
+        @case(1){
+          <div class="panel-heading"><div>
+            <h2><ng-container *ngTemplateOutlet="copy;context:{group:'destino',key:'titulo'}"/></h2>
+            <p><ng-container *ngTemplateOutlet="copy;context:{group:'destino',key:'descripcion'}"/></p>
+          </div><tp-icon name="hotel"/></div>
+          <ng-container *ngTemplateOutlet="sampleField;context:{group:'destino',key:'destino',placeholder:'seleccionar',required:true}"/>
+          <div class="hotel-choices">
+            <article class="selected">
+              <div class="hotel-choice"><tp-icon name="hotel"/><span><strong>Hotel de ejemplo</strong></span><span class="choice-check"><tp-icon name="check"/></span></div>
+              <div class="hotel-choice-fields">
+                <ng-container *ngTemplateOutlet="sampleField;context:{group:'destino',key:'regimen',placeholder:'seleccionarRegimen',required:true}"/>
+              </div>
+            </article>
+            <ng-container *ngTemplateOutlet="copy;context:{group:'destino',key:'masHoteles',icon:'plus'}"/>
+          </div>
+        }
+        @case(2){
+          <div class="panel-heading"><div>
+            <h2><ng-container *ngTemplateOutlet="copy;context:{group:'revision',key:'titulo'}"/></h2>
+            <p><ng-container *ngTemplateOutlet="copy;context:{group:'revision',key:'descripcion'}"/></p>
+          </div><tp-icon name="check"/></div>
+          <dl class="meta-grid">
+            @for(key of ['cliente','contacto','estancia','distribucion'];track key){
+              <div><dt><ng-container *ngTemplateOutlet="copy;context:{group:'revision',key}"/></dt><dd aria-hidden="true">—</dd></div>
+            }
+          </dl>
+          <div class="review-hotels"><div><tp-icon name="hotel"/><strong>Hotel de ejemplo</strong><span><ng-container *ngTemplateOutlet="copy;context:{group:'revision',key:'precio'}"/></span></div></div>
+          <div class="sample-field">
+            <div><ng-container *ngTemplateOutlet="copy;context:{group:'revision',key:'notas'}"/></div>
+            <div class="sample-control"></div>
+            <small><ng-container *ngTemplateOutlet="copy;context:{group:'revision',key:'ayuda'}"/></small>
+          </div>
+        }
+      }
+      <div class="dialog-actions">
+        @if(screen()>0){
+          <button tpButton type="button" icon="left" (click)="screen.set(screen()-1)">{{text('acciones','anterior')}}</button>
+        }
+        @if(screen()<2){
+          <button tpButton type="button" icon="right" variant="primary" (click)="screen.set(screen()+1)">{{text('acciones','continuar')}}</button>
+        } @else {
+          <ng-container *ngTemplateOutlet="copy;context:{group:'acciones',key:'guardar',icon:'check',variant:'primary'}"/>
+        }
+      </div>
+    </section>
+
+    <aside class="panel quote-summary">
+      <span class="eyebrow"><ng-container *ngTemplateOutlet="copy;context:{group:'resumen',key:'antetitulo'}"/></span>
+      <h2><ng-container *ngTemplateOutlet="copy;context:{group:'resumen',key:'titulo'}"/></h2>
+      <div><tp-icon name="calendar"/><span>0 {{text('resumen','noches')}}</span></div>
+      <div><tp-icon name="people"/><span>2 {{text('resumen','personas')}}</span></div>
+      <div><tp-icon name="hotel"/><span>0 {{text('resumen','hoteles')}}</span></div>
+      <p><ng-container *ngTemplateOutlet="copy;context:{group:'resumen',key:'nota'}"/></p>
+    </aside>
+  </div>
+
+  @if(screen()<2){
+    <details class="extra-copy">
+      <summary>Textos de estados y variantes de este paso</summary>
+      <div>
+        @switch(screen()){
+          @case(0){
+            <ng-container *ngTemplateOutlet="copy;context:{group:'cliente',key:'buscarAsesor'}"/>
+            <span><ng-container *ngTemplateOutlet="copy;context:{group:'habitaciones',key:'edad'}"/> 1</span>
+            <ng-container *ngTemplateOutlet="copy;context:{group:'habitaciones',key:'seleccionarCamas'}"/>
+          }
+          @case(1){
+            <ng-container *ngTemplateOutlet="copy;context:{group:'destino',key:'buscar'}"/>
+            <ng-container *ngTemplateOutlet="copy;context:{group:'destino',key:'sinDestino'}"/>
+            <ng-container *ngTemplateOutlet="copy;context:{group:'destino',key:'ayuda'}"/>
+          }
+        }
+      </div>
+    </details>
+  }
