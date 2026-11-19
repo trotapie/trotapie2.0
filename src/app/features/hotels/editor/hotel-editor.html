@@ -59,24 +59,22 @@
         </div>
         <div class="service-section">
           <h3>Actividades y amenidades</h3>
-          @if(isCreating){
-            <div class="amenity-group-control">
-              @if(amenityGroupsLoading()){
-                <p class="section-note" role="status">Cargando grupos de amenidades…</p>
-              } @else if(amenityGroupsError()){
-                <p class="section-note" role="alert">{{amenityGroupsError()}}</p>
-                <button tpButton type="button" icon="refresh" variant="quiet" (click)="loadAmenityGroups()">Reintentar</button>
-              } @else if(!optionsLoading()&&!optionsError()){
-                @if(amenityGroupOptions().length){
-                  <app-tp-select-search label="Aplicar grupo de amenidades" placeholder="Elige un grupo" [options]="amenityGroupOptions()" [showClear]="false" [ngModel]="appliedAmenityGroup()" (selectionChange)="applyAmenityGroup($event)"/>
-                  <p class="section-note">Se marcan las amenidades del grupo. Puedes agregar o quitar cualquiera abajo.</p>
-                  <p class="section-note amenity-group-feedback" role="status">{{amenityGroupMessage()}}</p>
-                } @else {
-                  <p class="section-note">No hay grupos disponibles. Puedes seleccionar las amenidades manualmente.</p>
-                }
+          <div class="amenity-group-control">
+            @if(amenityGroupsLoading()){
+              <p class="section-note" role="status">Cargando grupos de amenidades…</p>
+            } @else if(amenityGroupsError()){
+              <p class="section-note" role="alert">{{amenityGroupsError()}}</p>
+              <button tpButton type="button" icon="refresh" variant="quiet" (click)="loadAmenityGroups()">Reintentar</button>
+            } @else if(!optionsLoading()&&!optionsError()){
+              @if(amenityGroupOptions().length){
+                <app-tp-select-search label="Aplicar grupo de amenidades" placeholder="Elige un grupo" [options]="amenityGroupOptions()" [showClear]="false" [disabled]="saving()||!!createdId()" [ngModel]="appliedAmenityGroup()" (selectionChange)="applyAmenityGroup($event)"/>
+                <p class="section-note">Se agregan las amenidades del grupo sin quitar las que ya seleccionaste.</p>
+                <p class="section-note amenity-group-feedback" role="status">{{amenityGroupMessage()}}</p>
+              } @else {
+                <p class="section-note">No hay grupos disponibles. Puedes seleccionar las amenidades manualmente.</p>
               }
-            </div>
-          }
+            }
+          </div>
           <div class="selection-input-row">
             <app-tp-multiselect label="Amenidades del hotel" placeholder="Seleccionar amenidades" [options]="selectionOptions('activityIds',activities())" [ngModel]="hotel['activityIds']" (ngModelChange)="changeSelection('activityIds',$event)" [disabled]="optionsLoading()||!!optionsError()"/>
             @if(selectionCount('activityIds')>0){<button tpButton type="button" icon="eye" variant="icon" aria-label="Ver actividades y amenidades seleccionadas" title="Ver actividades y amenidades seleccionadas" (click)="selectionPreview.set('activityIds')"></button>}
