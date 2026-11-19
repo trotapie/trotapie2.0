@@ -51,13 +51,13 @@ export class HotelEditor implements OnInit {
   readonly optionsError=signal('');
   readonly optionsLoading=signal(false);
   readonly regimes=signal<TpSelectSearchOption[]>([]);
-  readonly activities=signal<TpSelectSearchOption[]>([]);
+  readonly activities=signal<Array<TpSelectSearchOption & {active?:boolean}>>([]);
   private readonly amenityGroups=signal<AmenityGroup[]>([]);
   readonly amenityGroupsLoading=signal(false);
   readonly amenityGroupsError=signal('');
   readonly appliedAmenityGroup=signal<number|null>(null);
   readonly amenityGroupMessage=signal('');
-  private readonly availableAmenityIds=computed(()=>new Set(this.activities().map(option=>Number(option.value))));
+  private readonly availableAmenityIds=computed(()=>new Set(this.activities().filter(option=>option.active!==false).map(option=>Number(option.value))));
   readonly amenityGroupOptions=computed(()=>this.amenityGroups().flatMap(group=>{
     const count=group.actividad_ids.filter(id=>this.availableAmenityIds().has(id)).length;
     return count?[{value:group.id,label:`${group.nombre} · ${count} ${count===1?'amenidad':'amenidades'}`}]:[];
@@ -121,7 +121,7 @@ export class HotelEditor implements OnInit {
     this.fields.set(hotelsDefinition.fields.filter(field=>!['fondo','ubicacion','galleryUrls','regimen_id'].includes(field.key)));
     void this.loadOptions();
     void this.loadImageTypes();
-    if(this.isCreating)void this.loadAmenityGroups();
+    void this.loadAmenityGroups();
     try{
       const destination=this.route.snapshot.queryParamMap.get('destino');
       const model=this.id===null?newHotelEditorDraft(destination):
@@ -138,7 +138,7 @@ export class HotelEditor implements OnInit {
       const data=this.resources.data;
       const [regimes,activities,discounts,languages]=await Promise.all([
         data.legacy.obtenerRegimenesAdmin(),
-        this.isCreating?this.resources.amenityOptions(true):data.legacy.obtenerActividadesAdmin().then(rows=>rows.map(item=>({value:item.id,label:item.descripcion+(item.activo?'':' (inactiva)')}))),
+        this.isCreating?this.resources.amenityOptions(true):data.legacy.obtenerActividadesAdmin().then(rows=>rows.map(item=>({value:item.id,label:item.descripcion+(item.activo?'':' (inactiva)'),active:item.activo}))),
         data.legacy.obtenerDescuentosAdmin(),
         data.legacy.obtenerIdiomasPreviewAdmin(),
       ]);
@@ -153,7 +153,7 @@ export class HotelEditor implements OnInit {
   }
 
   async loadAmenityGroups(){
-    if(!this.isCreating||this.amenityGroupsLoading())return;
+    if(this.amenityGroupsLoading())return;
     this.amenityGroupsLoading.set(true);this.amenityGroupsError.set('');
     try{
       this.amenityGroups.set(await this.resources.data.catalogs.obtenerGruposAmenidadesAdmin(true));
@@ -164,7 +164,7 @@ export class HotelEditor implements OnInit {
 
   applyAmenityGroup(value:string|number|null){
     const model=this.model();
-    if(!this.isCreating||!model||this.createdId()||this.saving()||this.optionsLoading()||this.optionsError()||this.amenityGroupsLoading()||this.amenityGroupsError())return;
+    if(!model||this.createdId()||this.saving()||this.optionsLoading()||this.optionsError()||this.amenityGroupsLoading()||this.amenityGroupsError())return;
     const group=this.amenityGroups().find(item=>item.id===Number(value));
     if(!group)return;
     const current=hotelIds(model['activityIds']);
