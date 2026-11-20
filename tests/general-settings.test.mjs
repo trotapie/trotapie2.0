@@ -101,7 +101,15 @@ test('settings service updates only the singleton and rejects invalid values bef
 test('configuration management is admin-only even if another role claims the permission',()=>{
   const authSource=source('src/app/core/services/auth.service.ts');
   const code=ts.transpile(authSource.slice(authSource.indexOf('export class AuthService'),authSource.indexOf('export const authGuard')).replace('export class','class'),{target:ts.ScriptTarget.ES2022});
-  const Auth=new Function('inject','signal','ClientService','Router',`${code};return AuthService;`)(()=>({}),signal,null,null);
+  const dependencies={
+    ClientService:{client:{auth:{onAuthStateChange:()=>({data:{subscription:{unsubscribe(){}}}})}}},
+    Router:{},
+    DOCUMENT:{defaultView:null},
+    DestroyRef:{onDestroy(){}},
+  };
+  const names=Object.keys(dependencies);
+  const Auth=new Function('inject','signal',...names,`${code};return AuthService;`)(
+    name=>dependencies[name],signal,...names);
   const auth=new Auth();
   auth.identity.set({role:'cotizador',permissions:['configuracion.manage','cotizaciones.view']});
   assert.equal(auth.hasPermission('configuracion.manage'),false);

@@ -16,6 +16,7 @@ export class Dialog {
   eyebrow = input('Trotapie');
   open = input(false);
   busy = input(false);
+  dismissible = input(true);
   scrollBody = input(true);
   fixedChrome = input(false);
   fullscreenDesktop = input(false);
@@ -42,7 +43,7 @@ export class Dialog {
   }
   cancel(e: Event) {
     e.preventDefault();
-    if (!this.busy()) this.closed.emit();
+    if (this.dismissible() && !this.busy()) this.closed.emit();
   }
   keepFocus(event: KeyboardEvent) {
     if (event.key !== 'Tab' || event.ctrlKey || event.metaKey || event.altKey) return;
@@ -78,6 +79,6 @@ export class Dialog {
     }
   }
   backdrop(e: Event) {
-    if (e.target === this.element()?.nativeElement && !this.busy()) this.closed.emit();
+    if (e.target === this.element()?.nativeElement && this.dismissible() && !this.busy()) this.closed.emit();
   }
 }

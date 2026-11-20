@@ -1,3 +1,4 @@
+@if(preview || !auth.idleExpired()){
 <div class="workspace-shell" [attr.lang]="language.language()">
   <header class="workspace-topbar">
     <a routerLink="/" class="workspace-brand" aria-label="Trotapie, página de inicio"><img src="/brand/iso.png" alt=""/><span>Trotapie<span class="brand-travel">Travel</span></span></a>
@@ -17,3 +18,12 @@
   </main>
 </div>
 <tp-navigation-search [open]="searchOpen()" [entries]="searchEntries()" (closed)="searchOpen.set(false)" />
+@if(!preview){
+  <tp-dialog title="¿Sigues ahí?" eyebrow="Seguridad de tu cuenta" [open]="auth.idleWarning()" [dismissible]="false">
+    <p>Por seguridad, tu sesión se cerrará en menos de 1 minuto por inactividad. Sigue conectado para guardar tus cambios y continuar trabajando.</p>
+    <div class="dialog-actions">
+      <button tpButton type="button" variant="primary" autofocus (click)="auth.keepAdminSessionAlive()">Seguir conectado</button>
+    </div>
+  </tp-dialog>
+}
+}

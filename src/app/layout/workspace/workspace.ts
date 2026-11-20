@@ -13,7 +13,8 @@ import {AuthService} from '../../core/services/auth.service';import {Icon} from 
 import {gsap} from 'gsap';
 import {LanguageService} from '../../core/services/language.service';
 import {UiTextPipe} from '../../shared/pipes/ui-text.pipe';
-@Component({selector:'tp-workspace',imports:[UiTextPipe,NavIndicatorDirective,NavigationSearch,RouterLink,RouterOutlet,Icon,Button,PageMotionDirective,DetailsMotionDirective],templateUrl:'./workspace.html',styleUrl:'./workspace.scss'})
+import {Dialog} from '../../shared/components/dialog/dialog';
+@Component({selector:'tp-workspace',imports:[UiTextPipe,NavIndicatorDirective,NavigationSearch,RouterLink,RouterOutlet,Icon,Button,Dialog,PageMotionDirective,DetailsMotionDirective],templateUrl:'./workspace.html',styleUrl:'./workspace.scss'})
 export class Workspace {
   readonly language=inject(LanguageService);
   theme=inject(ThemeService);

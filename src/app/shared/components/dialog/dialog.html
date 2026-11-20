@@ -17,7 +17,7 @@
       <span class="eyebrow">{{ eyebrow() | uiText }}</span>
       <h2>{{ title() | uiText }}</h2>
     </div>
-    <button
+    @if(dismissible()){<button
       tpButton
       variant="icon"
       icon="close"
@@ -25,7 +25,7 @@
       [attr.aria-label]="closeLabel() | uiText"
       [disabled]="busy()"
       (click)="closed.emit()"
-    ></button>
+    ></button>}
   </header>
   <div class="dialog-content"><ng-content /></div>
   <div class="dialog-footer"><ng-content select=".dialog-actions" /></div>

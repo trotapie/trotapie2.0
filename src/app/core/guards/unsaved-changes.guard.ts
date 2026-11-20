@@ -1,6 +1,8 @@
 import {DOCUMENT} from '@angular/common';
 import {afterEveryRender, DestroyRef, inject, Injectable} from '@angular/core';
 import {Router, type CanActivateFn, type CanDeactivateFn} from '@angular/router';
+import {AuthService} from '../services/auth.service';
+import {ADMIN_IDLE_REASON, isAdminUrl} from '../utils/admin-idle-session';
 import {createUnsavedChangesProtection} from '../utils/unsaved-changes';
 
 @Injectable({providedIn: 'root'})
@@ -12,8 +14,12 @@ export interface UnsavedChangesAware {
   canDeactivate(): boolean;
 }
 
-export const unsavedChangesGuard: CanDeactivateFn<UnsavedChangesAware> = component =>
-  component.canDeactivate();
+export const unsavedChangesGuard: CanDeactivateFn<UnsavedChangesAware> = (component, _route, current, next) => {
+  if (isAdminUrl(current.url) && inject(AuthService).idleExpired() &&
+      next.root.firstChild?.routeConfig?.path === 'acceso' &&
+      next.root.queryParamMap.get('reason') === ADMIN_IDLE_REASON) return true;
+  return component.canDeactivate();
+};
 
 /** CanDeactivate does not run when Angular reuses a route with different parameters. */
 export const reusedRouteChangesGuard: CanActivateFn = next => {
