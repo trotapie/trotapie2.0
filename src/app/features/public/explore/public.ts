@@ -64,7 +64,6 @@ export class PublicPage implements OnInit, OnDestroy {
   mode = this.route.snapshot.data['mode'] || 'home';
   id = Number(this.route.snapshot.paramMap.get('id'));
   loading = signal(true);
-  mobileMenuOpen = signal(false);
   error = signal('');
   page = signal<Page>({ items: [], total: 0, page: 0 });
   cover = signal<any>(null);

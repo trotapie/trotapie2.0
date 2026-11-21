@@ -1,6 +1,6 @@
 <div class="public-shell">
-  <tp-public-navigation [english]="data.language.language() === 'en'" [activeSection]="activeSection()" (homeSelected)="navigateHome($event)" (destinationsSelected)="navigateDestinations($event)" (languageChanged)="load()" (menuChanged)="mobileMenuOpen.set($event)" />
-  <div class="public-scroll-region" [inert]="mobileMenuOpen()">
+  <tp-public-navigation [english]="data.language.language() === 'en'" [activeSection]="activeSection()" (homeSelected)="navigateHome($event)" (destinationsSelected)="navigateDestinations($event)" (languageChanged)="load()" />
+  <div class="public-scroll-region">
   <main #scrollArea id="main-content" [class.catalog-scroll-area]="mode==='home'||mode==='destinos'||mode==='hoteles'" (scroll)="updateActiveSection()">
     @if (mode !== 'home' && mode !== 'destino' && mode !== 'hotel') {
       <tp-back-button [label]="text('Regresar', 'Back')" />
@@ -292,7 +292,7 @@
     <button tpButton type="button" class="back-to-top" icon="chevron-up" aria-controls="main-content" (click)="backToTop()">{{text('Volver arriba','Back to top')}}</button>
   }
   </div>
-  <tp-public-footer [english]="data.language.language() === 'en'" [inert]="mobileMenuOpen()" />
+  <tp-public-footer [english]="data.language.language() === 'en'" />
 </div>
 <tp-location-map
   [open]="mapOpen()"

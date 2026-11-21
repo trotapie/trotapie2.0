@@ -1,12 +1,12 @@
 @if(publicRequest){
- <div class="request-navigation"><tp-public-navigation [english]="data.language.language() === 'en'" (menuChanged)="mobileMenuOpen.set($event)" /></div>
+ <div class="request-navigation"><tp-public-navigation [english]="data.language.language() === 'en'" /></div>
 }
 @if(copyPending()){
- <div [class.public-request]="publicRequest" [attr.lang]="data.language.language()" [inert]="mobileMenuOpen()" aria-busy="true">
+ <div [class.public-request]="publicRequest" [attr.lang]="data.language.language()" aria-busy="true">
   <tp-state mode="loading"/>
  </div>
 }
-<div class="quote-editor-shell" [class.public-request]="publicRequest" [attr.lang]="data.language.language()" [inert]="mobileMenuOpen()" [hidden]="copyPending()">
+ <div class="quote-editor-shell" [class.public-request]="publicRequest" [attr.lang]="data.language.language()" [hidden]="copyPending()">
  <tp-page-header [showBack]="!success()"
   [title]="publicRequest ? sharedText('Nueva cotización','Tu viaje empieza aquí') : text(multiple?'Nueva comparativa':'Nueva cotización')"
   [description]="publicRequest ? sharedText('Una propuesta clara, desde el primer detalle.','Cuéntanos cómo quieres viajar. Te ayudaremos a encontrar tu estancia.') : text('Una propuesta clara, desde el primer detalle.')"
