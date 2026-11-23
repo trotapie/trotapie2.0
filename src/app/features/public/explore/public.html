@@ -2,7 +2,7 @@
   @if(!isCopyPreview()){
   <tp-public-navigation [english]="data.language.language() === 'en'" [activeSection]="activeSection()" (homeSelected)="navigateHome($event)" (destinationsSelected)="navigateDestinations($event)" (languageChanged)="load()" />
   }
-  <div class="public-scroll-region" [inert]="mobileMenuOpen()">
+  <div class="public-scroll-region">
   @if(copyPending()){
     <div class="home-copy-loader" aria-busy="true"><tp-state mode="loading"/></div>
   }
@@ -313,7 +313,7 @@
     <button tpButton type="button" class="back-to-top" icon="chevron-up" aria-controls="main-content" (click)="backToTop()">{{text('Volver arriba','Back to top')}}</button>
   }
   </div>
-  @if(!isCopyPreview()){<tp-public-footer [english]="data.language.language() === 'en'" [inert]="mobileMenuOpen()" />}
+  @if(!isCopyPreview()){<tp-public-footer [english]="data.language.language() === 'en'" />}
 </div>
 <ng-template #homeCopy let-group="group" let-key="key" let-en="en">
   @if(homeEditor(); as editor){<ng-container *ngTemplateOutlet="editor; context:homeField(group,key)"/>}
